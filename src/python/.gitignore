@@ -1,0 +1,6 @@
+# Penserbjorne
+*.idea
+__pycache__
+data/*
+*.png
+*.graphml

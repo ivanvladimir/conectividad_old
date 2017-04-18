@@ -41,7 +41,7 @@ if __name__ == "__main__":
             help="JSON file with information [on]")
 
 
-    # Parsing commanls line arguments
+    # Parsing commands line arguments
     args = p.parse_args()
 
     # Defining verbose function
