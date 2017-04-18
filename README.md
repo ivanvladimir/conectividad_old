@@ -1,1 +1,1 @@
-# ConectividadNormativa-
+# ConectividadNormativa-# AgradecimientosApoyo de Proyecto CONACYT Fronteras de la Ciencia Constructivismo jurídico complejo: cognición, complejidad y derecho

@@ -11,9 +11,14 @@
 import argparse
 import sys
 import os.path
+import os
 import requests
 from bs4 import BeautifulSoup
 import json
+import datetime
+from tinydb import TinyDB, Query
+
+
 
 def download_file(url,odir,simulate=False):
     local_filename = url.split('/')[-1]
@@ -43,6 +48,10 @@ if __name__ == "__main__":
             default="data/contenciosos/", type=str,
             action="store", dest="odir",
             help="File where to download data")
+    p.add_argument("--force_download",
+            default=False,
+            action="store_true", dest="force_download",
+            help="Force download of files")
     p.add_argument("-v", "--verbose",
             action="store_true", dest="verbose",
             help="Verbose mode [Off]")
@@ -57,14 +66,17 @@ if __name__ == "__main__":
     else:   
         verbose = lambda *a: None  
 
-   
- 
+    os.makedirs(os.path.dirname(args.odir), exist_ok=True)
+    os.makedirs(os.path.join(os.path.dirname(args.odir),'files'), exist_ok=True)
+    verbose("Connecting to DB:",os.path.join(args.odir,args.json_name))
+    db = TinyDB(os.path.join(args.odir,args.json_name))
+    contensiosos = db.table('contensiosos')
+
     verbose("Requesting urls:",args.url)
     r = requests.get(args.url)
     verbose("> status:", r.status_code)
     main_page = BeautifulSoup(r.text, 'html.parser')
     verbose("> recovering iframe:", main_page.iframe['src'])
-
 
     new_url="/".join(args.url.split('/',3)[:3]+[main_page.iframe['src']])
     verbose("Requesting urls:",new_url)
@@ -72,7 +84,7 @@ if __name__ == "__main__":
     verbose("> status:", r.status_code)
     main_page = BeautifulSoup(r.text, 'html.parser')
 
-    data=[]
+    icase=0
     for case in main_page.find_all('tr'):
         title=None
         info_pdf=None
@@ -91,28 +103,34 @@ if __name__ == "__main__":
                     else:
                         print("Other file type:",ref['href'])
         if title:
-            data.append(
-                {'title':title, 'source_pdf':info_pdf,'source_doc':info_doc}
-            )
+            contensiosos.insert(
+                {
+                    'doc_type':u'source',
+                    'date_creation': datetime.datetime.now().isoformat(' '),
+                    'date_modification':datetime.datetime.now().isoformat(' '),
+                    'title':title,
+                    'source_pdf':info_pdf,
+                    'source_doc':info_doc
+                })
 
 
-    verbose(len(data)," extracted cases")
+    verbose(len(contensiosos)," extracted cases")
     verbose("Starting to download files")
-    os.makedirs(os.path.dirname(args.odir), exist_ok=True)
-    os.makedirs(os.path.join(os.path.dirname(args.odir),'files'), exist_ok=True)
-    for case in data:
+    for case in contensiosos.all():
         if case['source_pdf']:
-            verbose("Dowloading ",case['source_pdf'])
-            filename=download_file(case['source_pdf'],os.path.join(args.odir,"files"),simulate=False)
-            case['pdf']=filename
+            filename=download_file(case['source_pdf'],os.path.join(args.odir,"files"),simulate=True)
+            if args.force_download or not os.path.exists(filename): 
+                verbose("Dowloading ",case['source_pdf'])
+                filename=download_file(case['source_pdf'],os.path.join(args.odir,"files"),simulate=False)
+            contensiosos.update({'pdf':filename,'date_modification':datetime.datetime.now().isoformat(' ')},eids=[case.eid])
         if case['source_doc']:
-            verbose("Dowloading ",case['source_doc'])
-            filename=download_file(case['source_doc'],os.path.join(args.odir,"files"),simulate=False)
-            case['doc']=filename
+            filename=download_file(case['source_doc'],os.path.join(args.odir,"files"),simulate=True)
+            if args.force_download or not os.path.exists(filename): 
+                verbose("Dowloading ",case['source_doc'])
+                filename=download_file(case['source_doc'],os.path.join(args.odir,"files"),simulate=False)
+            contensiosos.update({'doc':filename,'date_modification':datetime.datetime.now().isoformat(' ')},eids=[case.eid])
  
-    with open(os.path.join(args.odir,args.json_name), 'w') as outfile:
-        json.dump(data, outfile)
-
+    
 
        
 
