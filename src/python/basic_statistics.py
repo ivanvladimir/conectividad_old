@@ -18,6 +18,8 @@ from collections import Counter
 import nltk, re, pprint
 from nltk import word_tokenize
 from nltk.corpus import stopwords
+import datetime
+from tinydb import TinyDB, Query
 
 # local libraries
 from utils import pdf2text, extract_topics, search_regexp
@@ -33,13 +35,14 @@ if __name__ == "__main__":
             default=".*", type=str,
             action="store", dest="re_selector",
             help="ER to select files")
+    p.add_argument("--dbname",
+            default="data/DB.json", type=str,
+            action="store", dest="dbname",
+            help="Name for the db file")
     p.add_argument("-v", "--verbose",
             action="store_true", dest="verbose",
             help="Verbose mode [Off]")
-    p.add_argument("JSON",
-            action="store",
-            help="JSON file with information [on]")
-
+ 
 
     # Parsing commands line arguments
     args = p.parse_args()
@@ -51,9 +54,9 @@ if __name__ == "__main__":
     else:   
         verbose = lambda *a: None  
 
-   
-    with open(args.JSON, 'r') as outfile:
-        data=json.load(outfile)
+    verbose("Connecting to DB:",args.dbname)
+    db = TinyDB(args.dbname)
+    contensiosos = db.table('contensiosos')
 
     re_selector=re.compile(args.re_selector)
 
@@ -66,18 +69,18 @@ if __name__ == "__main__":
 
     graph={'nodes':[],'edges':[]}
     idg=0;
-    for case in data:
-        if re_selector.search(case['title']):
-            verbose('Analysing ',case['title'])
-            with open(case['text']) as text:
-                titles.append(case['title'])
-                graph['nodes'].append({'title':case['title'],'id':'d'+str(idg)})
-                idg+=1
-                raws.append(text.read())
-                tokens.append(word_tokenize(raws[-1]))
-                texts.append(nltk.Text(tokens[-1]))
-                vocab.update([w.lower() for w in tokens[-1]])
-    
+    Filter = Query()
+    for case in contensiosos.search(Filter.title.search(re_selector)):
+        verbose('Analysing ',case['title'])
+        with open(case['txt']) as text:
+            titles.append(case['title'])
+            graph['nodes'].append({'title':case['title'],'id':'d'+str(idg)})
+            idg+=1
+            raws.append(text.read())
+            tokens.append(word_tokenize(raws[-1]))
+            texts.append(nltk.Text(tokens[-1]))
+            vocab.update([w.lower() for w in tokens[-1]])
+
     print("Número total de documentos       : {0}".format(len(raws)))
     print("Longitud promedia de documentos  : {0:10.2f} (caracteres)".format(sum([len(x) for x in raws])/len(raws)))
     print("Longitud promedia de documentos  : {0:10.2f} (líneas)".format(sum([len(x.split('\n')) for x in raws])/len(raws)))

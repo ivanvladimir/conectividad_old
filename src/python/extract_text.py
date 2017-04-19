@@ -14,6 +14,8 @@ import os.path
 import requests
 import json
 import re
+from tinydb import TinyDB, Query
+import datetime
 
 
 # local libraries
@@ -24,10 +26,10 @@ if __name__ == "__main__":
     # Command line options
 
     p = argparse.ArgumentParser(description="Download files")
-    p.add_argument("--json_name",
-            default="info.json", type=str,
-            action="store", dest="json_name",
-            help="Name for the json file")
+    p.add_argument("--dbname",
+            default="data/DB.json", type=str,
+            action="store", dest="dbname",
+            help="Name for the db file")
     p.add_argument("--odir",
             default="data/contenciosos/", type=str,
             action="store", dest="odir",
@@ -35,10 +37,6 @@ if __name__ == "__main__":
     p.add_argument("-v", "--verbose",
             action="store_true", dest="verbose",
             help="Verbose mode [Off]")
-    p.add_argument("JSON",
-            action="store",
-            help="JSON file with information [on]")
-
 
     # Parsing commanls line arguments
     args = p.parse_args()
@@ -50,21 +48,14 @@ if __name__ == "__main__":
     else:   
         verbose = lambda *a: None  
 
-   
-    with open(args.JSON, 'r') as outfile:
-        data=json.load(outfile)
+    verbose("Connecting to DB:",args.dbname)
+    db = TinyDB(args.dbname)
+    contensiosos = db.table('contensiosos')
 
-    for case in data:
+
+    for case in contensiosos.all():
         h,t=os.path.split(case['pdf'])
         ofilename=os.path.join(args.odir,t.replace('.pdf','.txt'))
         verbose('Extracting text from ',case['pdf'], ' into ', ofilename)
         extract_text_from_pdf(case['pdf'],ofilename)
-        case['text']=ofilename
-    
-    with open(os.path.join(args.odir,args.json_name), 'w') as outfile:
-        json.dump(data, outfile)
-
-
-       
-
-
+        contensiosos.update({'txt':ofilename,'date_modification':datetime.datetime.now().isoformat(' ')},eids=[case.eid])

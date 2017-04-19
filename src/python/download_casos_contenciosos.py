@@ -19,7 +19,6 @@ import datetime
 from tinydb import TinyDB, Query
 
 
-
 def download_file(url,odir,simulate=False):
     local_filename = url.split('/')[-1]
     # NOTE the stream=True parameter
@@ -40,10 +39,10 @@ if __name__ == "__main__":
             default="http://www.corteidh.or.cr/index.php/es/casos-contenciosos", type=str,
             action="store", dest="url",
             help="URL to download")
-    p.add_argument("--json_name",
-            default="info.json", type=str,
-            action="store", dest="json_name",
-            help="Name for the json file")
+    p.add_argument("--dbname",
+            default="data/DB.json", type=str,
+            action="store", dest="dbname",
+            help="Name for the db file")
     p.add_argument("--odir",
             default="data/contenciosos/", type=str,
             action="store", dest="odir",
@@ -67,9 +66,10 @@ if __name__ == "__main__":
         verbose = lambda *a: None  
 
     os.makedirs(os.path.dirname(args.odir), exist_ok=True)
+    os.makedirs(os.path.dirname(args.dbname), exist_ok=True)
     os.makedirs(os.path.join(os.path.dirname(args.odir),'files'), exist_ok=True)
-    verbose("Connecting to DB:",os.path.join(args.odir,args.json_name))
-    db = TinyDB(os.path.join(args.odir,args.json_name))
+    verbose("Connecting to DB:",args.dbname)
+    db = TinyDB(args.dbname)
     contensiosos = db.table('contensiosos')
 
     verbose("Requesting urls:",args.url)
