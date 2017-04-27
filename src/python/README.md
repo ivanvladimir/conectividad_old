@@ -4,6 +4,8 @@ $ ./download_casos_contenciosos.py
 $ mkdir ./data/extract_text
 $ ./extract_text.py --dbname ./data/DB.json --odir ./data/extract_text -v
 $ ./basic_statistics.py -v
+$ ./module_canonical_name.py --dbname ./data/DB.json -v -i
+
 ```
 # Dependencias
 
