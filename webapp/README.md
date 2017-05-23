@@ -1,47 +1,64 @@
-Flask React
-===========
+# Flask Skeleton
 
-Introduction
-------------
-Boilerplate to create a simple web app with Flask and React. Other fontend libraries included Twitter Bootstrap, jQuery, Lodash, Require.js & Font Awesome.
+Flask starter project...
 
-Demo
-----
-Deployed on Heroku: [flask-react.herokuapp.com](http://flask-react.herokuapp.com)
+[![Build Status](https://travis-ci.org/realpython/flask-skeleton.svg?branch=master)](https://travis-ci.org/realpython/flask-skeleton)
 
-Installation
-------------
-* Install python dependencies
-	
-		pip install flask requests 
+## Quick Start
 
-* Install required frontend libraries using [bower](http://bower.io/#install-bower).
-		
-		bower install 
+### Basics
 
-* Transform JSX to JS using [React tool](http://facebook.github.io/react/docs/tooling-integration.html#productionizing-precompiled-jsx) for development purpose
-		
-		jsx --watch app/static/jsx app/static/js
-		
-* Run Flask server
-		
-		python app/main.py
-		
-* Start coding! :)
+1. Create and activate a virtualenv
+1. Install the requirements
 
-Author
-------
-Abhinay Omkar <abhiomkar@gmail.com>
+### Set Environment Variables
 
-License
--------
-MIT
+Update *project/server/config.py*, and then run:
 
-TODO
-----
+```sh
+$ export APP_SETTINGS="project.server.config.DevelopmentConfig"
+```
 
-- Migrate to ES6. Get rid of deprecated JSX.
-- Support server side rendering of React components
-- Use webpack & gulp for packaging and building.
-- Use PostCSS.
-- Add deploy instructions.
+or
+
+```sh
+$ export APP_SETTINGS="project.server.config.ProductionConfig"
+```
+
+### Create DB
+
+```sh
+$ python manage.py create_db
+$ python manage.py db init
+$ python manage.py db migrate
+$ python manage.py create_admin
+$ python manage.py create_data
+```
+
+### Run the Application
+
+```sh
+$ python manage.py runserver
+```
+
+So access the application at the address [http://localhost:5000/](http://localhost:5000/)
+
+> Want to specify a different port?
+
+> ```sh
+> $ python manage.py runserver -h 0.0.0.0 -p 8080
+> ```
+
+### Testing
+
+Without coverage:
+
+```sh
+$ python manage.py test
+```
+
+With coverage:
+
+```sh
+$ python manage.py cov
+```

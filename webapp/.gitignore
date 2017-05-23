@@ -1,7 +1,11 @@
-app/static/libs/
-app/static/js/
-node_modules
+.env
+env
+venv
+__pycache__
+
+*.pyc
+*.sqlite
+*.coverage
 .DS_Store
-.module-cache
-Gruntfile.js
-package.json
+env.sh
+migrations
