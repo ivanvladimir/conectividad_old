@@ -7,6 +7,14 @@
 
 from flask import render_template, Blueprint
 
+#######################
+#### loading JSONDB ###
+#######################
+
+from tinydb import TinyDB, Query
+db = TinyDB('DB.json')
+contensiosos = db.table('contensiosos')
+
 
 ################
 #### config ####
@@ -28,3 +36,7 @@ def home():
 @main_blueprint.route("/about/")
 def about():
     return render_template("main/about.html")
+
+@main_blueprint.route("/laws/")
+def laws():
+    return render_template("main/laws.html",docs=contensiosos.all())

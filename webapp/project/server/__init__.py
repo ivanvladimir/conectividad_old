@@ -37,7 +37,6 @@ app.config.from_object(app_settings)
 login_manager = LoginManager()
 login_manager.init_app(app)
 bcrypt = Bcrypt(app)
-toolbar = DebugToolbarExtension(app)
 bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
 
@@ -89,3 +88,5 @@ def page_not_found(error):
 @app.errorhandler(500)
 def server_error_page(error):
     return render_template("errors/500.html"), 500
+
+
