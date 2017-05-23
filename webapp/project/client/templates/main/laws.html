@@ -1,0 +1,28 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+<div class="body-content">
+  <div class="row">
+    <h1>Documentos</h1>
+
+	<table class="table">
+    <thead>
+      <tr>
+        <th>Caso</th>
+        <th>Files</th>
+      </tr>
+    </thead>
+    <tbody>
+	  {% for doc in docs %}
+      <tr>
+        <td><a href="{{doc.source_pdf}}">{{doc.title}}</a></td>
+        <td>[<a href="{{doc.pdf}}">pdf</a>|<a href="{{doc.txt}}">txt</a>]</td>
+      </tr>
+	 {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+{% endblock %}
