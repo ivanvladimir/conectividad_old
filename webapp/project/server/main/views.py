@@ -40,3 +40,7 @@ def about():
 @main_blueprint.route("/laws/")
 def laws():
     return render_template("main/laws.html",docs=contensiosos.all())
+
+@main_blueprint.route("/law/<int:idd>")
+def law(idd):
+    return render_template("main/law.html",doc=contensiosos.get(eid=idd))

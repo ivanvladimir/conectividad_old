@@ -6,17 +6,24 @@
   <div class="row">
     <h1>Documentos</h1>
 
-	<table class="table">
+	<input type="text" id="myFilterLaw" onkeyup="myFilterLaw()" placeholder="Search for documents">
+
+
+	<table class="table" id='lawsTable'>
     <thead>
       <tr>
         <th>Caso</th>
+        <th>Serie</th>
+        <th>Fecha</th>
         <th>Files</th>
       </tr>
     </thead>
     <tbody>
 	  {% for doc in docs %}
       <tr>
-        <td><a href="{{doc.source_pdf}}">{{doc.title}}</a></td>
+        <td><a href="{{url_for('main.law',idd=doc.eid)}}">{{doc.meta_name.name}}<a></td>
+        <td>{{doc.meta_name.number}}</td>
+        <td>{{doc.meta_name.date_sentence}}</td>
         <td>[<a href="{{doc.pdf}}">pdf</a>|<a href="{{doc.txt}}">txt</a>]</td>
       </tr>
 	 {% endfor %}

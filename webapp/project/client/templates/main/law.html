@@ -1,0 +1,45 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+
+
+<h4>{{doc.meta_name.name}}</h4>
+<div class="row">
+  <div class="col-sm-4">
+	<em>Número</em>
+  </div>
+  <div class="col-sm-4">
+	{{doc.meta_name.number}}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-4">
+	<em>Corte</em>
+  </div>
+  <div class="col-sm-4">
+	{{doc.meta_name.court}}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-4">
+	<em>Fecha</em>
+  </div>
+  <div class="col-sm-4">
+	{{doc.meta_name.date_sentence}}
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-sm-4">
+	<em>Documento original</em>
+  </div>
+  <div class="col-sm-4">
+	<a href="{{doc.source_pdf}}">PDF</a>
+  </div>
+</div>
+
+{% endblock %}
