@@ -1,0 +1,23 @@
+Phase: RomanNumeralIndex
+Input: Split Token
+Options: control = first
+
+Rule: RomanNumeralIndex
+(
+    (
+        {Split.kind == "external"}
+    )
+    (
+        {Token.string == "I"}|{Token.string == "II"}|{Token.string == "III"}|{Token.string == "IV"}|{Token.string == "V"}|
+        {Token.string == "VI"}|{Token.string == "VII"}|{Token.string == "VIII"}|{Token.string == "IX"}|{Token.string == "X"}|
+        {Token.string == "XI"}|{Token.string == "XII"}|{Token.string == "XIII"}|{Token.string == "XIV"}|{Token.string == "XV"}|        
+        {Token.string == "XVI"}|{Token.string == "XVII"}|{Token.string == "XVIII"}|{Token.string == "XIX"}|{Token.string == "XX"}|
+        {Token.string == "XXI"}|{Token.string == "XXII"}|{Token.string == "XXIII"}|{Token.string == "XXIV"}|{Token.string == "XXV"}|
+        {Token.string == "XXVI"}|{Token.string == "XXVII"}|{Token.string == "XXVIII"}|{Token.string == "XXIX"}|{Token.string == "XXX"}
+    ):RomanNumeralIndexLabel
+    (
+        {Split.kind == "external"}
+    )
+)
+-->
+:RomanNumeralIndexLabel.RomanNumeralIndex = {rule = "RomanNumeralIndex"}
