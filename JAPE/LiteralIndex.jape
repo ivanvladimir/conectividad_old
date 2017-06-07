@@ -1,0 +1,19 @@
+Phase: LiteralIndex
+Input: Split Token
+Options: control = first
+
+Rule: LiteralIndex
+(
+    (
+        {Split.kind == "external"}
+    )
+    (
+        {Token.string ==~ "[a-zA-Z]"}
+    ):LiteralIndexLabel
+    (
+        ({Token.string == ")"})
+        ({Token.kind == "word"})
+    )
+)
+-->
+:LiteralIndexLabel.LiteralIndex = {rule = "LiteralIndex"}
