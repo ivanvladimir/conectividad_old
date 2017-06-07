@@ -1,0 +1,19 @@
+Phase: NumericalIndex
+Input: Split Token
+Options: control = first
+
+Rule: NumericalIndex
+(
+    (
+        {Split.kind == "external"}
+    )
+    (
+        {Token.kind == "number"}|{Token.kind == "index"}|({Token.string ==~ "[0-9]"})
+    ):NumericalIndexLabel
+    (
+        ({Token.string == "."}|{Token.string == "-"}|{Token.string == " "}|{Token.string == ")"})?
+        ({Token.kind == "word", Token.orth == "upperInitial"})
+    )
+)
+-->
+:NumericalIndexLabel.NumericalIndex = {rule = "NumericalIndex"}
