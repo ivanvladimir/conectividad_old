@@ -44,3 +44,8 @@ def laws():
 @main_blueprint.route("/law/<int:idd>")
 def law(idd):
     return render_template("main/law.html",doc=contensiosos.get(eid=idd))
+
+@main_blueprint.route("/graph/")
+def graph():
+    return render_template("main/graph.html")
+

@@ -82,13 +82,13 @@ sudo apt-get install python3-matplotlib
 
 ## Generados por "download_casos_contenciosos.py"
 
-Al 24 de Abril del 2017:
+Al 16 de Junio del 2017:
 
--   Archivos descargados: 662
-    -   331 en Word.
-    -   331 en PDF
+-   Archivos descargados: 674
+    -   337 en Word.
+    -   337 en PDF
     -   Cada Word tiene un PDF
--   Tiempo aproximado de descarga: 5 a 15 min
+-   Tiempo aproximado de descarga: 15 a 30 min
 
 Ubicacion:
 
@@ -100,9 +100,9 @@ Ubicacion:
 
 ## Generados por "extract_text.py"
 
-Al 09 de Abril del 2017:
+Al 16 de Junio del 2017:
 
--   Archivos descargados: 330
+-   Archivos descargados: 337
     -   Uno por cada pareja de Word y PDF
 -   Tiempo aproximado de ejecucion:  1.5 min
 
@@ -114,8 +114,6 @@ Ubicacion:
 ```
 
 ## Generados por "basic_statistics.py"
-
-Resultados de la ejecucion al 09 de Abril del 2017:
 
 -   Grafico de barras de vocabulario.
 -   Grafo

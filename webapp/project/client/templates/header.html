@@ -16,6 +16,7 @@
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
           <li><a href="{{ url_for('main.laws') }}">Leyes</a></li>
+          <li><a href="{{ url_for('main.graph') }}">Grafo</a></li>
           <li><a href="{{ url_for('main.about') }}">Acerca</a></li>
           {% if current_user.is_authenticated %}
            <li><a href="{{ url_for('user.members') }}">Miembros</a></li>
