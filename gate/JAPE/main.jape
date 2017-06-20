@@ -1,0 +1,6 @@
+MultiPhase:	RelationExtractionGrammars
+Phases: 
+LiteralIndex
+NumericalIndex
+RomanNumeralIndex
+
