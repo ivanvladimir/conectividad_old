@@ -1,0 +1,21 @@
+// autor: @Penserbjorne - Sebastian Aguilar
+// FI-IIMAS-IIJ-UNAM
+
+Phase: CourtMembers
+Input: Split Token Lookup FirstPerson Person Unknown
+Options: control = appelt
+
+Rule: CourtMembers
+// Nos permite encontrar miembros de la corte
+(
+    ({Lookup.minorType == member})
+):courtMembersLabel
+-->
+:courtMembersLabel
+{
+    gate.AnnotationSet matchedAnns = (gate.AnnotationSet) bindings.get("courtMembersLabel");
+    gate.FeatureMap newFeatures = Factory.newFeatureMap();
+    newFeatures.put("rule","CourtMembers");
+    outputAS.add(matchedAnns.firstNode(), matchedAnns.lastNode(), "CourtMembers", newFeatures);
+}
+
