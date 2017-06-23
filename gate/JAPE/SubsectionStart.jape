@@ -1,0 +1,18 @@
+// author: @mattgarciablitz - Matias Fernando Garcia-Constantino
+// SERG-Ulster University
+
+Phase: SubsectionStart
+Input: SpaceToken NumericalIndex LiteralIndex
+Options: control = first
+
+Rule: SubsectionStart
+(
+    (
+        {NumericalIndex}|{LiteralIndex}
+    )
+    (
+        {SpaceToken}
+    ):SubsectionStartLabel
+)
+-->
+:SubsectionStartLabel.SubsectionStart = {rule = "SubsectionStart"}
