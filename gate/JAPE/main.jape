@@ -1,7 +1,13 @@
 MultiPhase:	RelationExtractionGrammars
-Phases: 
+Phases:
 LiteralIndex
 NumericalIndex
 RomanNumeralIndex
 CourtMembers
 PersonCourtMembers
+LastSection
+PreambleSection
+Section
+SectionStart
+Subsection
+SubsectionStart
