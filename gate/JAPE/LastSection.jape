@@ -1,0 +1,16 @@
+// author: @mattgarciablitz - Matias Fernando Garcia-Constantino
+// SERG-Ulster University
+
+Phase: LastSection
+Input: Token Sentence
+Options: control = appelt
+
+Rule: LastSection
+(
+    (
+        ({Sentence contains Token.string == "Redactada"})
+        ({Sentence})+
+    ):LastSectionLabel
+)
+-->
+:LastSectionLabel.LastSection = {rule = "LastSection"}
