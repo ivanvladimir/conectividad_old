@@ -1,0 +1,18 @@
+// author: @mattgarciablitz - Matias Fernando Garcia-Constantino
+// SERG-Ulster University
+
+Phase: PreambleSection
+Input: Token NumericalIndex
+Options: control = once
+
+Rule: PreambleSection
+(
+    (
+        ({Token})*
+    ):PreambleSectionLabel
+    (
+        {Token.string == "I"}{NumericalIndex}
+    )
+)
+-->
+:PreambleSectionLabel.PreambleSection = {rule = "PreambleSection"}
