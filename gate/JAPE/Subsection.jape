@@ -1,0 +1,27 @@
+// author: @mattgarciablitz - Matias Fernando Garcia-Constantino
+// SERG-Ulster University
+
+Phase: Subsection
+Input: SubsectionStart Token LiteralIndex NumericalIndex RomanNumeralIndex LastSection
+Options: control = first
+
+Rule: Subsection
+(
+    (
+        {SubsectionStart}
+    )
+    (
+        ({Token})+
+    ):SubsectionLabel
+    (
+        {NumericalIndex}
+        |
+        {LiteralIndex}
+        |
+        {RomanNumeralIndex}
+        |
+        {LastSection}
+    )
+)
+-->
+:SubsectionLabel.Subsection = {rule = "Subsection"}
