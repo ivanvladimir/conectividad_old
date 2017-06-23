@@ -1,0 +1,17 @@
+Phase: SectionStart
+// Input: Token RomanNumeralIndex
+Input: Split RomanNumeralIndex
+Options: control = first
+
+Rule: SectionStart
+(
+    (
+        {RomanNumeralIndex}
+    )
+    (
+        // ({Token})+
+        {Split.kind == "external"}
+    ):SectionStartLabel    
+)
+-->
+:SectionStartLabel.SectionStart = {rule = "SectionStart"}
