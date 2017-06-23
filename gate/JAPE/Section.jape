@@ -1,0 +1,20 @@
+Phase: Section
+Input: SectionStart Token RomanNumeralIndex LastSection
+Options: control = first
+
+Rule: Section
+(
+    (        
+        {SectionStart}
+    )
+    (
+        ({Token})+
+    ):SectionLabel
+    (        
+        {RomanNumeralIndex}
+        |
+        {LastSection}
+    )
+)
+-->
+:SectionLabel.Section = {rule = "Section"}
