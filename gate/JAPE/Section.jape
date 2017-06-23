@@ -1,3 +1,6 @@
+// author: @mattgarciablitz - Matias Fernando Garcia-Constantino
+// SERG-Ulster University
+
 Phase: Section
 Input: SectionStart Token RomanNumeralIndex LastSection
 Options: control = first
