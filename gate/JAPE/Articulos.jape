@@ -1,0 +1,34 @@
+// autor: @Penserbjorne - Sebastian Aguilar
+// FI-IIMAS-IIJ-UNAM
+
+Phase: CourtMembers
+Input: Split SpaceToken Token Lookup LiteralIndex NumericalIndex
+Options: control = appelt
+
+Rule: Articles
+// Nos permite encontrar articulos
+(
+    (
+      ({Token.string ==~ "(?i)(art)?([íi]culo)?([s])?"})
+      ({SpaceToken})?
+    )+
+    (
+      ({Token.string =~ "[\\d\\.]+", !LiteralIndex, !NumericalIndex})?
+      ({Token.string =~ "[a-zA-Z]", Token.length == 1})?
+      ({SpaceToken})?
+    )+
+    (
+      ({Token.string == "de"}|{Token.string == "la"}
+      |{Token.string == "su"}|{Token.string == "del"})?
+      ({SpaceToken})?
+    )*
+    ({Token.string =~ "(?i)(mism[oa]|[^,:()]+)"})*
+):articlesLabel
+-->
+:articlesLabel
+{
+    gate.AnnotationSet matchedAnns = (gate.AnnotationSet) bindings.get("articlesLabel");
+    gate.FeatureMap newFeatures = Factory.newFeatureMap();
+    newFeatures.put("rule","Articles");
+    outputAS.add(matchedAnns.firstNode(), matchedAnns.lastNode(), "Articles", newFeatures);
+}
