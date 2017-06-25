@@ -2,7 +2,7 @@
 // FI-IIMAS-IIJ-UNAM
 
 Phase: CourtMembers
-Input: Split Token Lookup FirstPerson Person Unknown
+Input: Lookup
 Options: control = appelt
 
 Rule: CourtMembers
@@ -18,4 +18,3 @@ Rule: CourtMembers
     newFeatures.put("rule","CourtMembers");
     outputAS.add(matchedAnns.firstNode(), matchedAnns.lastNode(), "CourtMembers", newFeatures);
 }
-

@@ -4,7 +4,9 @@
 
 La aplicación actual ya contiene todos los elementos necesarios para realizar tareas de IE en Gate Developer.
 
-Procurar añadir todos los recursos con codificacion UTF-8.
+Procurar añadir todos los recursos con codificacion ** *UTF-8* **.
+
+El **Gazetteer Juridicas** es ** *case-insensitive* **.
 
 ### Cargar aplicación
 

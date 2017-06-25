@@ -1,8 +1,8 @@
 // autor: @Penserbjorne - Sebastian Aguilar
 // FI-IIMAS-IIJ-UNAM
 
-Phase: CourtMembers
-Input: Split SpaceToken Token Lookup LiteralIndex NumericalIndex
+Phase: Articles
+Input: SpaceToken Token LiteralIndex NumericalIndex
 Options: control = appelt
 
 Rule: Articles

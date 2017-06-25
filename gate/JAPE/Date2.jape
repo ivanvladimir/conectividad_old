@@ -1,0 +1,137 @@
+// autor: @Penserbjorne - Sebastian Aguilar
+// FI-IIMAS-IIJ-UNAM
+
+Phase: Date2
+Input: Token Lookup NumericalIndex
+Options: control = appelt
+
+Macro: DIA
+// Dia
+(
+  ({Lookup.minorType == day2})?
+  ({Token.string =~ "^[\\d]{1,2}$", !NumericalIndex})
+  ({Token.string == "º"})?
+)
+
+Macro: MES
+// Mes basado en la lista del gazetteer
+(
+  ({Lookup.minorType == month2, !NumericalIndex})
+)
+
+Macro: ANIONUMERICO1
+// Año en cuatro digitos, usa gazetteer y regex
+(
+  {Lookup.minorType == year2, !NumericalIndex}
+  |{Token.string =~ "^[\\d]{4}$", !NumericalIndex}
+)
+
+Macro: ANIONUMERICO2
+// Año en cuatro digitos, solo usa gazetteer
+(
+  ({Lookup.minorType == year2, !NumericalIndex})
+)
+
+Macro: ANIOREFERENCIADO
+// Año referenciado en palabras
+(
+  ({Token.string =~ "(es[eé]|mismo|presente|anterior)"})
+  ({Token.string == "año"})
+  ({Token.string =~ "(es[eé]|mismo|presente|anterior)"})?
+  ({Token.string == "en"})?
+  ({Token.string == "curso"})?
+)
+
+Macro: SEPARADOR1
+// Separador entre elementos de la fecha
+(
+  {Token.string == "de"}|{Token.string == "del"}
+  |{Token.string == "-"}|{Token.string == "/"}|{Token.string == "."}
+)
+
+Macro: SEPARADOR2
+// Separador entre elementos de la fecha
+(
+  {Token.string == "de"}|{Token.string == "del"}
+)
+
+Rule: Date2
+/*
+Descripción:
+  Nos permite encontrar fechas en español
+  Es muy basico, se realizo pensando en las fechas que aparecen en los documentos de CIDH
+  Cuando no se indica el año, puede detectar las siguientes relaciones
+    de ese año
+    de el mismo año
+    del mismo año
+    de el presente año
+    del presente año
+    de el año anterior
+    del año anterior
+Dudas:
+  ¿Dejar la parte de "solo año" para que detecte cuatro digitos?
+    Los años indicados en el Gazetteer van de 1970 a 2039
+    ¿Como lo limitamos que no detecte dinero o cosas asi?
+  ¿Detectar relaciones similares a las del año pero con el mes?
+  ¿Detectar fechas con relaciones textuales como "de esa misma fecha?" en las que no hay ninguna fecha literalmente explcita?
+  ¿Añadir fechas en otros idiomas?
+*/
+
+(
+  // Dia Mes Año
+  (
+    // Día
+    (DIA)
+    // Separador
+    (SEPARADOR1)
+    // Mes
+    (MES)
+    // Separador
+    (SEPARADOR1)
+    // Año
+    (
+      // Año númerico
+      (ANIONUMERICO1)
+      |
+      // Año referenciado en palabras
+      (ANIOREFERENCIADO)
+    )
+  )
+  |
+  // Dia Mes
+  (
+    // Día
+    (DIA)
+    // Separador
+    (SEPARADOR2)
+    // Mes
+    (MES)
+  )
+  |
+  // Mes Año
+  (
+    // Mes
+    (MES)
+    // Separador
+    (SEPARADOR2)
+    // Año
+    (
+      // Año númerico
+      (ANIONUMERICO1)
+      |
+      // Año referenciado en palabras
+      (ANIOREFERENCIADO)
+    )
+  )
+  |
+  // Año
+  (ANIONUMERICO2)
+):dateLabel
+-->
+:dateLabel
+{
+    gate.AnnotationSet matchedAnns = (gate.AnnotationSet) bindings.get("dateLabel");
+    gate.FeatureMap newFeatures = Factory.newFeatureMap();
+    newFeatures.put("rule","Date2");
+    outputAS.add(matchedAnns.firstNode(), matchedAnns.lastNode(), "Date2", newFeatures);
+}

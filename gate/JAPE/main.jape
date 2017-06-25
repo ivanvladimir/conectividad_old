@@ -1,14 +1,17 @@
 MultiPhase:	RelationExtractionGrammars
 Phases:
+// Matt
 LiteralIndex
 NumericalIndex
 RomanNumeralIndex
-CourtMembers
-PersonCourtMembers
 LastSection
 PreambleSection
 Section
 SectionStart
 Subsection
 SubsectionStart
-Articulos
+// Penserbjorne
+CourtMembers
+PersonCourtMembers
+Articles
+Date2

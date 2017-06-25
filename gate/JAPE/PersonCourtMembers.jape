@@ -2,7 +2,7 @@
 // FI-IIMAS-IIJ-UNAM
 
 Phase: CourtMembers
-Input: Split Token Lookup FirstPerson Person Unknown CourtMembers
+Input: Token FirstPerson Person Unknown CourtMembers
 Options: control = appelt
 
 Rule: PersonCourtMembers

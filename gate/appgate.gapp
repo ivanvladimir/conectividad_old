@@ -139,7 +139,7 @@
             </localMap>
           </runtimeParams>
           <resourceType>gate.creole.gazetteer.DefaultGazetteer</resourceType>
-          <resourceName>ANNIE Gazetteer Juridicas</resourceName>
+          <resourceName>ANNIE Gazetteer</resourceName>
           <initParams class="gate.util.persistence.MapPersistence">
             <mapType>gate.util.SimpleFeatureMapImpl</mapType>
             <localMap>
@@ -150,7 +150,7 @@
               <entry>
                 <string>listsURL</string>
                 <gate.util.persistence.PersistenceManager-URLHolder>
-                  <urlString>$relpath$gazetteer/mylist.def</urlString>
+                  <urlString>$gatehome$plugins/ANNIE/resources/gazetteer/lists.def</urlString>
                 </gate.util.persistence.PersistenceManager-URLHolder>
               </entry>
               <entry>
@@ -195,7 +195,7 @@
             </localMap>
           </runtimeParams>
           <resourceType>gate.creole.gazetteer.DefaultGazetteer</resourceType>
-          <resourceName>ANNIE Gazetteer</resourceName>
+          <resourceName>ANNIE Gazetteer Juridicas</resourceName>
           <initParams class="gate.util.persistence.MapPersistence">
             <mapType>gate.util.SimpleFeatureMapImpl</mapType>
             <localMap>
@@ -206,7 +206,7 @@
               <entry>
                 <string>listsURL</string>
                 <gate.util.persistence.PersistenceManager-URLHolder>
-                  <urlString>$gatehome$plugins/ANNIE/resources/gazetteer/lists.def</urlString>
+                  <urlString>$relpath$gazetteer/mylist.def</urlString>
                 </gate.util.persistence.PersistenceManager-URLHolder>
               </entry>
               <entry>
@@ -215,7 +215,7 @@
               </entry>
               <entry>
                 <string>caseSensitive</string>
-                <boolean>true</boolean>
+                <boolean>false</boolean>
               </entry>
             </localMap>
           </initParams>
