@@ -49,3 +49,7 @@ def law(idd):
 def graph():
     return render_template("main/graph.html")
 
+@main_blueprint.route("/doc/")
+def doc():
+    return render_template("main/doc_test.xml")
+
