@@ -1,0 +1,24 @@
+// autor: @Penserbjorne - Sebastian Aguilar
+// FI-IIMAS-IIJ-UNAM
+
+Phase: Case
+Input: Token Sentence
+Options: control = appelt
+
+Rule: Case
+// Detecta el nombre del caso
+(
+  (
+      ({Sentence contains Token.string == "caso"}|{Sentence contains Token.string == "Caso"})
+      ({Token})
+  ):caseLabel
+  ({Sentence contains Token.string == "sentencia"}|{Sentence contains Token.string == "Sentencia"})
+)
+-->
+:caseLabel
+{
+    gate.AnnotationSet matchedAnns = (gate.AnnotationSet) bindings.get("caseLabel");
+    gate.FeatureMap newFeatures = Factory.newFeatureMap();
+    newFeatures.put("rule","Case");
+    outputAS.add(matchedAnns.firstNode(), matchedAnns.lastNode(), "Case", newFeatures);
+}
