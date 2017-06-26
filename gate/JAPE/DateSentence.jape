@@ -6,7 +6,7 @@ Input: Token Sentence Date2
 Options: control = appelt
 
 Rule: DateSentence
-// Detecta el nombre del caso
+// Detecta la fecha se la sentencia
 (
   ({Sentence contains Token.string =~ "[Ss]entencia", Sentence contains Date2})
 ):dateSentenceLabel

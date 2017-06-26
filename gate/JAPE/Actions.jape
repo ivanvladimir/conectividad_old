@@ -1,0 +1,21 @@
+// autor: @Penserbjorne - Sebastian Aguilar
+// FI-IIMAS-IIJ-UNAM
+
+Phase: Actions
+Input: Token Sentence DateSentence
+Options: control = appelt
+
+Rule: Actions
+// Detecta la fecha se la sentencia
+(
+  ({DateSentence})
+  ({Sentence}):actionsLabel
+)
+-->
+:actionsLabel
+{
+    gate.AnnotationSet matchedAnns = (gate.AnnotationSet) bindings.get("actionsLabel");
+    gate.FeatureMap newFeatures = Factory.newFeatureMap();
+    newFeatures.put("rule","Actions");
+    outputAS.add(matchedAnns.firstNode(), matchedAnns.lastNode(), "Actions", newFeatures);
+}

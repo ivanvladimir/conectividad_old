@@ -4,9 +4,22 @@
 
 La aplicación actual ya contiene todos los elementos necesarios para realizar tareas de IE en Gate Developer.
 
-Procurar añadir todos los recursos con codificacion ** *UTF-8* **.
-
-El **Gazetteer Juridicas** es ** *case-insensitive* **.
+## Notas
+- Procurar añadir todos los recursos con codificacion ** *UTF-8* **.
+- El **Gazetteer Juridicas** es ** *case-insensitive* **.
+- Anotaciones que se muestran en el ejemplo de la aplicación web
+    - Actions
+    - Articles
+    - Case
+    - Date2
+    - DateSentence
+    - PersonCourtMembers
+- Reglas por revisar y/o con dudas
+    - CourtMembers
+    - Date2
+- Reglas por mejorar
+    - Articles
+    - PersonCourtMembers
 
 ### Cargar aplicación
 
@@ -37,9 +50,9 @@ El **Gazetteer Juridicas** es ** *case-insensitive* **.
 - Hacer doble click en **Gazetteer Juridicas**.
 - Realizar las modificaciones deseadas (añadir listas o añadir elementos a las listas).
 - Dar click secundario sobre **Gazetteer Juridicas**
-- Seleccionar **Save and Reinitialise** 
+- Seleccionar **Save and Reinitialise**
     - Alternativamente teniendo seleccionado **Gazetteer Juridicas** se puede utilizar el comando **Ctrl-S**
-    
+
 <p align="center">
   <img width="600" alt="./images/readme-04.png" src="./images/readme-04.png"/>
 </p>
@@ -50,8 +63,8 @@ El **Gazetteer Juridicas** es ** *case-insensitive* **.
     - El archivo se encuentra en la ruta **/ruta-al-repo/ConectividadNormativa-/gate/JAPE**
 - Hacer doble click en **JAPE Transducer**.
 - Dar click secundario sobre **JAPE Transducer**
-- Seleccionar **Reinitialise** 
-    
+- Seleccionar **Reinitialise**
+
 <p align="center">
   <img width="500" alt="./images/readme-05.png" src="./images/readme-05.png"/>
 </p>
