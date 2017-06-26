@@ -9,10 +9,10 @@ Rule: Case
 // Detecta el nombre del caso
 (
   (
-      ({Sentence contains Token.string == "caso"}|{Sentence contains Token.string == "Caso"})
+      ({Sentence contains Token.string =~ "[Cc]aso"})
       ({Token})
   ):caseLabel
-  ({Sentence contains Token.string == "sentencia"}|{Sentence contains Token.string == "Sentencia"})
+  ({Sentence contains Token.string =~ "[Ss]entencia"})
 )
 -->
 :caseLabel

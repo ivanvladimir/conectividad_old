@@ -1,0 +1,20 @@
+// autor: @Penserbjorne - Sebastian Aguilar
+// FI-IIMAS-IIJ-UNAM
+
+Phase: Date2
+Input: Token Sentence Date2
+Options: control = appelt
+
+Rule: DateSentence
+// Detecta el nombre del caso
+(
+  ({Sentence contains Token.string =~ "[Ss]entencia", Sentence contains Date2})
+):dateSentenceLabel
+-->
+:dateSentenceLabel
+{
+    gate.AnnotationSet matchedAnns = (gate.AnnotationSet) bindings.get("dateSentenceLabel");
+    gate.FeatureMap newFeatures = Factory.newFeatureMap();
+    newFeatures.put("rule","DateSentence");
+    outputAS.add(matchedAnns.firstNode(), matchedAnns.lastNode(), "DateSentence", newFeatures);
+}

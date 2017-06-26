@@ -14,7 +14,7 @@ P, p { display: block } /* or any other paragraph tag */
 FirstPerson  { background-color: rgb(150, 230, 150) } [X]
 Identifier   { background-color: rgb(150, 150, 230) } [X]
 JobTitle     { background-color: rgb(150, 230, 230) } [X]
-Location     { background-color: rgb(230, 150, 230) }
+Location     { background-color: rgb(230, 150, 230) } [X]
 Money        { background-color: rgb(230, 230, 150) }
 Organization { background-color: rgb(230, 200, 200) }
 Percent      { background-color: rgb(200, 230, 200) }
@@ -26,6 +26,7 @@ Date2         { background-color: rgb(230, 150, 150) }
 Articles  { background-color: rgb(150, 230, 150) }
 PersonCourtMembers   { background-color: rgb(150, 150, 230) }
 Case     { background-color: rgb(150, 230, 230) }
+DateSentence     { background-color: rgb(230, 150, 230) }
 /* The next block is an example for having a small tag
    with the name of the annotation type after each annotation */
 Date2:after {
@@ -48,6 +49,12 @@ color: rgb(100, 100, 100);
 }
 Case:after {
 content: "Caso";
+font-size: 65%;
+vertical-align: sub;
+color: rgb(100, 100, 100);
+}
+DateSentence:after {
+content: "Fecha de la sentencia";
 font-size: 65%;
 vertical-align: sub;
 color: rgb(100, 100, 100);
