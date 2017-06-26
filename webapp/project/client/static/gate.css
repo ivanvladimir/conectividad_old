@@ -6,35 +6,42 @@
  Custom CSS for highlights documents
 */
 
-BODY, body { margin: 2em } /* or any other first level tag */  
-P, p { display: block } /* or any other paragraph tag */  
-/* ANNIE tags but you can use whatever tags you want */  
-/* be careful that XML tags are case sensitive */  
-/*Date         { background-color: rgb(230, 150, 150) }  
-FirstPerson  { background-color: rgb(150, 230, 150) }  
-Identifier   { background-color: rgb(150, 150, 230) }  
-JobTitle     { background-color: rgb(150, 230, 230) }  
-Location     { background-color: rgb(230, 150, 230) }  
-Money        { background-color: rgb(230, 230, 150) }  
-Organization { background-color: rgb(230, 200, 200) }  
-Percent      { background-color: rgb(200, 230, 200) }  
-Person       { background-color: rgb(200, 200, 230) }  
-Title        { background-color: rgb(200, 230, 230) }  
-Unknown      { background-color: rgb(230, 200, 230) }  
+BODY, body { margin: 2em } /* or any other first level tag */
+P, p { display: block } /* or any other paragraph tag */
+/* ANNIE tags but you can use whatever tags you want */
+/* be careful that XML tags are case sensitive */
+/*Date         { background-color: rgb(230, 150, 150) }
+FirstPerson  { background-color: rgb(150, 230, 150) }
+Identifier   { background-color: rgb(150, 150, 230) }
+JobTitle     { background-color: rgb(150, 230, 230) }
+Location     { background-color: rgb(230, 150, 230) }
+Money        { background-color: rgb(230, 230, 150) }
+Organization { background-color: rgb(230, 200, 200) }
+Percent      { background-color: rgb(200, 230, 200) }
+Person       { background-color: rgb(200, 200, 230) }
+Title        { background-color: rgb(200, 230, 230) }
+Unknown      { background-color: rgb(230, 200, 230) }
 Etc          { background-color: rgb(230, 230, 200) }  */
 Date2         { background-color: rgb(230, 150, 150) }
-Articles  { background-color: rgb(150, 230, 150) }  
-/* The next block is an example for having a small tag  
-   with the name of the annotation type after each annotation */  
-Date2:after {  
-content: "Fecha";  
-font-size: 75%;  
-vertical-align: sub;  
-color: rgb(100, 100, 100);  
-} 
-Articles:after {  
-content: "Artículo";  
-font-size: 75%;  
-vertical-align: sub;  
-color: rgb(100, 100, 100);  
-} 
+Articles  { background-color: rgb(150, 230, 150) }
+PersonCourtMembers   { background-color: rgb(150, 150, 230) }
+/* The next block is an example for having a small tag
+   with the name of the annotation type after each annotation */
+Date2:after {
+content: "Fecha";
+font-size: 75%;
+vertical-align: sub;
+color: rgb(100, 100, 100);
+}
+Articles:after {
+content: "Artículo";
+font-size: 75%;
+vertical-align: sub;
+color: rgb(100, 100, 100);
+}
+PersonCourtMembers:after {
+content: "Miembro de la Corte";
+font-size: 75%;
+vertical-align: sub;
+color: rgb(100, 100, 100);
+}

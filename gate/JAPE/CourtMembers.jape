@@ -6,7 +6,18 @@ Input: Lookup
 Options: control = appelt
 
 Rule: CourtMembers
-// Nos permite encontrar miembros de la corte
+/*
+  Descripcion:
+    Nos permite encontrar miembros de la corte
+  Dudas:
+    ¿Añadir los siguientes cargos?
+      Agente
+      Representante
+      Consejer@
+      Delegad@
+      Secretari@ ejecutiv@
+      ¿Que otros cargos?
+*/
 (
     ({Lookup.minorType == member})
 ):courtMembersLabel
