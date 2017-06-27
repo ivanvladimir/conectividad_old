@@ -8,7 +8,10 @@ Options: control = appelt
 Rule: DateSentence
 // Detecta la fecha se la sentencia
 (
-  ({Sentence contains Token.string =~ "[Ss]entencia", Sentence contains Date2})
+  //Aqui se deberia trabajar con una regla que opere solamente denro de PreambleSection
+  ({Token.string =~ "(?i)sentencia"})
+  ({Token.string =~ "(?i)de"})?
+  ({Date2})
 ):dateSentenceLabel
 -->
 :dateSentenceLabel

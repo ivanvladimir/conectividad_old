@@ -8,6 +8,8 @@ Options: control = appelt
 Rule: Actions
 // Detecta la fecha se la sentencia
 (
+  //Aqui se deberia trabajar con una regla que opere solamente denro de PreambleSection
+  // Aunque al parecer con que funcione DateSentence funciona :D
   ({DateSentence})
   ({Sentence}):actionsLabel
 )
