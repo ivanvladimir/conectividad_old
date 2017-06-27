@@ -295,16 +295,16 @@
                 <null/>
               </entry>
               <entry>
-                <string>inputASName</string>
-                <null/>
-              </entry>
-              <entry>
                 <string>posTagAllTokens</string>
                 <boolean>true</boolean>
               </entry>
               <entry>
                 <string>baseTokenAnnotationType</string>
                 <string>Token</string>
+              </entry>
+              <entry>
+                <string>inputASName</string>
+                <null/>
               </entry>
               <entry>
                 <string>baseSentenceAnnotationType</string>
@@ -456,86 +456,6 @@
               <entry>
                 <string>operators</string>
                 <null/>
-              </entry>
-            </localMap>
-          </initParams>
-          <features class="gate.util.persistence.MapPersistence">
-            <mapType>gate.util.SimpleFeatureMapImpl</mapType>
-            <localMap/>
-          </features>
-        </gate.util.persistence.LanguageAnalyserPersistence>
-        <gate.util.persistence.LanguageAnalyserPersistence>
-          <runtimeParams class="gate.util.persistence.MapPersistence">
-            <mapType>gate.util.SimpleFeatureMapImpl</mapType>
-            <localMap>
-              <entry>
-                <string>annotationSetName</string>
-                <null/>
-              </entry>
-              <entry>
-                <string>corpus</string>
-                <null/>
-              </entry>
-              <entry>
-                <string>annotationTypes</string>
-                <gate.util.persistence.CollectionPersistence>
-                  <localList>
-                    <string>Organization</string>
-                    <string>Person</string>
-                    <string>Location</string>
-                    <string>Date</string>
-                  </localList>
-                  <collectionType>java.util.ArrayList</collectionType>
-                </gate.util.persistence.CollectionPersistence>
-              </entry>
-              <entry>
-                <string>document</string>
-                <null/>
-              </entry>
-            </localMap>
-          </runtimeParams>
-          <resourceType>gate.creole.orthomatcher.OrthoMatcher</resourceType>
-          <resourceName>ANNIE OrthoMatcher</resourceName>
-          <initParams class="gate.util.persistence.MapPersistence">
-            <mapType>gate.util.SimpleFeatureMapImpl</mapType>
-            <localMap>
-              <entry>
-                <string>organizationType</string>
-                <string>Organization</string>
-              </entry>
-              <entry>
-                <string>highPrecisionOrgs</string>
-                <boolean>false</boolean>
-              </entry>
-              <entry>
-                <string>extLists</string>
-                <boolean>true</boolean>
-              </entry>
-              <entry>
-                <string>definitionFileURL</string>
-                <gate.util.persistence.PersistenceManager-URLHolder>
-                  <urlString>$gatehome$plugins/ANNIE/resources/othomatcher/listsNM.def</urlString>
-                </gate.util.persistence.PersistenceManager-URLHolder>
-              </entry>
-              <entry>
-                <string>caseSensitive</string>
-                <boolean>false</boolean>
-              </entry>
-              <entry>
-                <string>minimumNicknameLikelihood</string>
-                <double>0.5</double>
-              </entry>
-              <entry>
-                <string>encoding</string>
-                <string>UTF-8</string>
-              </entry>
-              <entry>
-                <string>personType</string>
-                <string>Person</string>
-              </entry>
-              <entry>
-                <string>processUnknown</string>
-                <boolean>true</boolean>
               </entry>
             </localMap>
           </initParams>

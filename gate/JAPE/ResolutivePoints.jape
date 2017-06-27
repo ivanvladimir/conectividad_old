@@ -1,0 +1,46 @@
+// autor: @Penserbjorne - Sebastian Aguilar
+// FI-IIMAS-IIJ-UNAM
+
+Phase: ResolutivePoints
+Input: Token Sentence RomanNumericalIndex NumericalIndex
+Options: control = appelt
+
+Rule: ResolutivePoints
+/*
+  Descripcion:
+    Detecta los puntos resolutivos de la sentencia
+  Pendientes:
+    Hay que mejorar que detecte el inicio del segmento
+    Hay que mejorar que detecte cuando no finaliza con redactada|emitida
+*/
+
+(
+  (
+    ({RomanNumericalIndex})?
+    (
+      {Token.string =~ "(?i)(puntos)"}
+      {Token.string =~ "(?i)(resolutivos)"}
+    )?
+    ({Sentence contains NumericalIndex})?
+    (
+      {Token.string =~ "(?i)(por)"}
+      {Token.string =~ "(?i)(tanto)"}
+    )
+    ({Token.string == ","})?
+    (
+      {Token.string =~ "(?i)(la)"}
+      {Token.string =~ "(?i)(corte)"}
+    )
+    ({Token.string == ","})?
+    ({Sentence})+
+  ):resolutivePointsLabel
+  ({Sentence contains Token.string =~ "(?i)(redactada|emitida])"})
+)
+-->
+:resolutivePointsLabel
+{
+    gate.AnnotationSet matchedAnns = (gate.AnnotationSet) bindings.get("resolutivePointsLabel");
+    gate.FeatureMap newFeatures = Factory.newFeatureMap();
+    newFeatures.put("rule","ResolutivePoints");
+    outputAS.add(matchedAnns.firstNode(), matchedAnns.lastNode(), "ResolutivePoints", newFeatures);
+}

@@ -14,12 +14,14 @@ La aplicación actual ya contiene todos los elementos necesarios para realizar t
     - Date2
     - DateSentence
     - PersonCourtMembers
+    - ResolutivePoints
 - Reglas por revisar y/o con dudas
     - CourtMembers
     - Date2
 - Reglas por mejorar
     - Articles
     - PersonCourtMembers
+    - ResolutivePoints
 
 ### Cargar aplicación
 
