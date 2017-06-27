@@ -45,14 +45,14 @@ Macro: ANIOREFERENCIADO
 Macro: SEPARADOR1
 // Separador entre elementos de la fecha
 (
-  {Token.string == "de"}|{Token.string == "del"}
+  {Token.string =~ "(?i)(del)"}|{Token.string =~ "(?i)(de)"}
   |{Token.string == "-"}|{Token.string == "/"}|{Token.string == "."}
 )
 
 Macro: SEPARADOR2
 // Separador entre elementos de la fecha
 (
-  {Token.string == "de"}|{Token.string == "del"}
+  {Token.string =~ "(?i)(del)"}|{Token.string =~ "(?i)(de)"}
 )
 
 Rule: Date2
@@ -69,6 +69,8 @@ Descripción:
     de el año anterior
     del año anterior
 Dudas:
+  ¿Los años referenciados en palabras tambien deberian ser case-insensitive?
+  ¿Que pasa con fechas como 16 FEBRERO DE 2017? -> Ver seriec_331_esp.txt
   ¿Dejar la parte de "solo año" para que detecte cuatro digitos?
     Los años indicados en el Gazetteer van de 1970 a 2039
     ¿Como lo limitamos que no detecte dinero o cosas asi?
