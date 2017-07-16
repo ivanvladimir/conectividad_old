@@ -2,7 +2,7 @@
 // SERG-Ulster University
 
 Phase: PreambleSection
-Input: Token NumericalIndex
+Input: Token NumericalIndex RomanNumeralIndex
 Options: control = once
 
 Rule: PreambleSection
@@ -11,7 +11,9 @@ Rule: PreambleSection
         ({Token})*
     ):PreambleSectionLabel
     (
-        {Token.string == "I"}{NumericalIndex}
+        ({Token.string == "I"})({NumericalIndex}|{RomanNumeralIndex})
+        |
+        ({Token.string == "TABLA"})({Token})[0, 2]
     )
 )
 -->
