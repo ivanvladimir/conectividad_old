@@ -1,0 +1,209 @@
+// author: @mattgarciablitz - Matias Fernando Garcia-Constantino
+// SERG-Ulster University
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.commons.io.FilenameUtils;
+
+import gate.Annotation;
+import gate.AnnotationSet;
+import gate.Corpus;
+import gate.CorpusController;
+import gate.Document;
+import gate.Factory;
+import gate.FeatureMap;
+import gate.Gate;
+import gate.LanguageAnalyser;
+import gate.Utils;
+import gate.creole.SerialAnalyserController;
+import gate.gui.MainFrame;
+import gate.util.ExtensionFileFilter;
+import gate.util.InvalidOffsetException;
+import gate.util.persistence.PersistenceManager;
+
+public class InformationExtraction_DocumentStructure {
+	
+	static int spc_count=-1;	
+	static ArrayList<String> namesOfFilesWithAbsolutePath = new ArrayList<String>();
+	
+	static ArrayList<String> getNamesOfFilesWithAbsolutePath(File aFile) {
+		spc_count++;
+		String spcs = "";
+		for (int i = 0; i < spc_count; i++)
+			spcs += " ";
+		if(aFile.isFile())
+			//System.out.println(spcs + "[FILE] " + aFile.getName());
+			//namesOfFilesWithAbsolutePath = new ArrayList<String>();
+			namesOfFilesWithAbsolutePath.add(aFile.getAbsolutePath());
+
+		else if (aFile.isDirectory()) {
+			//System.out.println(spcs + "[DIR] " + aFile.getName());
+			File[] listOfFiles = aFile.listFiles();
+			if(listOfFiles!=null) {
+				for (int i = 0; i < listOfFiles.length; i++)
+					getNamesOfFilesWithAbsolutePath(listOfFiles[i]);
+			} else {
+				System.out.println(spcs + " [ACCESS DENIED]");
+			}
+		}
+		spc_count--;
+		return namesOfFilesWithAbsolutePath;
+	}
+	
+	private static ArrayList<String> getTextAnnotationValues(Document doc, String annotationTag) throws InvalidOffsetException{
+
+		ArrayList<String> temporalArrayList = new ArrayList<String>();
+		ArrayList<String> annotationValuesArrayList = new ArrayList<String>();		
+
+		// Obtain the "Original markups" annotation set.
+		AnnotationSet originalMarkupsSet = doc.getAnnotations("Original markups");
+
+		AnnotationSet annotationSet = originalMarkupsSet.get(annotationTag);
+
+		// Iterate over each annotation.
+		// Obtain its features and print the value of "ThisDocument_LayoutInsensitive".
+		for(Annotation annotation : annotationSet){
+
+			temporalArrayList.add(doc.getContent().getContent(annotationSet.get(annotation.getId()).getStartNode().getOffset(), 
+					annotationSet.get(annotation.getId()).getEndNode().getOffset()).toString());
+
+		}
+
+		// Remove null values.
+		temporalArrayList.removeAll(Collections.singleton(null));
+		
+		for(int i = 0; i < temporalArrayList.size(); i++){
+			
+			annotationValuesArrayList.add(temporalArrayList.get(i));
+			
+			// To lower case.
+			// annotationValuesArrayList.add(temporalArrayList.get(i).toLowerCase());
+		}
+
+		return annotationValuesArrayList;
+	}
+
+	public static void main(String[] args) throws Exception{
+
+		// Prepare the library.
+		Gate.init();
+
+		// Show the main window.
+		//// MainFrame.getInstance().setVisible(true);
+
+		//// Load required plugins.
+		// Get the root plugins dir.
+		File pluginsDir = Gate.getPluginsHome();
+		
+		// Load saved GATE app.
+		//// CorpusController controller = (CorpusController)PersistenceManager.loadObjectFromFile(new File("appgate.gapp"));
+
+		// Load the "ANNIE" plugin.
+		File aPluginDir = new File(pluginsDir, "ANNIE");
+		Gate.getCreoleRegister().registerDirectories(aPluginDir.toURI().toURL());
+
+		//// Read a corpus.
+		Corpus corpus = Factory.newCorpus("Corpus");
+
+		File directory = new File("C:\\Users\\SergUser\\Documents\\Datasets\\3documents"); // TXT
+
+		URL url = directory.toURI().toURL();
+
+		ExtensionFileFilter txtFilter = new ExtensionFileFilter("TXT files", "txt");
+
+		corpus.populate(url, txtFilter, "UTF-8", false);
+
+		//// Create pipeline to annotate documents in corpus with JAPE rules.
+		// Create serialAnalyzerController.
+		SerialAnalyserController controller = (SerialAnalyserController)Factory.createResource("gate.creole.SerialAnalyserController");
+
+		// Load Processing Resources.
+		// LanguageAnalyser documentResetPR = (LanguageAnalyser)Factory.createResource("gate.creole.annotdelete.AnnotationDeletePR", Utils.featureMap("setsToRemove", "Original markups"));
+		LanguageAnalyser documentResetPR = (LanguageAnalyser)Factory.createResource("gate.creole.annotdelete.AnnotationDeletePR", Utils.featureMap("setsToRemove", "Original markups"));		
+		LanguageAnalyser ANNIE_EnglishTokeniser = (LanguageAnalyser)Factory.createResource("gate.creole.tokeniser.DefaultTokeniser");
+		LanguageAnalyser ANNIE_Gazetteer = (LanguageAnalyser)Factory.createResource("gate.creole.gazetteer.DefaultGazetteer");
+		LanguageAnalyser ANNIE_SentenceSplitter = (LanguageAnalyser)Factory.createResource("gate.creole.splitter.SentenceSplitter");
+		LanguageAnalyser ANNIE_POStagger = (LanguageAnalyser)Factory.createResource("gate.creole.POSTagger");
+		LanguageAnalyser ANNIE_NEtransducer = (LanguageAnalyser)Factory.createResource("gate.creole.ANNIETransducer");
+		// LanguageAnalyser ANNIE_OrthoMatcher = (LanguageAnalyser)Factory.createResource("gate.creole.orthomatcher.OrthoMatcher");
+
+		// Load JAPE grammar rules.
+
+		// JAPE rules for Document Structure.
+		LanguageAnalyser JAPE_LiteralIndex = (LanguageAnalyser)Factory.createResource("gate.creole.Transducer", Utils.featureMap("grammarURL", new File("C:\\Users\\SergUser\\Documents\\UNAM_collaboration\\GATE\\JAPErules\\LiteralIndex.jape").toURI().toURL(), "encoding", "UTF-8"));
+		LanguageAnalyser JAPE_NumericalIndex = (LanguageAnalyser)Factory.createResource("gate.creole.Transducer", Utils.featureMap("grammarURL", new File("C:\\Users\\SergUser\\Documents\\UNAM_collaboration\\GATE\\JAPErules\\NumericalIndex.jape").toURI().toURL(), "encoding", "UTF-8"));
+		LanguageAnalyser JAPE_RomanNumeralIndex = (LanguageAnalyser)Factory.createResource("gate.creole.Transducer", Utils.featureMap("grammarURL", new File("C:\\Users\\SergUser\\Documents\\UNAM_collaboration\\GATE\\JAPErules\\RomanNumeralIndex.jape").toURI().toURL(), "encoding", "UTF-8"));
+		
+		LanguageAnalyser JAPE_PreambleSection = (LanguageAnalyser)Factory.createResource("gate.creole.Transducer", Utils.featureMap("grammarURL", new File("C:\\Users\\SergUser\\Documents\\UNAM_collaboration\\GATE\\JAPErules\\PreambleSection.jape").toURI().toURL(), "encoding", "UTF-8"));
+		LanguageAnalyser JAPE_SubsectionStart = (LanguageAnalyser)Factory.createResource("gate.creole.Transducer", Utils.featureMap("grammarURL", new File("C:\\Users\\SergUser\\Documents\\UNAM_collaboration\\GATE\\JAPErules\\SubsectionStart.jape").toURI().toURL(), "encoding", "UTF-8"));
+		LanguageAnalyser JAPE_Subsection = (LanguageAnalyser)Factory.createResource("gate.creole.Transducer", Utils.featureMap("grammarURL", new File("C:\\Users\\SergUser\\Documents\\UNAM_collaboration\\GATE\\JAPErules\\Subsection.jape").toURI().toURL(), "encoding", "UTF-8"));
+		LanguageAnalyser JAPE_SectionStart = (LanguageAnalyser)Factory.createResource("gate.creole.Transducer", Utils.featureMap("grammarURL", new File("C:\\Users\\SergUser\\Documents\\UNAM_collaboration\\GATE\\JAPErules\\SectionStart.jape").toURI().toURL(), "encoding", "UTF-8"));
+		LanguageAnalyser JAPE_Section = (LanguageAnalyser)Factory.createResource("gate.creole.Transducer", Utils.featureMap("grammarURL", new File("C:\\Users\\SergUser\\Documents\\UNAM_collaboration\\GATE\\JAPErules\\Section.jape").toURI().toURL(), "encoding", "UTF-8"));
+		LanguageAnalyser JAPE_LastSection = (LanguageAnalyser)Factory.createResource("gate.creole.Transducer", Utils.featureMap("grammarURL", new File("C:\\Users\\SergUser\\Documents\\UNAM_collaboration\\GATE\\JAPErules\\LastSection.jape").toURI().toURL(), "encoding", "UTF-8"));
+
+		controller.add(documentResetPR);
+		controller.add(ANNIE_EnglishTokeniser);
+		controller.add(ANNIE_Gazetteer);
+		controller.add(ANNIE_SentenceSplitter);
+		controller.add(ANNIE_POStagger);
+		controller.add(ANNIE_NEtransducer);
+		// controller.add(ANNIE_OrthoMatcher);
+
+		controller.add(JAPE_LiteralIndex);
+		controller.add(JAPE_NumericalIndex);
+		controller.add(JAPE_RomanNumeralIndex);
+		
+		controller.add(JAPE_PreambleSection);
+		controller.add(JAPE_SubsectionStart);
+		controller.add(JAPE_Subsection);
+		controller.add(JAPE_SectionStart);
+		controller.add(JAPE_Section);
+		controller.add(JAPE_LastSection);
+
+		controller.setCorpus(corpus); // Set corpus.
+		controller.execute(); // Execute the corpus.
+
+		// Save annotated documents in corpus to a folder.
+		Set<String> annotTypesRequired = new HashSet<String>();
+
+		annotTypesRequired.add("LiteralIndex");
+		annotTypesRequired.add("NumericalIndex");
+		annotTypesRequired.add("RomanNumeralIndex");
+		
+		annotTypesRequired.add("PreambleSection");
+		annotTypesRequired.add("Subsection");
+		annotTypesRequired.add("Section");
+		annotTypesRequired.add("LastSection");
+
+		Writer output = null;
+
+		for(int i = 0; i < controller.getCorpus().size(); i++){
+
+			// Retrieving documents and their annotations.
+			AnnotationSet defaultAnnotSet = controller.getCorpus().get(i).getAnnotations();
+
+			Set<Annotation> annotationsRequired = new HashSet<Annotation>(defaultAnnotSet.get(annotTypesRequired));
+
+			File outputTestFile = new File("C:\\Users\\SergUser\\Documents\\Datasets\\AnnotatedDocuments\\" + controller.getCorpus().get(i).getName() + ".xml");
+			output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputTestFile),"UTF-8"));
+			// In the method toXML use "false" to use simple XML format (not GATE's XML).
+			output.write("<?xml version='1.0' encoding='UTF-8'?>\r\n" + "<Document>" + controller.getCorpus().get(i).toXml(annotationsRequired, false) + "</Document>");
+			output.close();
+
+		}		
+	}
+}
