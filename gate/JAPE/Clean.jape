@@ -1,0 +1,16 @@
+// autor: @Penserbjorne - Sebastian Aguilar
+// FI-IIMAS-IIJ-UNAM
+
+Phase: Clean
+Input: Token Sentence DateSentenceTemp
+Options: control = all
+
+Rule:CleanTempAnnotation
+(
+  {DateSentenceTemp}
+):temp
+-->
+{
+ gate.AnnotationSet temp = (gate.AnnotationSet)bindings.get("temp");
+ outputAS.removeAll(temp);
+}

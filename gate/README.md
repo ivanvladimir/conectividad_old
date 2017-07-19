@@ -22,7 +22,6 @@ La aplicación actual ya contiene todos los elementos necesarios para realizar t
     - Articles
     - PersonCourtMembers
     - ResolutivePoints
-    - DateSentence (Depende de que se arregle PreambleSection)
     - Actions (Depende de que se arregle PreambleSection
 
 ### Cargar aplicación

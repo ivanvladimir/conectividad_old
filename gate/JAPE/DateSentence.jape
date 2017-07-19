@@ -2,16 +2,12 @@
 // FI-IIMAS-IIJ-UNAM
 
 Phase: Date2
-Input: Token Sentence Date2
+Input: Token Sentence PreambleSection DateSentenceTemp
 Options: control = appelt
 
-Rule: DateSentence
-// Detecta la fecha se la sentencia
+Rule: DateSentencePreambleSection
 (
-  //Aqui se deberia trabajar con una regla que opere solamente denro de PreambleSection
-  ({Token.string =~ "(?i)sentencia"})
-  ({Token.string =~ "(?i)de"})?
-  ({Date2})
+  ({DateSentenceTemp within PreambleSection})
 ):dateSentenceLabel
 -->
 :dateSentenceLabel
