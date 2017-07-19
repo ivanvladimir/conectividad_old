@@ -5,8 +5,8 @@
 La aplicación actual ya contiene todos los elementos necesarios para realizar tareas de IE en Gate Developer.
 
 ## Notas
-- Procurar añadir todos los recursos con codificacion ** *UTF-8* **.
-- El **Gazetteer Juridicas** es ** *case-insensitive* **.
+- Procurar añadir todos los recursos con codificacion **UTF-8**.
+- El **Gazetteer Juridicas** es **case-insensitive**.
 - Anotaciones que se muestran en el ejemplo de la aplicación web
     - Actions
     - Articles

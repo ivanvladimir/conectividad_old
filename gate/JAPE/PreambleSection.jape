@@ -1,3 +1,4 @@
+
 // author: @mattgarciablitz - Matias Fernando Garcia-Constantino
 // SERG-Ulster University
 
@@ -12,6 +13,8 @@ Rule: PreambleSection
     ):PreambleSectionLabel
     (
         ({Token.string == "I"})({NumericalIndex}|{RomanNumeralIndex})
+        |
+        ({NumericalIndex}|{RomanNumeralIndex})
         |
         ({Token.string == "TABLA"})({Token})[0, 2]
     )
