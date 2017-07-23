@@ -2,15 +2,16 @@
 // FI-IIMAS-IIJ-UNAM
 
 Phase: Clean
-Input: Token Sentence DateSentenceTemp
+Input: DateSentenceTemp ResolutivePointsTemp
 Options: control = all
 
 Rule:CleanTempAnnotation
 (
-  {DateSentenceTemp}
+  {DateSentenceTemp}|
+  {ResolutivePointsTemp}
 ):temp
 -->
 {
- gate.AnnotationSet temp = (gate.AnnotationSet)bindings.get("temp");
- outputAS.removeAll(temp);
+  gate.AnnotationSet temp = (gate.AnnotationSet)bindings.get("temp");
+  outputAS.removeAll(temp);
 }

@@ -1,0 +1,52 @@
+// autor: @Penserbjorne - Sebastian Aguilar
+// FI-IIMAS-IIJ-UNAM
+
+Phase: ResolutivePoints
+Input: Sentence Token SpaceToken RomanNumeralIndex NumericalIndex
+Options: control = appelt
+
+Rule: ResolutivePointsTemp
+/*
+  Descripcion:
+    Detecta la "cabecera" de los puntos resolutivos
+  Pendientes:
+    Mejorar la deteccion de la cabecera.
+    Podria ser detectando que la cabecera no esta contenida en un parrado ya que
+    detecta oraciones como "Por tano, la corte ..." que estan en un parrafo cualquiera.
+
+*/
+(
+  ({SpaceToken})[3,50]
+  (
+    {RomanNumeralIndex}({SpaceToken})[0,50]
+  )?
+  (
+    {Token.string =~ "(?i)(puntos)"}{SpaceToken}{Token.string =~ "(?i)(resolutivos)"}({SpaceToken})[0,10]
+  )?
+  (
+    (
+      {Sentence contains NumericalIndex}
+      |
+      {Token.kind == "number"}|{Token.kind == "index"}|{Token.string ==~ "[0-9]"}
+    )
+    ({Token.string == "."}|{Token.string == "-"}|{Token.string == " "}|{Token.string == ")"})
+    ({SpaceToken})[0,10]
+  )?
+  (
+    {Token.string =~ "(?i)(por)"}{SpaceToken}{Token.string =~ "(?i)(tanto)"}
+  )
+  ({Token.string == ","})?
+  ({SpaceToken})[0,10]
+  (
+    {Token.string =~ "(?i)(la)"}{SpaceToken}{Token.string =~ "(?i)(corte)"}
+  )
+  ({Token.string == ","})?
+):resolutivePointsLabelTemp
+-->
+:resolutivePointsLabelTemp
+{
+    gate.AnnotationSet matchedAnns = (gate.AnnotationSet) bindings.get("resolutivePointsLabelTemp");
+    gate.FeatureMap newFeatures = Factory.newFeatureMap();
+    newFeatures.put("rule","ResolutivePointsTemp");
+    outputAS.add(matchedAnns.firstNode(), matchedAnns.lastNode(), "ResolutivePointsTemp", newFeatures);
+}

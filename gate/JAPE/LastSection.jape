@@ -1,14 +1,27 @@
 // author: @mattgarciablitz - Matias Fernando Garcia-Constantino
 // SERG-Ulster University
+//
+// modified: @Penserbjorne - Sebastian Aguilar
+// FI-IIMAS-IIJ-UNAM
 
 Phase: LastSection
 Input: Token Sentence
 Options: control = appelt
 
+/*
+  Pendientes:
+    Detectar cuando no existe redactada|emitida
+      Ej. Documento "seriec_333_esp.txt"
+*/
+
 Rule: LastSection
 (
     (
-        ({Sentence contains Token.string == "Redactada"})
+        (
+          {Sentence contains Token.string == "Redactada"}
+          |
+          {Sentence contains Token.string == "Emitida"}
+        )
         ({Sentence})+
     ):LastSectionLabel
 )

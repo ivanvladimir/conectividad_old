@@ -21,7 +21,8 @@ La aplicación actual ya contiene todos los elementos necesarios para realizar t
 - Reglas por mejorar
     - Articles
     - PersonCourtMembers
-    - ResolutivePoints
+    - LastSection
+    - ResolutivePointsTemp
 
 ### Cargar aplicación
 
