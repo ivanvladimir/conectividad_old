@@ -6,7 +6,10 @@
  Custom HTML for graph
 -->
 
-{% extends "_base_graph.html" %}
+{% extends "_base.html" %}
+{% block css %}
+<link href="{{url_for('static', filename='graph.css')}}" rel="stylesheet" media="screen">
+{% endblock %}
 
 {% block content %}
 

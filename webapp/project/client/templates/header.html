@@ -1,38 +1,61 @@
-<header class="site-header">
   <!-- Navigation -->
-  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-          <a class="navbar-brand" href="{{ url_for('main.home') }}">Conectividad Normativa</a>
-      </div>
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav">
-          <li><a href="{{ url_for('main.laws') }}">Leyes</a></li>
-          <li><a href="{{ url_for('main.graph') }}">Grafo</a></li>
-          <li><a href="{{ url_for('main.doc') }}">Documentos</a></li>
-          <li><a href="{{ url_for('main.about') }}">Acerca</a></li>
-          {% if current_user.is_authenticated %}
-           <li><a href="{{ url_for('user.members') }}">Miembros</a></li>
-          {% endif %}
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-          {% if current_user.is_authenticated %}
-            <li><a href="{{ url_for('user.logout') }}">Salir</a></li>
-          {% else %}
-            <li><a href="{{ url_for('user.login') }}"><span class="glyphicon glyphicon-user"></span>&nbsp;Registrarse/entrar</a></li>
-          {% endif %}
-        </ul>
-      </div>
-      <!-- /.navbar-collapse -->
-    </div>
-    <!-- /.container -->
+<header>
+  <nav class="navbar ">
+  
+
+
+  <div id="navMainMenu" class="navbar-menu">
+	  <div class="navbar-start">
+	 
+      <a class="navbar-item " href="{{ url_for('main.laws') }}">
+        Leyes
+      </a>
+      <a class="navbar-item " href="{{ url_for('main.graph') }}">
+        Grafo
+      </a>
+      <a class="navbar-item " href="{{ url_for('main.doc') }}">
+        Documentos
+      </a>
+      <a class="navbar-item " href="{{ url_for('main.about') }}">
+        About
+      </a>
+	  </div>
+
+
+	  <div class="navbar-end">
+      {% if current_user.is_authenticated %}
+		<a class="navbar-item " href="{{ url_for('main.members') }}">
+        	Miembros
+      	</a>
+	  {% endif %}
+      {% if current_user.is_authenticated %}
+	  <a class="navbar-item " href="{{ url_for('user.logout') }}">
+       <span class="icon" style="color: #333;">
+        <i class="fa fa-sign-out"></i>
+      </span>Salir
+	  </a>
+
+	  {% else %}
+	  <a class="navbar-item " href="{{ url_for('user.login') }}">
+       <span class="icon" style="color: #333;">
+        <i class="fa fa-sign-in"></i>
+      </span> Entrar/Registrarse
+	  </a>
+	  {% endif %}
+  	  </div>
+  </div>
   </nav>
+<section class="hero is-primary">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">
+           <strong>Conectividad Normativa</strong>
+      </h1>
+      <h2 class="subtitle">
+      Visualizador de conectividad de las sentencias de la Corte Interamericana de Derechos Humanos
+      </h2>
+    </div>
+  </div>
+</section>
 </header>
+
