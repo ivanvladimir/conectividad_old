@@ -11,7 +11,6 @@ from flask import Flask, render_template
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_debugtoolbar import DebugToolbarExtension
-from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -37,7 +36,6 @@ app.config.from_object(app_settings)
 login_manager = LoginManager()
 login_manager.init_app(app)
 bcrypt = Bcrypt(app)
-bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
 
 

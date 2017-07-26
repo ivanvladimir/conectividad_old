@@ -3,43 +3,50 @@
 {% block content %}
 
 
-
-<h4>{{doc.meta_name.name}}</h4>
-<div class="row">
-  <div class="col-sm-4">
+<div class="content">
+<p>
+<h3 class="title"><strong>{{doc.meta_name.name}}</strong></h3>
+</p>
+<hr/>
+<div class="columns is-multiline">
+  <div class="column is-2">
 	<em>Número</em>
   </div>
-  <div class="col-sm-4">
+  <div class="column is-10">
 	{{doc.meta_name.number}}
   </div>
-</div>
 
-<div class="row">
-  <div class="col-sm-4">
+  <div class="column is-2">
 	<em>Corte</em>
   </div>
-  <div class="col-sm-4">
+  <div class="column is-10">
 	{{doc.meta_name.court}}
   </div>
-</div>
 
-<div class="row">
-  <div class="col-sm-4">
+  <div class="column is-2">
 	<em>Fecha</em>
   </div>
-  <div class="col-sm-4">
+  <div class="column is-10">
 	{{doc.meta_name.date_sentence}}
   </div>
-</div>
 
 
-<div class="row">
-  <div class="col-sm-4">
+  <div class="column is-2">
 	<em>Documento original</em>
   </div>
-  <div class="col-sm-4">
-	<a href="{{doc.source_pdf}}">PDF</a>
+  <div class="column is-10">
+	<a href="{{doc.pdf}}">
+		<span class="icon">
+		<i class="fa fa-file-pdf-o"></i>
+		</span>
+	</a>
+	<a href="{{doc.txt}}">
+		<span class="icon">
+		<i class="fa fa-file-text"></i>
+		</span>
+	</a>
   </div>
+</div>
 </div>
 
 {% endblock %}

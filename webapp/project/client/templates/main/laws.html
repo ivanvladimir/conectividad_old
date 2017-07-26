@@ -2,11 +2,15 @@
 
 {% block content %}
 
-<div class="body-content">
-  <div class="row">
-    <h1>Documentos</h1>
+<div class="content">
+    <h3 class="title">Documentos</h3>
 
-	<input type="text" id="myFilterLaw" onkeyup="myFilterLaw()" placeholder="Filtrar las sentencias">
+	<div class="field">
+	    <div class="control">
+			<input class="input is-primary" type="text" id="myFilterLaw" onkeyup="myFilterLaw()" placeholder="Palabras claves">
+	   </div>
+	</div>
+
 
 	<table class="table" id='lawsTable'>
     <thead>
@@ -23,12 +27,24 @@
         <td><a href="{{url_for('main.law',idd=doc.eid)}}">{{doc.meta_name.name}}<a></td>
         <td>{{doc.meta_name.number}}</td>
         <td>{{doc.meta_name.date_sentence}}</td>
-        <td>[<a href="{{doc.pdf}}">pdf</a>|<a href="{{doc.txt}}">txt</a>]</td>
+        <td>
+		<a href="{{doc.pdf}}">
+			<span class="icon">
+        	<i class="fa fa-file-pdf-o"></i>
+      		</span>
+		</a>
+		<a href="{{doc.txt}}">
+			<span class="icon">
+        	<i class="fa fa-file-text"></i>
+      		</span>
+		</a>
+		</td>
+
+
       </tr>
 	 {% endfor %}
     </tbody>
   </table>
-  </div>
 </div>
 
 {% endblock %}
