@@ -37,8 +37,8 @@ def register():
 
         login_user(user)
 
-        flash('Thank you for registering.', 'success')
-        return redirect(url_for("user.members"))
+        flash('Gracias por suscribirte', 'success')
+        return redirect(url_for("main.home"))
 
     return render_template('user/register.html', form=form)
 
@@ -51,10 +51,10 @@ def login():
         if user and bcrypt.check_password_hash(
                 user.password, request.form['password']):
             login_user(user)
-            flash('You are logged in. Welcome!', 'success')
-            return redirect(url_for('user.members'))
+            flash('Bienvenido', 'success')
+            return redirect(url_for('main.home'))
         else:
-            flash('Invalid email and/or password.', 'danger')
+            flash('Password o usuario incorrectos', 'danger')
             return render_template('user/login.html', form=form)
     return render_template('user/login.html', title='Please Login', form=form)
 
@@ -63,7 +63,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('You were logged out. Bye!', 'success')
+    flash('Has entrado al sistema', 'success')
     return redirect(url_for('main.home'))
 
 

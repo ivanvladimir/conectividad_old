@@ -1,0 +1,20 @@
+{% macro render_field(field,icon,placeholder) %}
+	<div class="field">
+	  <p class="control has-icons-left has-icons-right">
+  		{{ field(class_="input",placeholder=placeholder,**kwargs)|safe }}
+		<span class="icon is-small is-left">
+		  <i class="fa fa-{{icon}}"></i>
+		</span>
+	  </p>
+	</div>
+
+
+  {% if field.errors %}
+    <ul class=errors>
+    {% for error in field.errors %}
+      <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+  </dd>
+{% endmacro %}

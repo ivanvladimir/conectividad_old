@@ -7,7 +7,7 @@ from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 
 class LoginForm(FlaskForm):
-    email = StringField('Email Address', [DataRequired(), Email()])
+    email = StringField('Email', [DataRequired(), Email()])
     password = PasswordField('Password', [DataRequired()])
 
 
@@ -28,6 +28,6 @@ class RegisterForm(FlaskForm):
         'Confirm password',
         validators=[
             DataRequired(),
-            EqualTo('password', message='Passwords must match.')
+            EqualTo('password', message='Los passworLos passwords deben ser identicos')
         ]
     )
