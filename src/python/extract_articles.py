@@ -56,6 +56,11 @@ if __name__ == "__main__":
             default="data/DB.json", type=str,
             action="store", dest="dbname",
             help="Name for the db file")
+    p.add_argument("--graph",
+            default="data/graph.json", type=str,
+            action="store", dest="graph",
+            help="Name for the grap file")
+
     p.add_argument("-v", "--verbose",
             action="store_true", dest="verbose",
             help="Verbose mode [Off]")
@@ -82,8 +87,12 @@ if __name__ == "__main__":
     mentions=[]
     for case in contensiosos.search(Filter.title.search(re_selector)):
         verbose('Analysing ',case['title'])
-        with open(case['txt']) as text:
-            doc=text.read()
+        try:
+            with open(case['txt']) as text:
+                doc=text.read()
+        except FileNotFoundError:
+            verbose(bcolors.FAIL +'ARCHIVO FALTANTE '+bcolors.ENDC,case['txt'])
+            continue
         sentences = sent_tokenize(doc)
         for sentence in sentences:
             sentence_original=sentence.replace('\n',' ')
@@ -110,11 +119,32 @@ if __name__ == "__main__":
 
                     source=m_.group(0)
                     articles=re_numbers.findall(m.group('articles'))
-                    mentions.append((source.strip(),articles))
+                    mentions.append((case['title'],source.strip(),articles))
 
-hist_sources=Counter([x for x,y in mentions])
+hist_dest=Counter([y for x,y,z in mentions])
+hist_sources=Counter([x for x,y,z in mentions])
+name2id={}
 
-for x,y in hist_sources.most_common():
-    print(y,x)
+for c,y in hist_dest.most_common():
+    print(y,c)
 
+JSON={}
+JSON["nodes"]=[]
+for idd,k in  enumerate(hist_sources.keys()):
+    if hist_sources[k]>10:
+        JSON['nodes'].append({"id":idd,"type":1,"name":k})
+        name2id[k]=idd
+for idd,k in  enumerate(hist_dest.keys()):
+    if hist_dest[k]>10:
+        JSON['nodes'].append({"id":idd+len(hist_sources),"type":2,"name":k})
+        name2id[k]=idd+len(hist_sources)
 
+JSON["links"]=[]
+for x,y,z in mentions:
+    try:
+        JSON['links'].append({"source":name2id[x],"target":name2id[y],"value":1})
+    except KeyError:
+        continue
+
+with open(args.graph, 'w') as outfile:
+    json.dump(JSON, outfile)
