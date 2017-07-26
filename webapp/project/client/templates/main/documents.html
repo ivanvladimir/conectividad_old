@@ -1,0 +1,15 @@
+<!--
+ Penserbjorne - Sebastian Aguilar
+ 06/2017
+ FI-IIMAS-IIJ-UNAM
+ Based on https://bl.ocks.org/mbostock/4062045
+ Custom HTML for graph
+-->
+
+{% extends "_base.html" %}
+
+{% block content %}
+<div class="notification">
+<iframe width="100%" scrolling="auto" src="{{url_for('static', filename='doc.html')}}"></iframe>
+</div>
+{% endblock %}

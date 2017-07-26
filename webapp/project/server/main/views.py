@@ -51,5 +51,5 @@ def graph():
 
 @main_blueprint.route("/doc/")
 def doc():
-    return render_template("main/doc_test.xml")
+    return render_template("main/documents.html")
 

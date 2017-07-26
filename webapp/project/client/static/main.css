@@ -3,3 +3,9 @@
 .site-content {
   padding-top: 75px;
 }
+
+iframe {
+    height: auto !important;
+    min-height: 600px; /* or whatever */
+    max-height: 5000px; /* or whatever */
+}
