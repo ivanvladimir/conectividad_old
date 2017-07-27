@@ -156,7 +156,7 @@ if __name__ == "__main__":
                     for article in articles:
                         mentions.append((case['title'],source,article))
 
-hist_dest=Counter([(y,z) for x,y,z in mentions])
+hist_dest=Counter([y for x,y,z in mentions])
 hist_sources=Counter([x for x,y,z in mentions])
 name2id={}
 
@@ -169,15 +169,16 @@ for idd,k in  enumerate(hist_sources.keys()):
     if hist_sources[k]>10:
         JSON['nodes'].append({"id":idd,"type":1,"name":k})
         name2id[k]=idd
+
 for idd,k in  enumerate(hist_dest.keys()):
     if hist_dest[k]>10:
-        JSON['nodes'].append({"id":idd+len(hist_sources),"type":2,"name":"{1}-{0}".format(*k)})
+        JSON['nodes'].append({"id":idd+len(hist_sources),"type":2,"name":k})
         name2id[k]=idd+len(hist_sources)
 
 JSON["links"]=[]
 for x,y,z in mentions:
     try:
-        JSON['links'].append({"source":name2id[x],"target":name2id[(y,z)],"value":1})
+        JSON['links'].append({"source":name2id[x],"target":name2id[y],"value":1,"article":z})
     except KeyError:
         continue
 

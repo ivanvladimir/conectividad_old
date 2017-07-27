@@ -20,7 +20,7 @@ contensiosos = db.table('contensiosos')
 #### config ####
 ################
 
-main_blueprint = Blueprint('main', __name__,url_prefix="/conectividad")
+main_blueprint = Blueprint('main', __name__,url_prefix="/connectividad")
 
 
 ################
