@@ -7,7 +7,7 @@
 */
 
 
-$.getJSON('/static/graph.json', function(data) {
+$.getJSON('/conectividad/static/graph.json', function(data) {
 
 
   var graphGenerator = Viva.Graph.generator();
