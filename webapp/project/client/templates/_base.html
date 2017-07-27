@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <base href="/conectividad/">
     <meta charset="utf-8">
     <title>Conectividad Normativa{% block title %}{% endblock %}</title>
     <!-- meta -->
@@ -10,7 +11,7 @@
     <!-- styles -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.4/css/bulma.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link href="{{url_for('static', filename='main.css')}}" rel="stylesheet" media="screen">
+    <link href="{{url_for('main.static', filename='main.css')}}" rel="stylesheet" media="screen">
     {% block css %}{% endblock %}
   </head>
 
