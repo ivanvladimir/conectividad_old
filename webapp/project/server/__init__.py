@@ -12,6 +12,7 @@ from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.wsgi import DispatcherMiddleware
 
 
 ################
@@ -45,8 +46,8 @@ db = SQLAlchemy(app)
 
 from project.server.user.views import user_blueprint
 from project.server.main.views import main_blueprint
-app.register_blueprint(user_blueprint)
-app.register_blueprint(main_blueprint)
+app.register_blueprint(user_blueprint,)
+app.register_blueprint(main_blueprint,)
 
 
 ###################

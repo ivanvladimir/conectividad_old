@@ -13,7 +13,7 @@ class BaseConfig(object):
     DEBUG_TB_ENABLED = False
     DEBUG_TB_INTERCEPT_REDIRECTS = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
+    APPLICATION_ROOT = "/conectividad"
 
 class DevelopmentConfig(BaseConfig):
     """Development configuration."""
