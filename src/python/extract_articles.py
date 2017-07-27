@@ -29,9 +29,25 @@ sws=stopwords.words('spanish')
     
 re_articulo=re.compile('[\d\.]+')
 re_articulos=re.compile('art[íi]culos?')
-re_recovery=re.compile('(artículos?|articulos?) (?P<articles>.+?) (de la|del|de su) (?P<source>.*)[,.]')
+re_recovery=re.compile('(artículos?|articulos?) (?P<articles>.+?) (de la|del|de su|en la) (?P<source>[^“”,;.()]*)[,.;]?')
 re_numbers=re.compile('[\d.]+')
-re_source=re.compile('(mism[oa]|[^,:()]+)')
+re_mismo=re.compile('(mism[oa]|([A-Z][^ \d]+ *|de +|en +|la +|del +)+)')
+
+
+reductions=[
+(re.compile('mism(a|o)'),'PENDING'),
+(re.compile('Convención'),'Convención Interamericana de Derechos Humanos'),
+(re.compile('CONVENCIÓN'),'Convención Interamericana de Derechos Humanos'),
+(re.compile('Estatuto.*(corte)*'),'Estatuto de la Corte'),
+(re.compile('Reglamento.*(corte)*'),'Reglamento de la Corte'),
+]
+
+
+replacements=[
+(re.compile(', numeral (\d+),'),'.\\1'),
+(re.compile(', párrafo (\d+),'),'.\\1'),
+]
+
 
 class bcolors:
     HEADER = '\033[95m'
@@ -110,18 +126,37 @@ if __name__ == "__main__":
                 segs=zip(starts[:-1],starts[1:])
                 for ini,fin in segs:
                     bit=sentence_lower[ini:fin]
+                   
                     m=re_recovery.search(bit)
                     if not m:
                         continue
-                    start,end=m.span()
-                    m_=re_source.search(m.group('source'))
+                    verbose(bcolors.WARNING +'> BIT '+ bcolors.ENDC,bit)
+                    source_start,source_end=m.span('source')
+                    SOURCE=sentence_original[ini+source_start:ini+source_end].strip()
+                    mismo=re_mismo.search(SOURCE)
+                    print(">>>>>>>>",SOURCE,mismo)
                     
+                    if not mismo:
+                        continue
+                    source=mismo.group(1)
+                    
+                    for re_, source_ in reductions:
+                        if re_.search(source):
+                            source=source_
+                            break
+                    arts=m.group('articles')
+                    for re_,rep_ in replacements:
+                        arts=re_.sub(rep_,arts)
+ 
+                    articles=re_numbers.findall(arts)
+                    if len(articles)==0:
+                        continue
+                    verbose(bcolors.WARNING +'> SOURCE '+ bcolors.ENDC,source)
+                    verbose(bcolors.WARNING +'> ARTICLES '+ bcolors.ENDC,articles)
+                    for article in articles:
+                        mentions.append((case['title'],source,article))
 
-                    source=m_.group(0)
-                    articles=re_numbers.findall(m.group('articles'))
-                    mentions.append((case['title'],source.strip(),articles))
-
-hist_dest=Counter([y for x,y,z in mentions])
+hist_dest=Counter([(y,z) for x,y,z in mentions])
 hist_sources=Counter([x for x,y,z in mentions])
 name2id={}
 
@@ -136,13 +171,13 @@ for idd,k in  enumerate(hist_sources.keys()):
         name2id[k]=idd
 for idd,k in  enumerate(hist_dest.keys()):
     if hist_dest[k]>10:
-        JSON['nodes'].append({"id":idd+len(hist_sources),"type":2,"name":k})
+        JSON['nodes'].append({"id":idd+len(hist_sources),"type":2,"name":"{1}-{0}".format(*k)})
         name2id[k]=idd+len(hist_sources)
 
 JSON["links"]=[]
 for x,y,z in mentions:
     try:
-        JSON['links'].append({"source":name2id[x],"target":name2id[y],"value":1})
+        JSON['links'].append({"source":name2id[x],"target":name2id[(y,z)],"value":1})
     except KeyError:
         continue
 
