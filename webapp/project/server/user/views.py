@@ -17,7 +17,7 @@ from project.server.user.forms import LoginForm, RegisterForm
 #### config ####
 ################
 
-user_blueprint = Blueprint('user', __name__,url_prefix="/connectividad")
+user_blueprint = Blueprint('user', __name__,url_prefix="/conectividad")
 
 
 ################
