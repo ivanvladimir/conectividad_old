@@ -1,8 +1,11 @@
 /* custom css */
 
+html, body, svg { width: 100%; height: 100%;}
+
 .site-content {
   padding-top: 75px;
 }
+
 
 iframe {
     height: auto !important;

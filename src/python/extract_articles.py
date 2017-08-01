@@ -158,6 +158,7 @@ if __name__ == "__main__":
 
 hist_dest=Counter([y for x,y,z in mentions])
 hist_sources=Counter([x for x,y,z in mentions])
+hist_full=Counter([x for x in mentions])
 name2id={}
 
 for c,y in hist_dest.most_common():
@@ -176,9 +177,11 @@ for idd,k in  enumerate(hist_dest.keys()):
         name2id[k]=idd+len(hist_sources)
 
 JSON["links"]=[]
-for x,y,z in mentions:
+vals,c_max=hist_full.most_common()[0]
+
+for (x,y,z),c in hist_full.most_common():
     try:
-        JSON['links'].append({"source":name2id[x],"target":name2id[y],"value":1,"article":z})
+        JSON['links'].append({"source":name2id[x],"target":name2id[y],"value":int(c/c_max*9)+1,"article":z})
     except KeyError:
         continue
 
