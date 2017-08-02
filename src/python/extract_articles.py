@@ -157,8 +157,9 @@ if __name__ == "__main__":
                         mentions.append((case['title'],source,article))
 
 hist_dest=Counter([y for x,y,z in mentions])
+hist_dest2=Counter([(y,z) for x,y,z in mentions])
 hist_sources=Counter([x for x,y,z in mentions])
-hist_full=Counter([x for x in mentions])
+hist_full=Counter([(x,y,z) for x,y,z in mentions])
 name2id={}
 
 for c,y in hist_dest.most_common():
@@ -166,22 +167,36 @@ for c,y in hist_dest.most_common():
 
 JSON={}
 JSON["nodes"]=[]
+JSON["links"]=[]
+id2node={}
+nnode=0
 for idd,k in  enumerate(hist_sources.keys()):
-    if hist_sources[k]>10:
-        JSON['nodes'].append({"id":idd,"type":1,"name":k})
-        name2id[k]=idd
+    if hist_sources[k]>3:
+        JSON['nodes'].append({"id":nnode,"type":1,"name":k})
+        name2id[k]=nnode
+        nnode+=1
 
 for idd,k in  enumerate(hist_dest.keys()):
-    if hist_dest[k]>10:
-        JSON['nodes'].append({"id":idd+len(hist_sources),"type":2,"name":k})
-        name2id[k]=idd+len(hist_sources)
+    if hist_dest[k]>3:
+        JSON['nodes'].append({"id":nnode,"type":2,"name":k})
+        name2id[k]=nnode
+        nnode+=1
 
-JSON["links"]=[]
+for idd,(k,a) in  enumerate(hist_dest2.keys()):
+    if k in name2id:
+        JSON['nodes'].append({"id":nnode,"type":3,"name":k+":"+a})
+        JSON['links'].append({"source":name2id[k],"target":nnode,"value":1,"article":a})
+        name2id[k+":"+a]=nnode
+        nnode+=1
+
+
 vals,c_max=hist_full.most_common()[0]
 
-for (x,y,z),c in hist_full.most_common():
+vals=hist_full.most_common()
+vals.reverse()
+for (x,y,a),c in vals:
     try:
-        JSON['links'].append({"source":name2id[x],"target":name2id[y],"value":int(c/c_max*9)+1,"article":z})
+        JSON['links'].append({"source":name2id[x],"target":name2id[y+":"+a],"value":int(c/c_max*9)+1,"article":a})
     except KeyError:
         continue
 

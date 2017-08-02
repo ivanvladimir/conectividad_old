@@ -1,1 +1,6 @@
-
+ .node-label {
+                  position: absolute;
+                  pointer-events: none;
+                  color: black;
+                  z-index: 10;
+            }
