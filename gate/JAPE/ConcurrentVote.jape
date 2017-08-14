@@ -1,0 +1,20 @@
+// autor: @Penserbjorne - Sebastian Aguilar
+// FI-IIMAS-IIJ-UNAM
+
+Phase: ConcurrentVote
+Input: Token Sentence
+Options: control = appelt
+
+Rule: ConcurrentVote
+// Detecta la mencion de un voto concurrente
+(
+  ({Sentence contains Token.string =~ "(?i)(voto)",Sentence contains Token.string =~ "(?i)(concurrente)"})
+):concurrentVoteLabel
+-->
+:concurrentVoteLabel
+{
+    gate.AnnotationSet matchedAnns = (gate.AnnotationSet) bindings.get("concurrentVoteLabel");
+    gate.FeatureMap newFeatures = Factory.newFeatureMap();
+    newFeatures.put("rule","ConcurrentVote");
+    outputAS.add(matchedAnns.firstNode(), matchedAnns.lastNode(), "ConcurrentVote", newFeatures);
+}

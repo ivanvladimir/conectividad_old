@@ -1,12 +1,14 @@
 # Orden de ejecucion
 ```
-$ ./download_casos_contenciosos.py
-$ mkdir ./data/extract_text
-$ ./extract_text.py --dbname ./data/DB.json --odir ./data/extract_text -v
-$ ./basic_statistics.py -v
-$ ./module_canonical_name.py --dbname ./data/DB.json -v -i
-
+python download_casos_contenciosos.py
+mkdir ./data/extract_text
+python extract_text.py --dbname ./data/DB.json --odir ./data/extract_text -v
+python basic_statistics.py -v
+python module_canonical_name.py --dbname ./data/DB.json -v -i
+python python extract_articles.py --dbname ./data/DB.json --graph ./data/graph.json -v
 ```
+Hay que realizar un enlace de *./data/DB.json* a *./../../webapp/DB.json* y de *./data/graph.json* a *./../../webapp/project/client/static/graph.json*
+
 # Dependencias
 
 ## download_casos_contenciosos.py

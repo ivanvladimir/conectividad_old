@@ -11,7 +11,7 @@
     <corpus class="gate.util.persistence.CorpusPersistence">
       <dsData class="gate.util.persistence.DSPersistence">
         <className>gate.persist.SerialDataStore</className>
-        <storageUrlString>file:/home/penserbjorne/Documentos/ConectividadNormativa-/gate/appgate/</storageUrlString>
+        <storageUrlString>file:/home/penserbjorne/Proyectos/ConectividadNormativa-/gate/appgate/</storageUrlString>
         <storageUrl class="gate.util.persistence.PersistenceManager$URLHolder">
           <urlString>$relpath$appgate/</urlString>
         </storageUrl>
@@ -436,11 +436,11 @@
             <mapType>gate.util.SimpleFeatureMapImpl</mapType>
             <localMap>
               <entry>
-                <string>binaryGrammarURL</string>
+                <string>annotationAccessors</string>
                 <null/>
               </entry>
               <entry>
-                <string>annotationAccessors</string>
+                <string>binaryGrammarURL</string>
                 <null/>
               </entry>
               <entry>

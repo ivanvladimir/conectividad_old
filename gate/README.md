@@ -15,6 +15,7 @@ La aplicación actual ya contiene todos los elementos necesarios para realizar t
     - DateSentence
     - PersonCourtMembers
     - ResolutivePoints
+    - ConcurrentVote
 - Reglas por revisar y/o con dudas
     - CourtMembers
     - Date2
