@@ -40,88 +40,30 @@ import gate.util.persistence.PersistenceManager;
 
 public class GateEmbedded{
 
-	static String DataFolder = "/home/penserbjorne/Proyectos/ConectividadNormativa-/src/python/data/";
-	static int spc_count=-1;
-	static ArrayList<String> namesOfFilesWithAbsolutePath = new ArrayList<String>();
-
-	static ArrayList<String> getNamesOfFilesWithAbsolutePath(File aFile) {
-		spc_count++;
-		String spcs = "";
-		for (int i = 0; i < spc_count; i++){
-			spcs += " ";
-		}
-		if(aFile.isFile()){
-			//System.out.println(spcs + "[FILE] " + aFile.getName());
-			namesOfFilesWithAbsolutePath.add(aFile.getAbsolutePath());
-		}else if (aFile.isDirectory()) {
-			//System.out.println(spcs + "[DIR] " + aFile.getName());
-			File[] listOfFiles = aFile.listFiles();
-			if(listOfFiles != null) {
-				for (int i = 0; i < listOfFiles.length; i++){
-					getNamesOfFilesWithAbsolutePath(listOfFiles[i]);
-				}
-			} else {
-				System.out.println(spcs + " [ACCESS DENIED]");
-			}
-		}
-		spc_count--;
-		return namesOfFilesWithAbsolutePath;
-	}
-
-	private static ArrayList<String> getTextAnnotationValues(Document doc, String annotationTag) throws InvalidOffsetException{
-
-		ArrayList<String> temporalArrayList = new ArrayList<String>();
-		ArrayList<String> annotationValuesArrayList = new ArrayList<String>();
-
-		// Obtain the "Original markups" annotation set.
-		AnnotationSet originalMarkupsSet = doc.getAnnotations("Original markups");
-
-		AnnotationSet annotationSet = originalMarkupsSet.get(annotationTag);
-
-		// Iterate over each annotation.
-		// Obtain its features and print the value of "ThisDocument_LayoutInsensitive".
-		for(Annotation annotation : annotationSet){
-
-			temporalArrayList.add(doc.getContent().getContent(annotationSet.get(annotation.getId()).getStartNode().getOffset(),
-					annotationSet.get(annotation.getId()).getEndNode().getOffset()).toString());
-
-		}
-
-		// Remove null values.
-		temporalArrayList.removeAll(Collections.singleton(null));
-
-		for(int i = 0; i < temporalArrayList.size(); i++){
-
-			annotationValuesArrayList.add(temporalArrayList.get(i));
-
-			// To lower case.
-			// annotationValuesArrayList.add(temporalArrayList.get(i).toLowerCase());
-		}
-
-		return annotationValuesArrayList;
-	}
+	static String DataFolder = "./../../src/python/data/";
 
 	public static void main(String[] args) throws Exception{
 
-
-		// Prepare the library.
+		System.out.println("Prepare the library.");
 		Gate.init();
 
-		// Show the main window.
-		//// MainFrame.getInstance().setVisible(true);
+		//System.out.println("Show the main window.");
+		//MainFrame.getInstance().setVisible(true);
 
-		//// Load required plugins.
-		// Get the root plugins dir.
+		System.out.println("Load required plugins.");
+		System.out.println("Get the root plugins dir.");
 		File pluginsDir = Gate.getPluginsHome();
 
-		// Load saved GATE app.
-		//// CorpusController controller = (CorpusController)PersistenceManager.loadObjectFromFile(new File("appgate.gapp"));
+		System.out.println("Load saved GATE app.");
+		CorpusController controller = (CorpusController)PersistenceManager.loadObjectFromFile(new File("./../appgate.gapp"));
 
+		/*
 		// Load the "ANNIE" plugin.
 		File aPluginDir = new File(pluginsDir, "ANNIE");
 		Gate.getCreoleRegister().registerDirectories(aPluginDir.toURI().toURL());
+		*/
 
-		//// Read a corpus.
+		System.out.println("Read a corpus.");
 		Corpus corpus = Factory.newCorpus("Corpus");
 
 		File directory = new File(DataFolder + "extract_text"); // TXT
@@ -132,6 +74,7 @@ public class GateEmbedded{
 
 		corpus.populate(url, txtFilter, "UTF-8", false);
 
+		/*
 		//// Create pipeline to annotate documents in corpus with JAPE rules.
 		// Create serialAnalyzerController.
 		SerialAnalyserController controller = (SerialAnalyserController)Factory.createResource("gate.creole.SerialAnalyserController");
@@ -177,24 +120,40 @@ public class GateEmbedded{
 		controller.add(JAPE_SectionStart);
 		controller.add(JAPE_Section);
 		controller.add(JAPE_LastSection);
-
+		*/
 		controller.setCorpus(corpus); // Set corpus.
+		System.out.println("Execute the corpus.");
 		controller.execute(); // Execute the corpus.
 
-		// Save annotated documents in corpus to a folder.
+		System.out.println("Save annotated documents in corpus to a folder.");
 		Set<String> annotTypesRequired = new HashSet<String>();
 
+		System.out.println("AnnotTypesRequired.");
+		// Matt Anottations
 		annotTypesRequired.add("LiteralIndex");
 		annotTypesRequired.add("NumericalIndex");
 		annotTypesRequired.add("RomanNumeralIndex");
 
+		annotTypesRequired.add("LastSection");
 		annotTypesRequired.add("PreambleSection");
 		annotTypesRequired.add("Subsection");
 		annotTypesRequired.add("Section");
-		annotTypesRequired.add("LastSection");
+
+		// Penserbjorne Anottations
+		annotTypesRequired.add("Case");
+		annotTypesRequired.add("Date2");
+		annotTypesRequired.add("DateSentence");
+		annotTypesRequired.add("Actions");
+		annotTypesRequired.add("CourtMembers");
+		annotTypesRequired.add("PersonCourtMembers");
+		annotTypesRequired.add("Articles");
+		annotTypesRequired.add("ResolutivePoints");
+		annotTypesRequired.add("ConcurrentVote");
+
 
 		Writer output = null;
 
+		System.out.println("Retrieving documents and their annotations.");
 		for(int i = 0; i < controller.getCorpus().size(); i++){
 
 			// Retrieving documents and their annotations.
