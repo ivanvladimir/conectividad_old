@@ -10,4 +10,6 @@ echo "flag_CP = " $CP
 
 javac -cp $CP GateEmbedded.java
 
+echo "Compiling successfully"
+
 echo ""

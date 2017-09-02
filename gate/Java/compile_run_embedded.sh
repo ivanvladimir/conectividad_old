@@ -10,6 +10,8 @@ echo "flag_CP = " $CP
 
 javac -cp $CP GateEmbedded.java
 
+echo "Compiling successfully"
+
 echo ""
 
 echo "Executing..."
@@ -21,5 +23,7 @@ DFLAGS3=-Dgate.site.config=$GATE_HOME/gate.xml
 echo "GateEmbedded flags: " $DFLAGS1 $DFLAGS2 $DFLAGS3
 
 java $DFLAGS1 $DFLAGS2 $DFLAGS3 -cp $CP GateEmbedded
+
+echo "Execution terminated"
 
 echo ""
