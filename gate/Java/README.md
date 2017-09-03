@@ -1,5 +1,14 @@
 # GATE Embedded
 
+## Instalacion desde terminal para entornos sin interfaz grafica
+
+Es necesario descargar el óodigo fuente.
+
+```
+svn checkout http://svn.code.sf.net/p/gate/code/gate/trunk gate
+```
+Y seguir las instrucciones de [aquí](https://gate.ac.uk/releases/gate-8.4.1-build5753-ALL/doc/tao/splitch2.html#x5-270002.6).
+
 ## GATE_HOME
 
 Es necesario tener la variable ```$GATE_HOME``` en el sistema .
