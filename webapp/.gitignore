@@ -1,6 +1,6 @@
 # Penserbjorne
 migrations/
-virtenv/
+env/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
