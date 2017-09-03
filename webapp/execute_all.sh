@@ -37,34 +37,34 @@ echo "ONE SCRIPT TO RULE THEM ALL!!!"
 echo $(timestamp) " > Begining"
 
 if [[ $FIRST_TIME ]]; then
-  echo $(timestamp) " > virtualenv virtenv"
-  virtualenv virtenv
+  echo $(timestamp) " > virtualenv -p /usr/bin/python3 env"
+  virtualenv -p /usr/bin/python3 env
 fi
 
-echo $(timestamp) " > source ./virtenv/bin/activate"
-source ./virtenv/bin/activate
+echo $(timestamp) " > source ./env/bin/activate"
+source ./env/bin/activate
 
 if [[ $FIRST_TIME ]]; then
   echo $(timestamp) " > pip install -r requirements.txt"
-  pip install -r requirements.txt
+  pip3 install -r requirements.txt
 
   echo $(timestamp) " > export APP_SETTINGS=\"project.server.config.ProductionConfig\""
   export APP_SETTINGS="project.server.config.ProductionConfig"
 
   echo $(timestamp) " > python manage.py create_db"
-  python manage.py create_db
+  python3 manage.py create_db
 
   echo $(timestamp) " > python manage.py db init"
-  python manage.py db init
+  python3 manage.py db init
 
   echo $(timestamp) " > python manage.py db migrate"
-  python manage.py db migrate
+  python3 manage.py db migrate
 
   echo $(timestamp) " > python manage.py create_admin"
-  python manage.py create_admin
+  python3 manage.py create_admin
 
   echo $(timestamp) " > python manage.py create_data"
-  python manage.py create_data
+  python3 manage.py create_data
 fi
 
 echo $(timestamp) " > SEMI DONE! RUNING SERVER!!!"
@@ -73,7 +73,7 @@ TIME_MID=$(date -u -d "$(timestamp)" +"%s")
 echo "Time until this command: " $(date -u -d "0 $TIME_MID sec - $TIME_INI sec" +"%H:%M:%S")
 
 echo $(timestamp) " > python manage.py runserver"
-python manage.py runserver
+python3 manage.py runserver
 
 echo $(timestamp) " > deactivate"
 deactivate

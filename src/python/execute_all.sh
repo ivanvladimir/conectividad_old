@@ -19,7 +19,7 @@ while getopts frh opts; do
    esac
 done
 
-if [[ $HELP ]]; then
+if [ $HELP ]; then
   echo "
   Descripción:
   Scripts necesarios para obtener los documentos necesarios así como los datos y metadatos básicos necesarios.
@@ -37,7 +37,7 @@ echo "ONE SCRIPT TO RULE THEM ALL!!!"
 
 echo $(timestamp) " > Begining"
 
-if [[ $REMOVE ]]; then
+if [ $REMOVE ]; then
   echo $(timestamp) " > rm -rf ./data"
   rm -rf ./data
 
@@ -48,36 +48,38 @@ if [[ $REMOVE ]]; then
   rm -rf ./../../webapp/project/client/static/graph.json
 fi
 
-if [[ $FIRST_TIME ]]; then
-  echo $(timestamp) " > virtualenv virtenv"
-  virtualenv virtenv
+if [ $FIRST_TIME ]; then
+  echo $(timestamp) " > virtualenv -p /usr/bin/python3 env"
+  virtualenv -p /usr/bin/python3 env
 fi
 
-echo $(timestamp) " > source ./virtenv/bin/activate"
-source ./virtenv/bin/activate
+echo $(timestamp) " > source ./env/bin/activate"
+source ./env/bin/activate
 
-if [[ $FIRST_TIME ]]; then
+if [ $FIRST_TIME ]; then
   echo $(timestamp) " > pip install -r requirements.txt"
-  pip install -r requirements.txt
+  pip3 install -r requirements.txt
+
+  python3 -m nltk.downloader all
 fi
 
 echo $(timestamp) " > download_casos_contenciosos.py"
-python ./download_casos_contenciosos.py
+python3 ./download_casos_contenciosos.py
 
 echo $(timestamp) " > mkdir ./data/extract_text"
 mkdir ./data/extract_text
 
 echo $(timestamp) " > extract_text.py"
-python extract_text.py --dbname ./data/DB.json --odir ./data/extract_text
+python3 extract_text.py --dbname ./data/DB.json --odir ./data/extract_text
 
 echo $(timestamp) " > basic_statistics.py"
-python basic_statistics.py
+python3 basic_statistics.py
 
 echo $(timestamp) " > module_canonical_name.py"
-python module_canonical_name.py --dbname ./data/DB.json
+python3 module_canonical_name.py --dbname ./data/DB.json
 
 echo $(timestamp) " > extract_articles.py"
-python extract_articles.py --dbname ./data/DB.json --graph ./data/graph.json
+python3 extract_articles.py --dbname ./data/DB.json --graph ./data/graph.json
 
 echo $(timestamp) " > deactivate"
 deactivate
