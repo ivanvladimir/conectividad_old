@@ -1,3 +1,16 @@
+# ONE SCRIPT TO RULE THEM ALL!!!
+
+Scripts para ejecutar el sistema de manera automatizada.
+
+Banderas:
+
+- -f : Primer uso. Instala las dependencias necesarias, importa las variables necesarias y crea el entorno virtual.
+- -h : Muestra la ayuda.
+- Sin banderas : Ejecuta el script sin la bandera -f .
+```
+./execute_all.sh [-f][-h]
+```
+
 # Flask Skeleton
 
 Flask starter project...

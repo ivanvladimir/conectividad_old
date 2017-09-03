@@ -25,7 +25,7 @@ if [[ $HELP ]]; then
   Scripts necesarios para obtener los documentos necesarios así como los datos y metadatos básicos necesarios.
 
   -f : Primer uso. Instala las dependencias necesarias y crea el entorno virtual.
-  -r : Eliminar. Forza a eliminar todos los registros creados previamente (documentos, enlaces, entornos virtuales).
+  -r : Eliminar. Forza a eliminar todos los registros creados previamente (documentos, enlaces y salidas de datos).
   -h : Muestra la ayuda.
   Sin banderas : Ejecuta el script sin las banderas -f -r .
 
