@@ -1,10 +1,19 @@
 # Orden de ejecucion
 
+Scripts necesarios para obtener los documentos necesarios así como los datos y metadatos básicos necesarios.
+
 ## ONE SCRIPT TO RULE THEM ALL!!!
 
 Para ejecutar todo de una sola vez.
+
+Banderas:
+
+- -f : Primer uso. Instala las dependencias necesarias y crea el entorno virtual.
+- -r : Eliminar. Forza a eliminar todos los registros creados previamente (documentos, enlaces, entornos virtuales).
+- -h : Muestra la ayuda.
+- Sin banderas : Ejecuta el script sin las banderas -f -r .
 ```
-./execute_all.sh
+./execute_all.sh [-f][-r][-h]
 ```
 
 ## Uno por uno
@@ -24,75 +33,4 @@ Hay que realizar un enlace de *./data/DB.json* a *./../../webapp/DB.json* y de *
 ```
 ln -sf ./data/DB.json ./../../webapp/DB.json
 ln -sf ./data/graph.json ./../../webapp/project/client/static/graph.json
-```
-
-# Dependencias
-
-## download_casos_contenciosos.py
-
-En Ubuntu:
-
-```
-sudo apt-get install python3-requests
-sudo apt-get install python3-bs4
-sudo pip3 install tinydb
-```
-
-## download_casos_contenciosos.py
-
-En Ubuntu:
-
-```
-sudo pip3 install tinydb
-sudo pip3 -U install nltk
-sudo pip3 -U install pdfminer3k
-sudo apt-get install python3-numpy
-sudo apt-get install python3-scipy
-sudo pip3 -U install sklearn
-```
-
-Es necesario instalar los siguientes recursos de nltk:
-
--   corpora/stopwords
--   tokenizers/punkt
-
-```
-$ python
->>> import nltk
->>> nltk.download();
-NLTK Downloader
----------------------------------------------------------------------------
-    d) Download   l) List    u) Update   c) Config   h) Help   q) Quit
----------------------------------------------------------------------------
-Downloader> d
-
-Download which package (l=list; x=cancel)?
-  Identifier> stopwords
-    Downloading package stopwords to /home/penserbjorne/nltk_data...
-      Unzipping corpora/stopwords.zip.
-
----------------------------------------------------------------------------
-    d) Download   l) List    u) Update   c) Config   h) Help   q) Quit
----------------------------------------------------------------------------
-Downloader> d
-
-Download which package (l=list; x=cancel)?
-  Identifier> punkt
-    Downloading package punkt to /home/penserbjorne/nltk_data...
-      Unzipping tokenizers/punkt.zip.
-
----------------------------------------------------------------------------
-    d) Download   l) List    u) Update   c) Config   h) Help   q) Quit
----------------------------------------------------------------------------
-Downloader> q
->>> exit();
-```
-
-## basic_statistics.py
-
-En Ubuntu:
-
-```
-sudo pip3 install tinydb
-sudo apt-get install python3-matplotlib
 ```

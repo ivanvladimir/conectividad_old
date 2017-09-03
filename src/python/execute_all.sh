@@ -9,18 +9,57 @@ timestamp() {
 
 TIME_INI=$(date -u -d "$(timestamp)" +"%s")
 
+# Get Parammeter
+while getopts frh opts; do
+   case ${opts} in
+      f) FIRST_TIME=true;;
+      r) REMOVE=true ;;
+      #r) REMOVE=${OPTARG} ;;
+      h) HELP=true ;;
+   esac
+done
+
+if [[ $HELP ]]; then
+  echo "
+  Descripción:
+  Scripts necesarios para obtener los documentos necesarios así como los datos y metadatos básicos necesarios.
+
+  -f : Primer uso. Instala las dependencias necesarias y crea el entorno virtual.
+  -r : Eliminar. Forza a eliminar todos los registros creados previamente (documentos, enlaces, entornos virtuales).
+  -h : Muestra la ayuda.
+  Sin banderas : Ejecuta el script sin las banderas -f -r .
+
+  Uso: ./execute_all.sh [-f][-r][-h]"
+  exit
+fi
+
 echo "ONE SCRIPT TO RULE THEM ALL!!!"
 
 echo $(timestamp) " > Begining"
 
-echo $(timestamp) " > rm -rf ./data"
-rm -rf ./data
+if [[ $REMOVE ]]; then
+  echo $(timestamp) " > rm -rf ./data"
+  rm -rf ./data
 
-echo $(timestamp) " > rm -rf ./../../webapp/DB.json"
-rm -rf ./../../webapp/DB.json
+  echo $(timestamp) " > rm -rf ./../../webapp/DB.json"
+  rm -rf ./../../webapp/DB.json
 
-echo $(timestamp) " > rm -rf ./../../webapp/project/client/static/graph.json"
-rm -rf ./../../webapp/project/client/static/graph.json
+  echo $(timestamp) " > rm -rf ./../../webapp/project/client/static/graph.json"
+  rm -rf ./../../webapp/project/client/static/graph.json
+fi
+
+if [[ $FIRST_TIME ]]; then
+  echo $(timestamp) " > virtualenv virtenv"
+  virtualenv virtenv
+fi
+
+echo $(timestamp) " > source ./virtenv/bin/activate"
+source ./virtenv/bin/activate
+
+if [[ $FIRST_TIME ]]; then
+  echo $(timestamp) " > pip install -r requirements.txt"
+  pip install -r requirements.txt
+fi
 
 echo $(timestamp) " > download_casos_contenciosos.py"
 python ./download_casos_contenciosos.py
@@ -39,6 +78,9 @@ python module_canonical_name.py --dbname ./data/DB.json
 
 echo $(timestamp) " > extract_articles.py"
 python extract_articles.py --dbname ./data/DB.json --graph ./data/graph.json
+
+echo $(timestamp) " > deactivate"
+deactivate
 
 echo $(timestamp) " > cd ./../../webapp/"
 cd ./../../webapp/
