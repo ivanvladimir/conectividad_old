@@ -25,7 +25,7 @@ def download_file(url,odir,simulate=False):
     if not simulate:
         r = requests.get(url, stream=True)
         with open(os.path.join(odir,local_filename), 'wb') as f:
-            for chunk in r.iter_content(chunk_size=1024): 
+            for chunk in r.iter_content(chunk_size=1024):
                 if chunk: # filter out keep-alive new chunks
                     f.write(chunk)
     return os.path.join(odir,local_filename)
@@ -62,8 +62,8 @@ if __name__ == "__main__":
     if args.verbose:
        def verbose(*args):
             print("".join([str(x) for x in args]),file=sys.stderr)
-    else:   
-        verbose = lambda *a: None  
+    else:
+        verbose = lambda *a: None
 
     os.makedirs(os.path.dirname(args.odir), exist_ok=True)
     os.makedirs(os.path.dirname(args.dbname), exist_ok=True)
@@ -119,19 +119,13 @@ if __name__ == "__main__":
     for case in contensiosos.all():
         if case['source_pdf']:
             filename=download_file(case['source_pdf'],os.path.join(args.odir,"files"),simulate=True)
-            if args.force_download or not os.path.exists(filename): 
+            if args.force_download or not os.path.exists(filename):
                 verbose("Dowloading ",case['source_pdf'])
                 filename=download_file(case['source_pdf'],os.path.join(args.odir,"files"),simulate=False)
             contensiosos.update({'pdf':filename,'date_modification':datetime.datetime.now().isoformat(' ')},eids=[case.eid])
         if case['source_doc']:
             filename=download_file(case['source_doc'],os.path.join(args.odir,"files"),simulate=True)
-            if args.force_download or not os.path.exists(filename): 
+            if args.force_download or not os.path.exists(filename):
                 verbose("Dowloading ",case['source_doc'])
                 filename=download_file(case['source_doc'],os.path.join(args.odir,"files"),simulate=False)
             contensiosos.update({'doc':filename,'date_modification':datetime.datetime.now().isoformat(' ')},eids=[case.eid])
- 
-    
-
-       
-
-

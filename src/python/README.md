@@ -1,13 +1,30 @@
 # Orden de ejecucion
+
+## ONE SCRIPT TO RULE THEM ALL!!!
+
+Para ejecutar todo de una sola vez.
+```
+./execute_all.sh
+```
+
+## Uno por uno
+
+Es necesario ejecutar estos scripts en este orden, pueden omitirse las banderas -v -i .
 ```
 python download_casos_contenciosos.py
 mkdir ./data/extract_text
 python extract_text.py --dbname ./data/DB.json --odir ./data/extract_text -v
 python basic_statistics.py -v
 python module_canonical_name.py --dbname ./data/DB.json -v -i
-python python extract_articles.py --dbname ./data/DB.json --graph ./data/graph.json -v
+python extract_articles.py --dbname ./data/DB.json --graph ./data/graph.json -v
 ```
+
 Hay que realizar un enlace de *./data/DB.json* a *./../../webapp/DB.json* y de *./data/graph.json* a *./../../webapp/project/client/static/graph.json*
+
+```
+ln -sf ./data/DB.json ./../../webapp/DB.json
+ln -sf ./data/graph.json ./../../webapp/project/client/static/graph.json
+```
 
 # Dependencias
 
@@ -79,48 +96,3 @@ En Ubuntu:
 sudo pip3 install tinydb
 sudo apt-get install python3-matplotlib
 ```
-
-# Resultados y carpeta Data
-
-## Generados por "download_casos_contenciosos.py"
-
-Al 16 de Junio del 2017:
-
--   Archivos descargados: 674
-    -   337 en Word.
-    -   337 en PDF
-    -   Cada Word tiene un PDF
--   Tiempo aproximado de descarga: 15 a 30 min
-
-Ubicacion:
-
-```
-->  data
-    ->  contenciosos
-        ->  files
-```
-
-## Generados por "extract_text.py"
-
-Al 16 de Junio del 2017:
-
--   Archivos descargados: 337
-    -   Uno por cada pareja de Word y PDF
--   Tiempo aproximado de ejecucion:  1.5 min
-
-Ubicacion:
-
-```
-->  data
-    ->  contenciosos
-```
-
-## Generados por "basic_statistics.py"
-
--   Grafico de barras de vocabulario.
--   Grafo
--   Tiempo aproximado de ejecucion:  3 min
-
-Ubicacion:
-
--   Carpeta raiz ''python''
