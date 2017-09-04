@@ -23,6 +23,10 @@ echo ""
 
 echo $(timestamp) " > Executing"
 
+echo $(timestamp) " > ulimit -m 4194304"
+#ulimit -m 6291456
+ulimit -m 4194304
+
 DFLAGS1=-Dgate.home=$GATE_HOME
 DFLAGS2=-Dgate.plugins.home=$GATE_HOME/plugins
 DFLAGS3=-Dgate.site.config=$GATE_HOME/gate.xml

@@ -114,71 +114,89 @@ public class GateEmbedded {
 
     //for(int i = firstFile; i < args.length; i++) {
     while(iterFiles.hasNext()) {
-      // load the document (using the specified encoding if one was given)
-      //File docFile = new File(args[i]);
-      File docFile = (File)iterFiles.next();
-      System.out.println("Processing document " + (processedFiles+1) + " of " + filesToUse.size() + ": " + docFile + "...");
-      Document doc = Factory.newDocument(docFile.toURL(), encoding);
+      try{
+        // load the document (using the specified encoding if one was given)
+        //File docFile = new File(args[i]);
+        File docFile = (File)iterFiles.next();
+        System.out.println("Processing document " + (processedFiles+1) + " of " + filesToUse.size() + ": " + docFile + "...");
+        Document doc = Factory.newDocument(docFile.toURL(), encoding);
 
-      System.out.println("\tAdding to corpus and executing.");
-      // put the document in the corpus
-      corpus.add(doc);
+        System.out.println("\tAdding to corpus and executing.");
+        // put the document in the corpus
+        corpus.add(doc);
 
-      // run the application
-      application.execute();
+        // run the application
+        application.execute();
 
-      // remove the document from the corpus again
-      corpus.clear();
+        // remove the document from the corpus again
+        corpus.clear();
 
-      String docXMLString = null;
+        String docXMLString = null;
 
-      System.out.println("\tExtracting annotations.");
+        System.out.println("\tExtracting annotations.");
 
-      // Create a temporary Set to hold the annotations we wish to write out
-      Set annotationsToWrite = new HashSet();
+        // Create a temporary Set to hold the annotations we wish to write out
+        Set annotationsToWrite = new HashSet();
 
-      // we only extract annotations from the default (unnamed) AnnotationSet
-      // in this example
-      AnnotationSet defaultAnnots = doc.getAnnotations();
-      Iterator annotTypesIt = annotTypesRequired.iterator();
-      while(annotTypesIt.hasNext()) {
-        // extract all the annotations of each requested type and add them to
-        // the temporary set
-        AnnotationSet annotsOfThisType = defaultAnnots.get((String)annotTypesIt.next());
-        if(annotsOfThisType != null) {
-          annotationsToWrite.addAll(annotsOfThisType);
+        // we only extract annotations from the default (unnamed) AnnotationSet
+        // in this example
+        AnnotationSet defaultAnnots = doc.getAnnotations();
+        Iterator annotTypesIt = annotTypesRequired.iterator();
+        while(annotTypesIt.hasNext()) {
+          // extract all the annotations of each requested type and add them to
+          // the temporary set
+          AnnotationSet annotsOfThisType = defaultAnnots.get((String)annotTypesIt.next());
+          if(annotsOfThisType != null) {
+            annotationsToWrite.addAll(annotsOfThisType);
+          }
         }
+
+        System.out.println("\tCreating XML file.");
+        // create the XML string using these annotations
+        docXMLString = doc.toXml(annotationsToWrite, false);
+
+        // Release the document, as it is no longer needed
+        Factory.deleteResource(doc);
+
+        // output the XML to <inputFile>.out.xml
+        String outputFileName = "/../annotatedDocuments/" + docFile.getName() + ".xml";
+        File outputFile = new File(docFile.getParentFile(), outputFileName);
+
+        System.out.println("\tWriting XML file on " + outputFile);
+        // Write output files using the same encoding as the original
+        FileOutputStream fos = new FileOutputStream(outputFile);
+        BufferedOutputStream bos = new BufferedOutputStream(fos);
+        OutputStreamWriter out;
+        if(encoding == null) {
+          out = new OutputStreamWriter(bos);
+        }
+        else {
+          out = new OutputStreamWriter(bos, encoding);
+        }
+
+        //out.write("<?xml version='1.0' encoding='UTF-8'?>\r\n" + "<Document>" + docXMLString + "</Document>");
+        out.write(docXMLString);
+
+        out.close();
+        System.out.println("\tDone current document.");
+        processedFiles++;
+
+        docFile = null;
+        doc = null;
+        docXMLString = null;
+        annotationsToWrite = null;
+        defaultAnnots = null;
+        annotTypesIt = null;
+        outputFileName = null;
+        outputFile = null;
+        fos = null;
+        bos = null;
+        out = null;
+        System.gc();
+      }catch(OutOfMemoryError e){
+        System.out.println("Error of memory!");
+        System.gc();
       }
-
-      System.out.println("\tCreating XML file.");
-      // create the XML string using these annotations
-      docXMLString = doc.toXml(annotationsToWrite, false);
-
-      // Release the document, as it is no longer needed
-      Factory.deleteResource(doc);
-
-      // output the XML to <inputFile>.out.xml
-      String outputFileName = "/../annotatedDocuments/" + docFile.getName() + ".xml";
-      File outputFile = new File(docFile.getParentFile(), outputFileName);
-
-      System.out.println("\tWriting XML file on " + outputFile);
-      // Write output files using the same encoding as the original
-      FileOutputStream fos = new FileOutputStream(outputFile);
-      BufferedOutputStream bos = new BufferedOutputStream(fos);
-      OutputStreamWriter out;
-      if(encoding == null) {
-        out = new OutputStreamWriter(bos);
-      }
-      else {
-        out = new OutputStreamWriter(bos, encoding);
-      }
-
-      //out.write("<?xml version='1.0' encoding='UTF-8'?>\r\n" + "<Document>" + docXMLString + "</Document>");
-      out.write(docXMLString);
-
-      out.close();
-      System.out.println("\tDone current document.");
-      processedFiles++;
     } // for each file
 
     System.out.println("All done!!!");
