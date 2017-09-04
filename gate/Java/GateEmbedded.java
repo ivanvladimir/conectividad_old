@@ -39,6 +39,12 @@ import java.io.FileOutputStream;
 import java.io.BufferedOutputStream;
 import java.io.OutputStreamWriter;
 
+// For log
+import java.io.IOException;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 /**
  * This class ilustrates how to do simple batch processing with GATE.  It loads
  * an application from a .gapp file (created using "Save application state" in
@@ -62,6 +68,22 @@ public class GateEmbedded {
    * (inputFile.out.xml).
    */
   public static void main(String[] args) throws Exception {
+    Logger logger = Logger.getLogger("logExecution");
+    FileHandler fh;
+    try {
+        // This block configure the logger with handler and formatter
+        fh = new FileHandler("./logExecution.log");
+        logger.addHandler(fh);
+        //logger.setLevel(Level.ALL);
+        SimpleFormatter formatter = new SimpleFormatter();
+        fh.setFormatter(formatter);
+        logger.info("Se ha comenzado la ejecucion.");
+    } catch (SecurityException e) {
+        e.printStackTrace();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
     parseCommandLine(args);
 
     System.out.println("Getting all documents to process.");
@@ -114,10 +136,11 @@ public class GateEmbedded {
 
     //for(int i = firstFile; i < args.length; i++) {
     while(iterFiles.hasNext()) {
+      File docFile = (File)iterFiles.next();
       try{
         // load the document (using the specified encoding if one was given)
         //File docFile = new File(args[i]);
-        File docFile = (File)iterFiles.next();
+        //File docFile = (File)iterFiles.next();
         System.out.println("Processing document " + (processedFiles+1) + " of " + filesToUse.size() + ": " + docFile + "...");
         Document doc = Factory.newDocument(docFile.toURL(), encoding);
 
@@ -194,13 +217,19 @@ public class GateEmbedded {
         out = null;
         System.gc();
       }catch(OutOfMemoryError e){
-        System.out.println("Error of memory!");
+        System.out.println("OutOfMemoryError!");
+        System.out.println("Error el procesar " + docFile);
+        logger.info("OutOfMemoryError!");
+        logger.info("Error el procesar " + docFile);
         System.gc();
+        logger.info("Se ha terminado la ejecucion por un error.");
+        System.exit(1);
       }
     } // for each file
 
     System.out.println("All done!!!");
     System.out.println(processedFiles + " files processed.");
+    logger.info("Se ha terminado la ejecucion satisfactoriamente.");
   } // void main(String[] args)
 
 
