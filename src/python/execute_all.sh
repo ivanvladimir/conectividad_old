@@ -69,6 +69,9 @@ python3 ./download_casos_contenciosos.py
 echo $(timestamp) " > mkdir ./data/extract_text"
 mkdir ./data/extract_text
 
+echo $(timestamp) " > mkdir ./data/AnnotatedDocuments"
+mkdir ./data/annotatedDocuments
+
 echo $(timestamp) " > extract_text.py"
 python3 extract_text.py --dbname ./data/DB.json --odir ./data/extract_text
 
