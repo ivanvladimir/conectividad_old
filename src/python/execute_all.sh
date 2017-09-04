@@ -35,6 +35,10 @@ fi
 
 echo "ONE SCRIPT TO RULE THEM ALL!!!"
 
+echo "Es necesrio instalar tkinter para python3 por separado."
+echo "Presione una tecla para cotinuar..."
+read
+
 echo $(timestamp) " > Begining"
 
 if [ $REMOVE ]; then
