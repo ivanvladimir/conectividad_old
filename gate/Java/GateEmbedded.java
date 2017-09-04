@@ -40,7 +40,7 @@ import gate.util.persistence.PersistenceManager;
 
 public class GateEmbedded{
 
-	static String DataFolder = "./../../src/python/data/";
+	static String DataFolder = "./../../data/";
 
 	public static void main(String[] args) throws Exception{
 
@@ -66,7 +66,7 @@ public class GateEmbedded{
 		System.out.println("Read a corpus.");
 		Corpus corpus = Factory.newCorpus("Corpus");
 
-		File directory = new File(DataFolder + "extract_text"); // TXT
+		File directory = new File(DataFolder + "contenciosos"); // TXT
 
 		URL url = directory.toURI().toURL();
 
