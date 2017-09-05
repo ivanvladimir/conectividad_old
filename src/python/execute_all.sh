@@ -48,6 +48,9 @@ if [ $REMOVE ]; then
   echo $(timestamp) " > rm -rf ./../../webapp/DB.json"
   rm -rf ./../../webapp/DB.json
 
+  echo $(timestamp) " > rm -rf ./../../webapp/annotatedDocuments"
+  rm -rf ./../../webapp/annotatedDocuments
+
   echo $(timestamp) " > rm -rf ./../../webapp/project/client/static/graph.json"
   rm -rf ./../../webapp/project/client/static/graph.json
 fi
@@ -96,6 +99,9 @@ cd ./../../webapp/
 
 echo $(timestamp) " > ln -sf ./../src/python/data/DB.json ./DB.json"
 ln -sf ./../src/python/data/DB.json ./DB.json
+
+echo $(timestamp) " > ln -sf ./../src/python/data/annotatedDocuments ./annotatedDocuments"
+ln -sf ./../src/python/data/annotatedDocuments ./annotatedDocuments
 
 echo $(timestamp) " > cd ./project/client/static/"
 cd ./project/client/static/
