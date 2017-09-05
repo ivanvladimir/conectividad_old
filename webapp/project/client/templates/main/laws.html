@@ -32,12 +32,11 @@
         	<i class="fa fa-file-pdf-o"></i>
       		</span>
 		</a>
-		<!---
-		<a href="{{doc.txt}}">
+		<a href="{{url_for('main.doc',filename=doc.txt.rsplit("/",1)[1])}}">
 			<span class="icon">
         	<i class="fa fa-file-text"></i>
       		</span>
-		</a> -->
+		</a> 
 		</td>
 
 

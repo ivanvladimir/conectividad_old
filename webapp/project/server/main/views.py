@@ -5,7 +5,7 @@
 #### imports ####
 #################
 
-from flask import render_template, Blueprint
+from flask import render_template, Blueprint, send_from_directory
 
 #######################
 #### loading JSONDB ###
@@ -52,7 +52,30 @@ def law(idd):
 def graph():
     return render_template("main/graph.html")
 
-@main_blueprint.route("/doc/")
-def doc():
-    return render_template("main/documents.html")
+@main_blueprint.route("/doc/<string:filename>")
+def doc(filename):
+    return render_template("main/documents.html",filename=filename+".xml")
+
+
+@main_blueprint.route("/xml/<string:filename>")
+def xml(filename):
+    string="""
+<!DOCTYPE html>
+<html xml:lang="en" lang="en">  
+<head>
+    <base href="/conectividad/">
+        <title>Conectividad Normativa</title>
+        <link href="/static/gate.css" rel="stylesheet" media="screen"></link>
+     </base>
+</head>
+<body>
+{0}
+</body>
+</html>
+"""
+    with open('annotatedDocuments/'+filename) as filename:
+        lines=filename.readlines()
+
+    return string.format("<br/>".join(lines))
+
 
