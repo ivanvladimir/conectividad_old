@@ -22,7 +22,6 @@ Comando ```nano /etc/environment```
 Contenido del archivo:
 
 ```
-# Penserbjorne
 GATE_HOME=/path/to/gate
 ```
 
