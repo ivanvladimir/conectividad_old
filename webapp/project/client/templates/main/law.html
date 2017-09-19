@@ -40,7 +40,7 @@
 
 
   <div class="column is-2">
-	<em>Documento original</em>
+	<em>Documentopq</em>
   </div>
   <div class="column is-10">
 	<a href="{{doc.source_pdf}}" arget="_blank">
@@ -48,13 +48,11 @@
 		<i class="fa fa-file-pdf-o"></i>
 		</span>
 	</a>
-	<!---
-	<a href="{{doc.txt}}">
-		<span class="icon">
-		<i class="fa fa-file-text"></i>
-		</span>
-	</a>
-	-->
+	<a href="{{url_for('main.doc',filename=doc.txt.rsplit("/",1)[1])}}">
+			<span class="icon">
+        	<i class="fa fa-eye"></i>
+      		</span>
+	</a> 
   </div>
 </div>
 </div>
