@@ -27,7 +27,10 @@ from bs4 import BeautifulSoup
 from utils import pdf2text, extract_topics, search_regexp
 
 sws=stopwords.words('spanish')
-    
+
+
+
+
 re_articulo=re.compile('[\d\.]+')
 re_articulos=re.compile('art[íi]culos?')
 re_recovery=re.compile('(artículos?|articulos?) (?P<articles>[^;]+?) (de esa|de esta|de la |del |de su |en la )?(?P<source>(dich[oa] |últim[oa] |presente ley |ley )?[^"",;.()]*)[,.;]?')
@@ -102,7 +105,6 @@ if __name__ == "__main__":
     p.add_argument("-v", "--verbose",
             action="store_true", dest="verbose",
             help="Verbose mode [Off]")
- 
 
     # Parsing commands line arguments
     args = p.parse_args()
@@ -210,13 +212,16 @@ if __name__ == "__main__":
                         verbose(bcolors.ORANGE +'> SOURCE '+ bcolors.ENDC,source)
                         verbose(bcolors.ORANGE +'> ARTICLES '+ bcolors.ENDC,articles)
                         for article in articles:
-                            mentions.append((case['title'],source,article))
+                            mentions.append((case['title'],source,article,case))
                         prev_source=source
 
-hist_dest=Counter([y for x,y,z in mentions])
-hist_dest2=Counter([(y,z) for x,y,z in mentions])
-hist_sources=Counter([x for x,y,z in mentions])
-hist_full=Counter([(x,y) for x,y,z in mentions])
+hist_dest=Counter([y for x,y,z,w in mentions])
+hist_dest2=Counter([(y,z) for x,y,z,w in mentions])
+hist_sources=Counter([x for x,y,z,w in mentions])
+hist_full=Counter([(x,y) for x,y,z,w in mentions])
+cases_xy={}
+for x,y,z,w in mentions:
+    cases_xy[(x,y)]=w
 name2id={}
 
 for c,y in hist_dest.most_common():
@@ -228,23 +233,23 @@ JSON["links"]=[]
 id2node={}
 nnode=0
 for idd,k in  enumerate(hist_sources.keys()):
-    if hist_sources[k]>3:
+    if hist_sources[k]>0:
         JSON['nodes'].append({"id":nnode,"type":1,"name":k})
         name2id[k]=nnode
         nnode+=1
 
 for idd,k in  enumerate(hist_dest.keys()):
-    if hist_dest[k]>3:
+    if hist_dest[k]>0:
         JSON['nodes'].append({"id":nnode,"type":2,"name":k})
         name2id[k]=nnode
         nnode+=1
 
-for idd,(k,a) in  enumerate(hist_dest2.keys()):
-    if k in name2id:
-        JSON['nodes'].append({"id":nnode,"type":3,"name":k+":"+a})
-        JSON['links'].append({"source":name2id[k],"target":nnode,"value":1,"article":a})
-        name2id[k+":"+a]=nnode
-        nnode+=1
+#for idd,(k,a) in  enumerate(hist_dest2.keys()):
+#    if k in name2id:
+#        JSON['nodes'].append({"id":nnode,"type":3,"name":k+":"+a})
+#        JSON['links'].append({"source":name2id[k],"target":nnode,"value":1,"article":a})
+#        name2id[k+":"+a]=nnode
+#        nnode+=1
 
 
 vals,c_max=hist_full.most_common()[0]
@@ -253,7 +258,8 @@ vals=hist_full.most_common()
 vals.reverse()
 for (x,y),c in vals:
     try:
-        JSON['links'].append({"source":name2id[x],"target":name2id[y],"value":int(c/c_max*9)+1,"article":a})
+        w=cases_xy[(x,y)]
+        JSON['links'].append({"source":name3id[x],"target":name2id[y],"value":int(c/c_max*9)+1,"date_setnece":w["meta_name"]['date_sentence']})
     except KeyError:
         continue
 

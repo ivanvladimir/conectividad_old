@@ -6,6 +6,7 @@
 #################
 
 from flask import render_template, Blueprint, send_from_directory
+from datetime import datetime
 
 #######################
 #### loading JSONDB ###
@@ -50,7 +51,7 @@ def law(idd):
 
 @main_blueprint.route("/graph/")
 def graph():
-    return render_template("main/graph.html")
+    return render_template("main/graph.html",year=datetime.now().year)
 
 @main_blueprint.route("/doc/<string:filename>")
 def doc(filename):
