@@ -9,10 +9,15 @@ timestamp() {
 
 TIME_INI=$(date -u -d "$(timestamp)" +"%s")
 
+echo $(timestamp) " > ulimit -m 4194304"
+#ulimit -m 6291456
+ulimit -m 4194304
+
 # Get Parammeter
-while getopts frh opts; do
+while getopts fdrh opts; do
    case ${opts} in
       f) FIRST_TIME=true;;
+      d) DOWNLOAD=true;;
       r) REMOVE=true ;;
       #r) REMOVE=${OPTARG} ;;
       h) HELP=true ;;
@@ -25,11 +30,12 @@ if [ $HELP ]; then
   Scripts necesarios para obtener los documentos necesarios así como los datos y metadatos básicos necesarios.
 
   -f : Primer uso. Instala las dependencias necesarias y crea el entorno virtual.
+  -d : Vuelve a descargar los archivos fuente del repositorio.
   -r : Eliminar. Forza a eliminar todos los registros creados previamente (documentos, enlaces y salidas de datos).
   -h : Muestra la ayuda.
-  Sin banderas : Ejecuta el script sin las banderas -f -r .
+  Sin banderas : Ejecuta el script sin las banderas -f -d -r .
 
-  Uso: ./execute_all.sh [-f][-r][-h]"
+  Uso: ./execute_all.sh [-f][-d][-r][-h]"
   exit
 fi
 
@@ -70,8 +76,10 @@ if [ $FIRST_TIME ]; then
   python3 -m nltk.downloader all
 fi
 
-echo $(timestamp) " > download_casos_contenciosos.py"
-python3 ./download_casos_contenciosos.py
+if [ $FIRST_TIME ] || [ $DOWNLOAD ]; then
+  echo $(timestamp) " > download_casos_contenciosos.py"
+  python3 ./download_casos_contenciosos.py
+fi
 
 echo $(timestamp) " > mkdir ./data/extract_text"
 mkdir ./data/extract_text
@@ -80,16 +88,26 @@ echo $(timestamp) " > mkdir ./data/AnnotatedDocuments"
 mkdir ./data/annotatedDocuments
 
 echo $(timestamp) " > extract_text.py"
-python3 extract_text.py --dbname ./data/DB.json --odir ./data/extract_text
+python3 extract_text.py
 
-echo $(timestamp) " > basic_statistics.py"
-python3 basic_statistics.py
+# Se necesita?
+#echo $(timestamp) " > basic_statistics.py"
+#python3 basic_statistics.py
 
 echo $(timestamp) " > module_canonical_name.py"
-python3 module_canonical_name.py --dbname ./data/DB.json
+python3 module_canonical_name.py
+
+echo $(timestamp) " > cd ./../../gate/Java/"
+cd ./../../gate/Java/
+
+echo $(timestamp) " > ./compile_run_embedded.sh"
+./compile_run_embedded.sh
+
+echo $(timestamp) " > cd ./../../gate/Java/"
+cd ./../src/python
 
 echo $(timestamp) " > extract_articles.py"
-python3 extract_articles.py --dbname ./data/DB.json --graph ./data/graph.json
+python3 extract_articles.py
 
 echo $(timestamp) " > deactivate"
 deactivate
