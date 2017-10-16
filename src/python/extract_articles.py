@@ -180,7 +180,6 @@ if __name__ == "__main__":
                         if not mismo:
                             continue
                         source=mismo.group(1).strip()
-                        print(">>>>>>>>>>>>>",mismo.groups(),source,definitions)
                      
                         for definition in definitions.keys():
                             #print(source.lower().strip().find(definition),definition,source.lower().strip())
@@ -218,6 +217,7 @@ if __name__ == "__main__":
 hist_dest=Counter([y for x,y,z,w in mentions])
 hist_dest2=Counter([(y,z) for x,y,z,w in mentions])
 hist_sources=Counter([x for x,y,z,w in mentions])
+hist_sources_=dict([(x,w) for x,y,z,w in mentions])
 hist_full=Counter([(x,y) for x,y,z,w in mentions])
 cases_xy={}
 for x,y,z,w in mentions:
@@ -233,8 +233,9 @@ JSON["links"]=[]
 id2node={}
 nnode=0
 for idd,k in  enumerate(hist_sources.keys()):
-    if hist_sources[k]>0:
-        JSON['nodes'].append({"id":nnode,"type":1,"name":k})
+    if hist_sources[k]>10:
+        case=hist_sources_[k]
+        JSON['nodes'].append({"id":nnode,"type":1,"name":k,"year":case["meta_name"]['date_sentence'][-4:] })
         name2id[k]=nnode
         nnode+=1
 
@@ -259,7 +260,7 @@ vals.reverse()
 for (x,y),c in vals:
     try:
         w=cases_xy[(x,y)]
-        JSON['links'].append({"source":name3id[x],"target":name2id[y],"value":int(c/c_max*9)+1,"date_setnece":w["meta_name"]['date_sentence']})
+        JSON['links'].append({"source":name2id[x],"target":name2id[y],"value":int(c/c_max*9)+1})
     except KeyError:
         continue
 
