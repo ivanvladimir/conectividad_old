@@ -1,4 +1,4 @@
-<p!--
+<!--
  Penserbjorne - Sebastian Aguilar
  06/2017
  FI-IIMAS-IIJ-UNAM
@@ -23,6 +23,8 @@
   <label class="label">Años</label>
   </div>
 
+{{query}}
+
 	<div class="content">
 	<div style="top:0; left:0; right:0; bottom:0; height:600px;" id="graph-ctn"></div>
 	</div>
@@ -32,4 +34,8 @@
 <script src="{{url_for('main.static', filename='nouislider.min.js')}}" type="text/javascript"></script>
 <script src="{{url_for('main.static', filename='wNumb.js')}}" type="text/javascript"></script>
 <script src="{{url_for('main.static', filename='graph.js')}}" type="text/javascript"></script>
+
+<script>
+$.getJSON('graph.json{{query}}', function(data_) {load_data(data_)});
+</script>
 {% endblock %}

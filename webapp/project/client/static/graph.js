@@ -38,18 +38,16 @@ handlesSlider.noUiSlider.on('slide', function(){
 });
 
 function load_data(data){
-	
 	var nodes_ = [];
 	var edges_ = [];
 
 	
 	for(inode in data.nodes){
 		node=data.nodes[inode];
-		nodes_.push({'group':node.type,'id':inode, 'label':node.name,'clicked':false, 'year':node.year});
+		nodes_.push({'group':node.type,'id':node.id, 'label':node.name,'clicked':false, 'year':node.year});
 	}
 
 	nodes = new vis.DataSet(nodes_);
-
 
 	for(ilink in data.links){
 		link=data.links[ilink];
@@ -57,7 +55,6 @@ function load_data(data){
 	}
 
 	edges = new vis.DataSet(edges_);
-
 
 	var data_vis={
 		nodes:nodes,
@@ -93,29 +90,52 @@ function update_graph(ini,fin){
 	var updates = [];
 	var updates_ = [];
 	nodes.forEach(function(node) {
-		if((node.hidden==false || !node.hidden) && (node.year<ini || node.year>fin)){
-			updates.push({id:node.id,hidden:true});
-			var edges_ = network.getConnectedEdges(node.id);
-			for (iedge in edges_){
-				var edge= edges_[iedge];
-				updates_.push({id:edge,hidden:true});	
+		if(node.group==1){
+			if((node.hidden==false || !node.hidden) && (node.year<ini || node.year>fin)){
+				updates.push({id:node.id,hidden:true});
+				var edges_ = network.getConnectedEdges(node.id);
+				for (iedge in edges_){
+					var edge= edges_[iedge];
+					updates_.push({id:edge,hidden:true});	
+				}
+			}
+			if(node.hidden==true && (node.year>=ini && node.year<=fin)){
+				updates.push({id:node.id,hidden:false});
+				var edges_ = network.getConnectedEdges(node.id);
+				for (iedge in edges_){
+					var edge= edges_[iedge];
+					updates_.push({id:edge,hidden:false});	
+				}
+
 			}
 		}
-		if(node.hidden==true && (node.year>=ini && node.year<=fin)){
-			updates.push({id:node.id,hidden:false});
-			var edges_ = network.getConnectedEdges(node.id);
-			for (iedge in edges_){
-				var edge= edges_[iedge];
-				updates_.push({id:edge,hidden:false});	
+	});
+	nodes.update(updates);
+	edges.update(updates_);
+	updates = [];
+	nodes.forEach(function(node) {
+		if(node.group==2){
+			var nodes_ = network.getConnectedEdges(node.id);
+			var res_ = true;
+			for(inode in nodes_){
+				if (edges.get(nodes_[inode]).hidden == undefined || edges.get(nodes_[inode]).hidden==false){
+					res_ = false;
+					break;
+				}
+			}
+			if((node.hidden==false || !node.hidden) && res_==true)
+			{
+				updates.push({id:node.id,hidden:true});
+			}
+			if(node.hidden==true && res_==false)
+			{
+				updates.push({id:node.id,hidden:false});
 			}
 
 		}
 	});
 	nodes.update(updates);
-	edges.update(updates_);
-
 }
 
-$.getJSON('/conectividad/static/graph.json', function(data_) {load_data(data_)});
 
 
