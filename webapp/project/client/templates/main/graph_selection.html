@@ -1,0 +1,80 @@
+<!--
+ Penserbjorne - Sebastian Aguilar
+ 06/2017
+ FI-IIMAS-IIJ-UNAM
+ Based on https://bl.ocks.org/mbostock/4062045
+ Custom HTML for graph
+-->
+
+{% extends "_base.html" %}
+{% from "_formhelpers.html" import render_field %}
+
+
+{% block content %}
+
+<section class="section">
+
+<div class="container">
+<h1 class="title">Dibujar grafo completo</h1>
+
+<form action="graph_full"  method="GET">
+<div class="field is-grouped">
+  <div class="control">
+  <button class="button is-primary" type="submit">Grafo completo</a>
+  </div>
+  </div>
+</form>
+</div>
+</section>
+
+<section class="section">
+
+<div class="container">
+<h1 class="title">Configurar grafo</h1>
+
+<form action="graph/"  method="POST">
+{{ form.csrf_token }}
+
+<div class="field">
+<label class="label">Incluir sentencias</label>
+<div class="control">
+{{ render_field(form.include,None,"Termino a incluir")}} 
+</div>
+</div>
+
+<div class="field">
+<label class="label">Excluir sentencias</label>
+<div class="control">
+{{ render_field(form.exclude,None,"Termino a excluir")}} 
+</input>
+</div>
+</div>
+
+
+<div class="field">
+<label class="label">Incluir documentos citados</label>
+<div class="control">
+{{ render_field(form.include,None,"Termino a incluir")}} 
+</div>
+</div>
+
+<div class="field">
+<label class="label">Excluir documentos citados</label>
+<div class="control">
+{{ render_field(form.exclude,None,"Termino a excluir")}} 
+</input>
+</div>
+</div>
+
+
+<div class="field is-grouped">
+  <div class="control">
+  <button class="button is-primary" type="submit">Dibujar</a>
+  </div>
+  </div>
+</form>
+</div>
+
+
+
+{% endblock %}
