@@ -35,6 +35,8 @@ main_blueprint = Blueprint('main', __name__,
     )
 
 
+import re
+
 ################
 #### forms ####
 ################
@@ -45,8 +47,8 @@ from wtforms.validators import DataRequired
 class GraphForm(Form):
     include = StringField('include')
     exclude = StringField('exclude')
-    include2 = StringField('include2')
-    exclude2 = StringField('exclude2')
+    include_doc = StringField('include_doc')
+    exclude_doc = StringField('exclude_doc')
 
 
 ################
@@ -75,15 +77,19 @@ def law(idd):
 def graph():
     form = GraphForm(request.form)
     if request.method == 'POST' and form.validate():
-        query=[]
+        query={}
         if form.include.data:
-            query.append("include="+form.include.data)
+            query["include"]=form.include.data
         if form.exclude.data:
-            query.append("exclude="+form.exclude.data)
+            query["exclude"]=form.exclude.data
+        if form.include_doc.data:
+            query["include_doc"]=form.include_doc.data
+        if form.exclude_doc.data:
+            query["exclude_doc"]=form.exclude_doc.data
         if len(query)>0:
-            return render_template("main/graph.html",query="?"+"&".join(query),year=datetime.now().year)
+            return render_template("main/graph.html",params=query,year=datetime.now().year)
         else:
-            return render_template("main/graph.html",query="",year=datetime.now().year)
+            return render_template("main/graph.html",params={},year=datetime.now().year)
     return render_template("main/graph_selection.html",form=form)
 
 
@@ -98,31 +104,89 @@ def graph_json():
         return jsonify(json_graph)
     graph_={'nodes':[],'links':[]}
     nodes_=set()
+    graph_nodes=[]
+    if request.args.get('include'):
+        re_include=re.compile(request.args.get('include'))
+    if request.args.get('include_doc'):
+        re_include_doc=re.compile(request.args.get('include_doc'))
+
     for node in json_graph['nodes']:
         if node['type']==1:
             if request.args.get('include'):
-                if request.args.get('include') in node['name'].lower():
-                    graph_['nodes'].append(node)
-                    nodes_.add(node['id'])
+                if re_include.search(node['name'].lower()):
+                    if not node['id'] in nodes_:
+                        nodes_.add(node['id'])
+                        graph_nodes.append(node)
             else:
-                    graph_['nodes'].append(node)
+                if not node['id'] in nodes_:
+                    graph_nodes.append(node)
                     nodes_.add(node['id'])
+        elif node['type']==2:
+            if request.args.get('include_doc'):
+                if re_include_doc.search(node['name'].lower()):
+                    if not node['id'] in nodes_:
+                        graph_nodes.append(node)
+                        nodes_.add(node['id'])
+            else:
+                if not node['id'] in nodes_:
+                    graph_nodes.append(node)
+                    nodes_.add(node['id'])
+
+
+    graph_nodes_=[]
+    nodes_=set()
+
+    if request.args.get('exclude'):
+        re_exclude=re.compile(request.args.get('exclude'))
+    if request.args.get('exclude_doc'):
+        re_exclude_doc=re.compile(request.args.get('exclude_doc'))
+
+
+    for node in graph_nodes:
+        if node['type']==1:
+            print([k for k in request.args.keys()])
+            if request.args.get('exclude'):
+                if not re_exclude.search(node['name'].lower()):
+                    if not node['id'] in nodes_:
+                        graph_nodes_.append(node)
+                        nodes_.add(node['id'])
+            else:
+                if not node['id'] in nodes_:
+                    graph_nodes_.append(node)
+                    nodes_.add(node['id'])
+        elif node['type']==2:
+            if request.args.get('exclude_doc'):
+                if not re_exclude_doc.search(node['name'].lower()):
+                    if not node['id'] in nodes_:
+                        graph_nodes_.append(node)
+                        nodes_.add(node['id'])
+            else:
+                if not node['id'] in nodes_:
+                    graph_nodes_.append(node)
+                    nodes_.add(node['id'])
+
 
     targets_=set()
+    sources_=set()
     for edge in json_graph['links']:
-        if edge['source'] in nodes_:
+        if edge['source'] in nodes_ and edge['target'] in nodes_:
             graph_['links'].append(edge)
             targets_.add(edge['target'])
+            sources_.add(edge['source'])
 
-    for node in json_graph['nodes']:
-        if node['type']==2 and node['id'] in targets_:
-            if request.args.get('include2'):
-                if request.args.get('include2') in node['name'].lower():
-                    graph_['nodes'].append(node)
-            else:
-                    graph_['nodes'].append(node)
+   
+    print(len(graph_nodes_))
+    for node in graph_nodes_:
+        if node['type']==1:
+            if node['id'] in sources_:
+                graph_['nodes'].append(node)
+        if node['type']==2:
+            if node['id'] in targets_:
+                graph_['nodes'].append(node)
+    
 
-    print(graph_)
+    print(len(graph_['nodes']))
+    print(len(graph_['links']))
     return jsonify(graph_)
 
 
