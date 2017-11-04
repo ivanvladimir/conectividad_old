@@ -45,32 +45,15 @@
       <p class="title" id="len_arcs"></p>
     </div>
   </div>
-</nav>
-
-<hr/>
-
-
-<div class="container">
-  	<div style="top:0; left:0; right:0; bottom:0; height:600px;" id="graph-ctn"></div>
-
-
-<div class="field">
-  <div id="slider"></div>
-  <label class="label">Años</label>
-</div>
-
-
-
-</div>
-<div class="container">
-<div class="card">
-  <div class="card-content">
-    <div class="content">
 {% if params | length > 0 %}
+<div class="level-item has-text-centered">
+<div>
+      <p class="heading">Gráfico</p>
+      <p class="title" id="len_arcs">
 <div class="dropdown is-hoverable">
   <div class="dropdown-trigger">
     <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4">
-      <span>Parámetros gráfico</span>
+      <span>Parámetros</span>
 
       <span class="icon is-small">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
@@ -84,32 +67,32 @@
 	<table class="table">
   	<thead>
     <tr>
-      <th>Parámetros</th>
+      <th>Caso</th>
       <th>ER</th>
     </tr>
   	</thead>
   	<tbody>
 	{% if params['include'] %}
     <tr>
-      <td>Casos incluir</td>
+      <td>Sentencia incluidas</td>
       <td>{{params['include']}}</td>
     </tr>
 	{% endif %}
 	{% if params['exclude'] %}
     <tr>
-      <td>Casos excluir</td>
+      <td>Sentencias excluidas</td>
       <td>{{params['exclude']}}</td>
     </tr>
 	{% endif %}
 	{% if params['include_doc'] %}
     <tr>
-      <td>Citas incluir</td>
+      <td>Citas incluidas</td>
       <td>{{params['include_doc']}}</td>
     </tr>
 	{% endif %}
 	{% if params['exclude_doc'] %}
     <tr>
-      <td>Citas excluir</td>
+      <td>Citas excluidas</td>
       <td>{{params['exclude_doc']}}</td>
     </tr>
 	{% endif %}
@@ -122,15 +105,33 @@
     </div>
   </div>
 </div>
+</p>
+</div>
+</div>
 {% endif %}
 
 
-	<div id="infoNode"></div>
-    </div>
-  </div>
+
+</nav>
+
+<hr/>
+
+
+<div class="container">
+  	<div style="top:0; left:0; right:0; bottom:0; height:600px;" id="graph-ctn"></div>
+<br/>
+
+<div class="field">
+  <div id="slider"></div>
+  <label class="label">Años</label>
+</div>
 </div>
 
-  </div>
+<div class="container">
+<br/>
+<br/>
+	<div id="infoNode"></div>
+
 </div>
 
 

@@ -152,7 +152,6 @@ def graph_json():
 
     for node in graph_nodes:
         if node['type']==1:
-            print([k for k in request.args.keys()])
             if request.args.get('exclude'):
                 if not re_exclude.search(node['name'].lower()):
                     if not node['id'] in nodes_:
@@ -183,7 +182,6 @@ def graph_json():
             sources_.add(edge['source'])
 
    
-    print(len(graph_nodes_))
     for node in graph_nodes_:
         if node['type']==1:
             if node['id'] in sources_:

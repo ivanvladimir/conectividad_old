@@ -85,12 +85,16 @@ function load_data(data){
 
 	network.on("click", function (params) {
 		params.event = "[original event]";
-		var nodo = params.nodes[0];
-		var info={};
-		$.getJSON('contensioso/'+nodo,function(data){
-			console.log(data);
-			document.getElementById('infoNode').innerHTML = infoNode(params,data);
-		})
+		if(params.nodes.length>0){
+			var node = nodes.get(params.nodes[0]);
+			if(node.group==1){
+				$.getJSON('contensioso/'+node.id,function(data){
+					document.getElementById('infoNode').innerHTML = infoNode(params,data,node);
+				});
+			}else{
+				document.getElementById('infoNode').innerHTML = infoNode(params,null,node);
+			}
+			};
 		});
 
 	document.getElementById('len_nodes').innerHTML = nodes.length;
@@ -101,22 +105,83 @@ function load_data(data){
 }
 
 
-function infoNode(params,info){
-
+function infoNode(params,info,node){
 	var tipo = "Arco";
-	if(params.nodes.length==1){
-		tipo = "Nodo";
+	var name = "";
+	node=nodes.get(params.nodes[0])
+
+	//draw column_on
+	if(node.group==2){
+		tipo = "Documento cita";
+		name = node.label;
+		var column_one=`<div class="column">
+			<table class="table">
+			<tbody>
+			<tr><td><strong>Tipo</strong></td><td>${tipo}</td></tr>
+			</tbody>
+		</table>
+		</div>`;
+	} else if(info.doc_type=="source"){
+		tipo = "Sentencia";
+		name = info.meta_name.name;
+		var column_one=`<div class="column">
+			<table class="table">
+			<tbody>
+			<tr><td><strong>Tipo</strong></td><td>${tipo}</td></tr>
+			<tr><td><strong>Subtítulo</strong></td><td>${info.meta_name.actions}</td></tr>
+			<tr><td><strong>Número</strong></td><td>${info.meta_name.number}</td></tr>
+			<tr><td><strong>Fecha</strong></td><td>${info.meta_name.date_sentence}</td></tr>
+			<tr><td><strong>Fuentes</strong></td><td>
+        		<a href="${info.source_pdf}" target="_blank" >
+            	<span class="icon">
+            		<i class="fa fa-file-pdf-o"></i>
+            	</span>
+        		</a>
+        		<a href="doc/${info.txt.split("/").pop(-1)}">
+            		<span class="icon">
+            		<i class="fa fa-eye"></i>
+            	</span>
+        		</a> 
+        	</td>
+        	</tr>
+	
+			</tbody>
+		</table>
+		</div>
+	`;
 	}
+	
+	var connected_nodes = network.getConnectedNodes(node.id);
 
-	var template=`<table class="table">
-		<tbody>
-		<tr><td><strong>Tipo</strong></td><td>${tipo}</td></tr>
-		<tr><td><strong>Total arcos</strong></td><td>${params.edges.length}</td></tr>
-		<tr><td><strong>Nombre</strong></td><td>${info.meta_name.name}</td></tr>
-		</tbody>
-	</table>`;
+	var rows_column_two = "";
+	connected_nodes.forEach(function(connected_node){
+		connected_node=nodes.get(connected_node);
+		rows_column_two+=`<tr><td>${connected_node.label}</td><td>${connected_node.value}</td></tr>`
+	})
 
-	return template;
+	var column_two=`<div class="column">
+			<table class="table">
+			<tbody>
+			<tr><td><strong>Total arcos</strong></td><td>${params.edges.length}</td></tr>
+			${rows_column_two}
+			</tbody>
+			</table>
+	</div>`
+
+
+
+	return `<div class="card">
+	<header class="card-header">
+	    <p class="card-header-title has-text-primary">
+		      ${name}
+		</p>
+	</header>
+		<div class="card-content">
+		    <div class="content">
+				<div class='columns'>${column_one} ${column_two}</div>
+			</div>
+		</div>
+		</div>`;
 }
 
 

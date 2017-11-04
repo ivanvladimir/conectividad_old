@@ -15,7 +15,7 @@
 <section class="section">
 
 <div class="container">
-<h1 class="title">Dibujar grafo completo</h1>
+<h1 class="title">Grafo completo</h1>
 
 <form action="graph_full"  method="GET">
 <div class="field is-grouped">
@@ -26,6 +26,34 @@
 </form>
 </div>
 </section>
+
+<section class="section">
+
+<div class="container">
+<h1 class="title">Grafos por país</h1>
+
+<form action="graph/"  method="POST">
+<div class="field is-grouped">
+  <div class="control">
+<div class="select">
+<select name="include">
+	<option value="chile">Chile</option>
+	<option value="costa rica">Costa Rica</option>
+	<option value="honduras">Honduras</option>
+	<option value="méxico">México</option>
+	<option value="perú">Perú</option>
+</select>
+</div>
+
+ <button class="button is-primary" type="submit">Grafo completo</a>
+  </div>
+  </div>
+</form>
+</div>
+</section>
+
+
+
 
 <section class="section">
 
