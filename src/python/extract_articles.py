@@ -120,6 +120,9 @@ if __name__ == "__main__":
     db = TinyDB(args.dbname)
     contensiosos = db.table('contensiosos')
 
+    print(len(contensiosos))
+
+
     re_selector=re.compile(args.re_selector)
 
     # Initialization counting
@@ -184,7 +187,7 @@ if __name__ == "__main__":
                         for definition in definitions.keys():
                             #print(source.lower().strip().find(definition),definition,source.lower().strip())
                             if (source.lower().strip()+" ").find(definition)>=0:
-                                print("HIT HIT",source,definition,definitions)
+                                #print("HIT HIT",source,definition,definitions)
                                 source=definitions[definition]
                                 break
 
@@ -231,14 +234,13 @@ JSON={}
 JSON["nodes"]=[]
 JSON["links"]=[]
 id2node={}
-nnode=0
 for idd,k in  enumerate(hist_sources.keys()):
-    if hist_sources[k]>10:
+    if hist_sources[k]>3:
         case=hist_sources_[k]
-        JSON['nodes'].append({"id":nnode,"type":1,"name":k,"year":case["meta_name"]['date_sentence'][-4:] })
-        name2id[k]=nnode
-        nnode+=1
+        JSON['nodes'].append({"id":case.doc_id,"type":1,"name":case["meta_name"]['name'],"year":case["meta_name"]['date_sentence'][-4:] })
+        name2id[k]=case.doc_id
 
+nnode=len(contensiosos)+1
 for idd,k in  enumerate(hist_dest.keys()):
     if hist_dest[k]>0:
         JSON['nodes'].append({"id":nnode,"type":2,"name":k})
@@ -260,7 +262,7 @@ vals.reverse()
 for (x,y),c in vals:
     try:
         w=cases_xy[(x,y)]
-        JSON['links'].append({"source":name2id[x],"target":name2id[y],"value":int(c/c_max*9)+1})
+        JSON['links'].append({"source":name2id[x],"target":name2id[y],"value":c+1})
     except KeyError:
         continue
 
