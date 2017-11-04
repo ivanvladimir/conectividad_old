@@ -83,6 +83,40 @@ function load_data(data){
 	};
 	network = new vis.Network(container, data_vis, options);
 
+	network.on("click", function (params) {
+		params.event = "[original event]";
+		var nodo = params.nodes[0];
+		var info={};
+		$.getJSON('contensioso/'+nodo,function(data){
+			console.log(data);
+			document.getElementById('infoNode').innerHTML = infoNode(params,data);
+		})
+		});
+
+	document.getElementById('len_nodes').innerHTML = nodes.length;
+	document.getElementById('len_sntcs').innerHTML = nodes_.filter((node) =>node.group==1).length;
+	document.getElementById('len_citations').innerHTML = nodes_.filter((node) => node.group==2).length;
+	document.getElementById('len_arcs').innerHTML = edges.length;
+
+}
+
+
+function infoNode(params,info){
+
+	var tipo = "Arco";
+	if(params.nodes.length==1){
+		tipo = "Nodo";
+	}
+
+	var template=`<table class="table">
+		<tbody>
+		<tr><td><strong>Tipo</strong></td><td>${tipo}</td></tr>
+		<tr><td><strong>Total arcos</strong></td><td>${params.edges.length}</td></tr>
+		<tr><td><strong>Nombre</strong></td><td>${info.meta_name.name}</td></tr>
+		</tbody>
+	</table>`;
+
+	return template;
 }
 
 
@@ -135,6 +169,34 @@ function update_graph(ini,fin){
 		}
 	});
 	nodes.update(updates);
+
+	var n_nodes=0;
+	var n_nodes_1=0;
+	var n_nodes_2=0;
+	var n_edges =0;
+	nodes.forEach(function(node){
+		if (node.hidden == undefined || node.hidden == false){
+			n_nodes+=1;
+			if (node.group==1){
+				n_nodes_1+=1;	
+			}
+			if (node.group==2){
+				n_nodes_2+=1;	
+			}
+			
+		}
+	});
+
+	edges.forEach(function(edge){
+		if (edge.hidden == undefined || edge.hidden == false){
+			n_edges+=1;
+		}
+	});
+
+	document.getElementById('len_nodes').innerHTML = n_nodes;
+	document.getElementById('len_sntcs').innerHTML = n_nodes_1;
+	document.getElementById('len_citations').innerHTML = n_nodes_2;
+	document.getElementById('len_arcs').innerHTML = n_edges;
 }
 
 
