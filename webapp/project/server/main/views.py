@@ -16,7 +16,7 @@ from datetime import datetime
 from tinydb import TinyDB, Query
 db = TinyDB('DB.json')
 contensiosos = db.table('contensiosos')
-
+CaseQ = Query()
 
 #######################
 #### loading JSONGRPAH ###
@@ -95,7 +95,15 @@ def graph():
 
 @main_blueprint.route("/graph_full/")
 def graph_full():
-    return render_template("main/graph.html",year=datetime.now().year,query="")
+    return render_template("main/graph.html",params={},year=datetime.now().year,query="")
+
+
+
+@main_blueprint.route("/contensioso/<int:case_id>")
+def case_json(case_id):
+   case = contensiosos.get(doc_id=case_id)
+   return jsonify(case)
+ 
 
 
 @main_blueprint.route("/graph.json")

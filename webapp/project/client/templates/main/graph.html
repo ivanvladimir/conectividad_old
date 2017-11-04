@@ -18,20 +18,60 @@
 {% endblock %}
 
 {% block content %}
-  <div class="field">
+<div class="content">
+ 
+<nav class="level">
+  <div class="level-item has-text-centered">
+    <div>
+      <p class="heading">Nodos</p>
+      <p class="title" id="len_nodes"></p>
+    </div>
+  </div>
+  <div class="level-item has-text-centered">
+    <div>
+      <p class="heading">Sentencias</p>
+      <p class="title" id="len_sntcs"></p>
+    </div>
+  </div>
+  <div class="level-item has-text-centered">
+    <div>
+      <p class="heading">Citas</p>
+      <p class="title" id="len_citations"></p>
+    </div>
+  </div>
+  <div class="level-item has-text-centered">
+    <div>
+      <p class="heading">Arcos</p>
+      <p class="title" id="len_arcs"></p>
+    </div>
+  </div>
+</nav>
+
+<hr/>
+
+
+<div class="container">
+  	<div style="top:0; left:0; right:0; bottom:0; height:600px;" id="graph-ctn"></div>
+
+
+<div class="field">
   <div id="slider"></div>
   <label class="label">Años</label>
-  </div>
+</div>
 
 
 
-	<div class="content">
-
+</div>
+<div class="container">
+<div class="card">
+  <div class="card-content">
+    <div class="content">
 {% if params | length > 0 %}
 <div class="dropdown is-hoverable">
   <div class="dropdown-trigger">
     <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4">
       <span>Parámetros gráfico</span>
+
       <span class="icon is-small">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
       </span>
@@ -40,7 +80,6 @@
   <div class="dropdown-menu" id="dropdown-menu4" role="menu">
     <div class="dropdown-content">
       <div class="dropdown-item">
-
 
 	<table class="table">
   	<thead>
@@ -86,10 +125,15 @@
 {% endif %}
 
 
+	<div id="infoNode"></div>
+    </div>
+  </div>
+</div>
+
+  </div>
+</div>
 
 
-	<div style="top:0; left:0; right:0; bottom:0; height:600px;" id="graph-ctn"></div>
-	</div>
 {% endblock %}
 
 {% block js %}
