@@ -6,7 +6,7 @@
 #################
 
 from flask import render_template, Blueprint, send_from_directory, request
-from flask import jsonify
+from flask import jsonify, url_for
 from datetime import datetime
 
 #######################
@@ -204,23 +204,24 @@ def doc(filename):
 
 @main_blueprint.route("/xml/<string:filename>")
 def xml(filename):
+    gate_url=url_for('main.static', filename='gate.css')
     string="""
 <!DOCTYPE html>
 <html xml:lang="en" lang="en">  
 <head>
-    <base href="/conectividad/">
+    <base>
         <title>Conectividad Normativa</title>
-        <link href="/static/gate.css" rel="stylesheet" media="screen"></link>
+        <link href="{0}" rel="stylesheet" media="screen"></link>
      </base>
 </head>
 <body>
-{0}
+{1}
 </body>
 </html>
 """
     with open('annotatedDocuments/'+filename) as filename:
         lines=filename.readlines()
 
-    return string.format("<br/>".join(lines))
+    return string.format(gate_url,"<br/>".join(lines))
 
 
