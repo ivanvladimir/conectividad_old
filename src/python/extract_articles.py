@@ -234,10 +234,16 @@ JSON={}
 JSON["nodes"]=[]
 JSON["links"]=[]
 id2node={}
+
+re_pais=re.compile(r".*\.([^.]*)$")
 for idd,k in  enumerate(hist_sources.keys()):
     if hist_sources[k]>3:
         case=hist_sources_[k]
-        JSON['nodes'].append({"id":case.doc_id,"type":1,"name":case["meta_name"]['name'],"year":case["meta_name"]['date_sentence'][-4:] })
+        m=re_pais.match(case['meta_name']['name'])
+        pais="unknown"
+        if m:
+            pais=m.group(1)
+        JSON['nodes'].append({"id":case.doc_id,"type":1,"country":pais.lower().strip(),"name":case["meta_name"]['name'],"year":case["meta_name"]['date_sentence'][-4:] })
         name2id[k]=case.doc_id
 
 nnode=len(contensiosos)+1

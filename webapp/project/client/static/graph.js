@@ -37,6 +37,35 @@ handlesSlider.noUiSlider.on('slide', function(){
 	update_graph(years[0],years[1]);
 });
 
+
+var country2color={
+	"argentina":"#922B21",
+	"barbados":"#CB4335",
+	"bolivia":"#884EA0 ",
+	"brasil":"#7D3C98",
+	"chile":"#2471A3",
+	"colombia":"#2E86C1",
+	"costa rica":"#2E86C1",
+	"dominicana":"#17A589",
+	"ecuador":"#138D75",
+	"el salvador":"#F1C40F",
+	"guatemala":"#D68910",
+	"granada":"#D68910",
+	"haití":"#800000",
+	"honduras":"#008080",
+	"jamaica":"#FFFF00",
+	"méxico":"#008000",
+	"nicaragua":"#0000FF",
+	"panama":"#000080",
+	"paraguay":"#800080",
+	"perú":"#FF0000",
+	"república dominicana":"#FF5733",
+	"trinidad y tobago":"#808000",
+	"surinam":"#FFCE00",
+	"uruguay":"#5AC8D8",
+	"venezuela":"#CF0A2C",
+}
+
 function load_data(data){
 	var nodes_ = [];
 	var edges_ = [];
@@ -44,7 +73,11 @@ function load_data(data){
 	
 	for(inode in data.nodes){
 		node=data.nodes[inode];
-		nodes_.push({'group':node.type,'id':node.id, 'label':node.name,'clicked':false, 'year':node.year});
+		if(node.type==1){
+			nodes_.push({'group':node.type,'id':node.id, 'label':node.name,'clicked':false, 'year':node.year,'color':country2color[node.country],'size':35});
+		}else if(node.type==2){
+			nodes_.push({'group':node.type,'id':node.id, 'label':node.name,'clicked':false, 'year':node.year});
+		}
 	}
 
 	nodes = new vis.DataSet(nodes_);
@@ -118,6 +151,7 @@ function infoNode(params,info,node){
 			<table class="table">
 			<tbody>
 			<tr><td><strong>Tipo</strong></td><td>${tipo}</td></tr>
+			<tr><td><strong>Total arcos</strong></td><td>${params.edges.length}</td></tr>
 			</tbody>
 		</table>
 		</div>`;
@@ -131,6 +165,7 @@ function infoNode(params,info,node){
 			<tr><td><strong>Subtítulo</strong></td><td>${info.meta_name.actions}</td></tr>
 			<tr><td><strong>Número</strong></td><td>${info.meta_name.number}</td></tr>
 			<tr><td><strong>Fecha</strong></td><td>${info.meta_name.date_sentence}</td></tr>
+			<tr><td><strong>Total arcos</strong></td><td>${params.edges.length}</td></tr>
 			<tr><td><strong>Fuentes</strong></td><td>
         		<a href="${info.source_pdf}" target="_blank" >
             	<span class="icon">
@@ -151,18 +186,26 @@ function infoNode(params,info,node){
 	`;
 	}
 	
-	var connected_nodes = network.getConnectedNodes(node.id);
+	var connected_edges = network.getConnectedEdges(node.id);
 
 	var rows_column_two = "";
-	connected_nodes.forEach(function(connected_node){
-		connected_node=nodes.get(connected_node);
-		rows_column_two+=`<tr><td>${connected_node.label}</td><td>${connected_node.value}</td></tr>`
+	connected_edges.forEach(function(connected_edge){
+		connected_edge=edges.get(connected_edge);
+		if(node.group==1){
+			connected_node=nodes.get(connected_edge.to);
+			rows_column_two+=`<tr><td>${connected_node.label}</td><td>${connected_edge.value}</td></tr>`
+		}else{
+			connected_node=nodes.get(connected_edge.from);
+			rows_column_two+=`<tr><td>${connected_node.label}</td><td>${connected_edge.value}</td></tr>`
+		}
 	})
 
 	var column_two=`<div class="column">
 			<table class="table">
+			<thead>
+				<tr><th>Cita</th><th>Cantidad</th></tr>
+			</thead>
 			<tbody>
-			<tr><td><strong>Total arcos</strong></td><td>${params.edges.length}</td></tr>
 			${rows_column_two}
 			</tbody>
 			</table>
