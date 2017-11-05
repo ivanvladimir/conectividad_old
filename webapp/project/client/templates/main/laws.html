@@ -14,10 +14,10 @@
 	<table class="table" id='lawsTable'>
     <thead>
       <tr>
-        <th>Caso</th>
+        <th width="60%">Caso</th>
         <th>Serie</th>
         <th>Fecha</th>
-        <th>Files</th>
+        <th>Ligas</th>
       </tr>
     </thead>
     <tbody>
@@ -27,6 +27,7 @@
         <td>{{doc.meta_name.number}}</td>
         <td>{{doc.meta_name.date_sentence}}</td>
         <td>
+		<form id="{{doc.meta_name.name}}" method="POST" action="graph/">
 		<a href="{{doc.source_pdf}}" arget="_blank" >
 			<span class="icon">
         	<i class="fa fa-file-pdf-o"></i>
@@ -34,9 +35,16 @@
 		</a>
 		<a href="{{url_for('main.doc',filename=doc.txt.rsplit("/",1)[1])}}">
 			<span class="icon">
+        	<i class="fa fa-file-text-o"></i>
+      		</span>
+		</a>
+		<input type="hidden" id="include" name="include" value="{{doc.meta_name.name | lower}}">
+		<a onclick="document.getElementById('{{doc.meta_name.name}}').submit();">
+			<span class="icon">
         	<i class="fa fa-eye"></i>
       		</span>
-		</a> 
+		</a>
+		</form>
 		</td>
 
 
@@ -44,6 +52,14 @@
 	 {% endfor %}
     </tbody>
   </table>
+</form>
 </div>
 
+
+<script> 
+   function DoPost(page,params){
+	   console.log(page,params);
+	         $.post(page,params );
+	}
+</script>
 {% endblock %}

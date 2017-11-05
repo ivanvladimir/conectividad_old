@@ -51,14 +51,40 @@
 </select>
 </div>
   </div>
+<label class="checkbox">
+  <input type="checkbox" name="exclude_doc" value="(convención americana sobre derechos humanos|reglamento de la corte)">Excluir citas comunes</input>
+</label>
   </div>
  <button class="button is-primary" type="submit">Dibujar</a>
 </form>
 </div>
 </section>
 
+<section class="section">
 
+<div class="container">
+<h1 class="title">Grafos completo</h1>
 
+<form action="graph/"  method="POST">
+<div class="field is-grouped">
+  <div class="control">
+  <input type="hidden" id="exclude_doc" name="exclude_doc" value="(convención americana sobre derechos humanos|reglamento de la corte)">
+  <button class="button is-primary" type="submit">Grafo sin links comunes</a>
+  </div>
+  </div>
+</form>
+
+<form action="graph_full"  method="GET">
+<div class="field is-grouped">
+  <div class="control">
+  <label class="label">Grafo completo</label>
+  <button class="button is-success" type="submit">Grafo completo</a>
+  </div>
+  </div>
+</form>
+
+</div>
+</section>
 
 <section class="section">
 
@@ -71,14 +97,14 @@
 <div class="field">
 <label class="label">Incluir sentencias</label>
 <div class="control">
-{{ render_field(form.include,None,"Termino a incluir")}} 
+{{ render_field(form.include,None,"Termino a incluir (usar minúsculas)")}} 
 </div>
 </div>
 
 <div class="field">
 <label class="label">Excluir sentencias</label>
 <div class="control">
-{{ render_field(form.exclude,None,"Termino a excluir")}} 
+{{ render_field(form.exclude,None,"Termino a excluir (usar minúsculas)")}} 
 </input>
 </div>
 </div>
@@ -87,14 +113,14 @@
 <div class="field">
 <label class="label">Incluir documentos citados</label>
 <div class="control">
-{{ render_field(form.include_doc,None,"Termino a incluir")}} 
+{{ render_field(form.include_doc,None,"Termino a incluir (usar minúsculas)")}} 
 </div>
 </div>
 
 <div class="field">
 <label class="label">Excluir documentos citados</label>
 <div class="control">
-{{ render_field(form.exclude_doc,None,"Termino a excluir")}} 
+{{ render_field(form.exclude_doc,None,"Termino a excluir (usar minúsculas)")}} 
 </input>
 </div>
 </div>
@@ -108,21 +134,6 @@
 </form>
 </div>
 
-</section>
-
-<section class="section">
-
-<div class="container">
-<h1 class="title">Grafo completo</h1>
-
-<form action="graph_full"  method="GET">
-<div class="field is-grouped">
-  <div class="control">
-  <button class="button is-success" type="submit">Grafo completo</a>
-  </div>
-  </div>
-</form>
-</div>
 </section>
 
 
