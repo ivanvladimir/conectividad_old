@@ -6,6 +6,9 @@
 # Ivan Vladimir Meza-Ruiz/ ivanvladimir at turing.iimas.unam.mx
 # 2017/IIMAS/UNAM
 # ----------------------------------------------------------------------
+# Paul Sebastian Aguilar Enriquez/ paul.aguilar at hotmail.com
+# 2017/FI/IIMAS/UNAM
+# ----------------------------------------------------------------------
 
 # System libraries
 import argparse
@@ -33,7 +36,7 @@ if __name__ == "__main__":
     p.add_argument("--odir",
             default="data/contenciosos/", type=str,
             action="store", dest="odir",
-            help="File where to download data")
+            help="File where to extract data")
     p.add_argument("-v", "--verbose",
             action="store_true", dest="verbose",
             help="Verbose mode [Off]")
@@ -45,8 +48,8 @@ if __name__ == "__main__":
     if args.verbose:
        def verbose(*args):
             print("".join([str(x) for x in args]),file=sys.stderr)
-    else:   
-        verbose = lambda *a: None  
+    else:
+        verbose = lambda *a: None
 
     verbose("Connecting to DB:",args.dbname)
     db = TinyDB(args.dbname)
@@ -56,6 +59,7 @@ if __name__ == "__main__":
     for case in contensiosos.all():
         h,t=os.path.split(case['pdf'])
         ofilename=os.path.join(args.odir,t.replace('.pdf','.txt'))
-        verbose('Extracting text from ',case['pdf'], ' into ', ofilename)
-        extract_text_from_pdf(case['pdf'],ofilename)
-        contensiosos.update({'txt':ofilename,'date_modification':datetime.datetime.now().isoformat(' ')},eids=[case.eid])
+        if not os.path.exists(ofilename):
+            verbose('Extracting text from ',case['pdf'], ' into ', ofilename)
+            extract_text_from_pdf(case['pdf'],ofilename)
+            contensiosos.update({'txt':ofilename,'date_modification':datetime.datetime.now().isoformat(' ')},eids=[case.eid])

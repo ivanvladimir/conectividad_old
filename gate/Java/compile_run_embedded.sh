@@ -7,7 +7,10 @@ timestamp() {
   date +"%T"
 }
 
-TIME_INI=$(date -u -d "$(timestamp)" +"%s")
+TIME_INI_t=$(date -u -d "$(timestamp)" +"%s")
+
+echo $(timestamp) " > ulimit -m 2097152 => Max. 2 GB"
+ulimit -m 2097152
 
 echo $(timestamp) " > Compiling"
 
@@ -23,10 +26,6 @@ echo ""
 
 echo $(timestamp) " > Executing"
 
-echo $(timestamp) " > ulimit -m 4194304"
-#ulimit -m 6291456
-ulimit -m 4194304
-
 DFLAGS1=-Dgate.home=$GATE_HOME
 DFLAGS2=-Dgate.plugins.home=$GATE_HOME/plugins
 DFLAGS3=-Dgate.site.config=$GATE_HOME/gate.xml
@@ -37,7 +36,7 @@ java $DFLAGS1 $DFLAGS2 $DFLAGS3 -cp $CP GateEmbedded -g ./../appgate.gapp -e UTF
 
 echo $(timestamp) " > Execution terminated"
 
-TIME_FIN=$(date -u -d "$(timestamp)" +"%s")
-echo "Total time: " $(date -u -d "0 $TIME_FIN sec - $TIME_INI sec" +"%H:%M:%S")
+TIME_FIN_t=$(date -u -d "$(timestamp)" +"%s")
+echo "Total time: " $(date -u -d "0 $TIME_FIN_t sec - $TIME_INI_t sec" +"%H:%M:%S")
 
 echo ""

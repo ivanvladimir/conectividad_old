@@ -1,36 +1,17 @@
-# Orden de ejecución
+# ONE SCRIPT TO RULE THEM ALL!!!
 
-Scripts necesarios para obtener los documentos necesarios así como los datos y metadatos básicos necesarios.
+Descripción: Script útilizado para automátizar la ejecución y despliegue del sistema.
 
-## ONE SCRIPT TO RULE THEM ALL!!!
+- h) Help
+- i) Initialize (install dependencies and create - environment)
+- d) Download data
+- t) Extract text
+- m) Annotated documents
+- a) Extract articles
+- s) Basic statistics
+- l) Create links
+- r) Remove data
+- z) Execute all process
+- e) Exit
 
-Para ejecutar todo de una sola vez.
-
-Banderas:
-
-- -f : Primer uso. Instala las dependencias necesarias y crea el entorno virtual.
-- -r : Eliminar. Forza a eliminar todos los registros creados previamente (documentos, enlaces y salidas de datos).
-- -h : Muestra la ayuda.
-- Sin banderas : Ejecuta el script sin las banderas -f -r .
-```
-./execute_all.sh [-f][-r][-h]
-```
-
-## Uno por uno
-
-Es necesario ejecutar estos scripts en este orden, pueden omitirse las banderas -v -i .
-```
-python download_casos_contenciosos.py
-mkdir ./data/extract_text
-python extract_text.py --dbname ./data/DB.json --odir ./data/extract_text -v
-python basic_statistics.py -v
-python module_canonical_name.py --dbname ./data/DB.json -v -i
-python extract_articles.py --dbname ./data/DB.json --graph ./data/graph.json -v
-```
-
-Hay que realizar un enlace de *./data/DB.json* a *./../../webapp/DB.json* y de *./data/graph.json* a *./../../webapp/project/client/static/graph.json*
-
-```
-ln -sf ./data/DB.json ./../../webapp/DB.json
-ln -sf ./data/graph.json ./../../webapp/project/client/static/graph.json
-```
+Uso: ```./execute.sh [hidtmaslrze]```

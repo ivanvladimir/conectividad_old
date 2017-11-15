@@ -4,11 +4,13 @@
 
 #### Obtener y pre-procesar archivos.
 
-Ejecutar el script ```execute_all.sh``` de ```/path/to/project/src/python/```.
+Ejecutar el script ```execute.sh``` de ```/path/to/project/src/python/```.
 
-Si es la primera vez que se ejecuta, utilizar la bandera ```-f```.
+Para ejecutar con un menu desplegado ```execute.sh```.
 
-```execute_all.sh -f```
+Para ejecutar con alguna bandera especifica ```execute.sh [hidtmaslrze]``` , utilizar la bandera ```h``` para mostrar ayuda.
+
+Para ejecutar todo el proceso utilizar la bandera ```z```, ```execute.sh z```
 
 #### Desplegar sitio web.
 

@@ -49,14 +49,10 @@ import java.util.logging.SimpleFormatter;
  * This class ilustrates how to do simple batch processing with GATE.  It loads
  * an application from a .gapp file (created using "Save application state" in
  * the GATE GUI), and runs the contained application over one or more files.
- * The results are written out to XML files, either in GateXML format (all
- * annotation sets preserved, as in "save as XML" in the GUI), or with inline
- * XML tags taken from the default annotation set (as in "save preserving
- * format").  In this example, the output file names are simply the input file
- * names with ".out.xml" appended.
+ * The results are written out to XML files.
+ * In this example, the output file names are simply the input file names with
+ * ".out.xml" appended.
  *
- * To keep the example simple, we do not do any exception handling - any error
- * will cause the process to abort.
  */
 public class GateEmbedded {
 
@@ -68,6 +64,8 @@ public class GateEmbedded {
    * (inputFile.out.xml).
    */
   public static void main(String[] args) throws Exception {
+
+    // For Logs
     Logger logger = Logger.getLogger("logExecution");
     FileHandler fh;
     try {
@@ -84,10 +82,8 @@ public class GateEmbedded {
         e.printStackTrace();
     }
 
+    // Parsing command line args
     parseCommandLine(args);
-
-    System.out.println("Getting all documents to process.");
-    filesToUse = listf(DataFolder + "extract_text/");
 
     // initialise GATE - this must be done before calling any GATE APIs
     System.out.println("Prepare the library.");
@@ -130,19 +126,36 @@ public class GateEmbedded {
 		annotTypesRequired.add("ResolutivePoints");
 		annotTypesRequired.add("ConcurrentVote");
 
+    System.out.println("Getting all documents to process.");
+    //filesToUse = listf(DataFolder + "extract_text/");
+    filesToUse = listf(DataFolder + "contenciosos/");
+
     System.out.println("Process the files one by one");
     // process the files one by one
     Iterator iterFiles = filesToUse.iterator();
 
+    // Var for the while
+    File docFile;
+    Document doc;
+    String docXMLString;
+    Set annotationsToWrite;
+    AnnotationSet defaultAnnots;
+    Iterator annotTypesIt;
+    String outputFileName;
+    File outputFile;
+    FileOutputStream fos;
+    BufferedOutputStream bos;
+    OutputStreamWriter out;
+
     //for(int i = firstFile; i < args.length; i++) {
     while(iterFiles.hasNext()) {
-      File docFile = (File)iterFiles.next();
+      docFile = (File)iterFiles.next();
       try{
         // load the document (using the specified encoding if one was given)
         //File docFile = new File(args[i]);
         //File docFile = (File)iterFiles.next();
         System.out.println("Processing document " + (processedFiles+1) + " of " + filesToUse.size() + ": " + docFile + "...");
-        Document doc = Factory.newDocument(docFile.toURL(), encoding);
+        doc = Factory.newDocument(docFile.toURL(), encoding);
 
         System.out.println("\tAdding to corpus and executing.");
         // put the document in the corpus
@@ -154,17 +167,18 @@ public class GateEmbedded {
         // remove the document from the corpus again
         corpus.clear();
 
-        String docXMLString = null;
+        docXMLString = null;
+        System.gc();
 
         System.out.println("\tExtracting annotations.");
 
         // Create a temporary Set to hold the annotations we wish to write out
-        Set annotationsToWrite = new HashSet();
+        annotationsToWrite = new HashSet();
 
         // we only extract annotations from the default (unnamed) AnnotationSet
         // in this example
-        AnnotationSet defaultAnnots = doc.getAnnotations();
-        Iterator annotTypesIt = annotTypesRequired.iterator();
+        defaultAnnots = doc.getAnnotations();
+        annotTypesIt = annotTypesRequired.iterator();
         while(annotTypesIt.hasNext()) {
           // extract all the annotations of each requested type and add them to
           // the temporary set
@@ -173,6 +187,7 @@ public class GateEmbedded {
             annotationsToWrite.addAll(annotsOfThisType);
           }
         }
+        System.gc();
 
         System.out.println("\tCreating XML file.");
         // create the XML string using these annotations
@@ -182,14 +197,14 @@ public class GateEmbedded {
         Factory.deleteResource(doc);
 
         // output the XML to <inputFile>.out.xml
-        String outputFileName = "/../annotatedDocuments/" + docFile.getName() + ".xml";
-        File outputFile = new File(docFile.getParentFile(), outputFileName);
+        outputFileName = "/../annotatedDocuments/" + docFile.getName() + ".xml";
+        outputFile = new File(docFile.getParentFile(), outputFileName);
 
         System.out.println("\tWriting XML file on " + outputFile);
         // Write output files using the same encoding as the original
-        FileOutputStream fos = new FileOutputStream(outputFile);
-        BufferedOutputStream bos = new BufferedOutputStream(fos);
-        OutputStreamWriter out;
+        fos = new FileOutputStream(outputFile);
+        bos = new BufferedOutputStream(fos);
+
         if(encoding == null) {
           out = new OutputStreamWriter(bos);
         }
@@ -227,10 +242,21 @@ public class GateEmbedded {
       }
     } // for each file
 
+    System.gc();
     System.out.println("All done!!!");
     System.out.println(processedFiles + " files processed.");
     logger.info("Se ha terminado la ejecucion satisfactoriamente.");
   } // void main(String[] args)
+
+  /**
+  * Get extenssion from a file
+  */
+  private static String getFileExtension(File file) {
+      String fileName = file.getName();
+      if(fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0)
+      return fileName.substring(fileName.lastIndexOf(".")+1);
+      else return "";
+    }
 
 
   /**
@@ -243,12 +269,14 @@ public class GateEmbedded {
        File[] fList = directory.listFiles();
        //resultList.addAll(Arrays.asList(fList));
        for (File file : fList) {
-         if(file.isFile()){
+         if( file.isFile() && getFileExtension(file).equals("txt") ){
            resultList.add(file);
          }else if(file.isDirectory()) {
            resultList.addAll(listf(file.getAbsolutePath()));
          }
        }
+
+       System.gc();
        return resultList;
    }
 
@@ -293,9 +321,7 @@ public class GateEmbedded {
   private static final void usage() {
     System.err.println(
    "Usage:\n" +
-   "   BatchProcessApp -g <gappFile> [-e encoding] [-a annotType]\n" +
-   "             [-a annotType] file1 file2 ... fileN\n" +
-   "\n" +
+   "   BatchProcessApp -g <gappFile> [-e encoding]\n" +
    "-g gappFile : (required) the path to the saved application state we are\n" +
    "              to run over the given documents.  This application must be\n" +
    "              a \"corpus pipeline\" or a \"conditional corpus pipeline\".\n" +

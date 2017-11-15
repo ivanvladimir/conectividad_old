@@ -7,7 +7,7 @@ timestamp() {
   date +"%T"
 }
 
-TIME_INI=$(date -u -d "$(timestamp)" +"%s")
+TIME_INI_t=$(date -u -d "$(timestamp)" +"%s")
 
 echo $(timestamp) " > Compiling"
 
@@ -19,7 +19,7 @@ javac -cp $CP GateEmbedded.java
 
 echo $(timestamp) " > Compiling successfully"
 
-TIME_FIN=$(date -u -d "$(timestamp)" +"%s")
-echo "Total time: " $(date -u -d "0 $TIME_FIN sec - $TIME_INI sec" +"%H:%M:%S")
+TIME_FIN_t=$(date -u -d "$(timestamp)" +"%s")
+echo "Total time: " $(date -u -d "0 $TIME_FIN_t sec - $TIME_INI_t sec" +"%H:%M:%S")
 
 echo ""

@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8
 # ----------------------------------------------------------------------
-# Download cases form webpage
+# Download cases from webpage
 # ----------------------------------------------------------------------
 # Ivan Vladimir Meza-Ruiz/ ivanvladimir at turing.iimas.unam.mx
 # 2017/IIMAS/UNAM
+# ----------------------------------------------------------------------
+# Paul Sebastian Aguilar Enriquez/ paul.aguilar at hotmail.com
+# 2017/FI/IIMAS/UNAM
 # ----------------------------------------------------------------------
 
 # System libraries
@@ -14,11 +17,10 @@ import os.path
 import os
 import requests
 from bs4 import BeautifulSoup
-import json
 import datetime
 from tinydb import TinyDB, Query
 
-
+# Descarga archivo
 def download_file(url,odir,simulate=False):
     local_filename = url.split('/')[-1]
     # NOTE the stream=True parameter
@@ -55,7 +57,7 @@ if __name__ == "__main__":
             action="store_true", dest="verbose",
             help="Verbose mode [Off]")
 
-    # Parsing commanls line arguments
+    # Parsing command line arguments
     args = p.parse_args()
 
     # Defining verbose function
@@ -65,13 +67,18 @@ if __name__ == "__main__":
     else:
         verbose = lambda *a: None
 
+    # Creamos carpetas para almacenar los datos
     os.makedirs(os.path.dirname(args.odir), exist_ok=True)
     os.makedirs(os.path.dirname(args.dbname), exist_ok=True)
     os.makedirs(os.path.join(os.path.dirname(args.odir),'files'), exist_ok=True)
+
+    # Conectamos a la BD
     verbose("Connecting to DB:",args.dbname)
     db = TinyDB(args.dbname)
     contensiosos = db.table('contensiosos')
+    query = Query()
 
+    # Accediendo al sitio
     verbose("Requesting urls:",args.url)
     r = requests.get(args.url)
     verbose("> status:", r.status_code)
@@ -84,6 +91,8 @@ if __name__ == "__main__":
     verbose("> status:", r.status_code)
     main_page = BeautifulSoup(r.text, 'html.parser')
 
+    # Creamos registro de los documentos a descargar
+    # almacenamos la info en la BD
     icase=0
     for case in main_page.find_all('tr'):
         title=None
@@ -93,28 +102,31 @@ if __name__ == "__main__":
             if not title and not (child.font and child.font.strong):
                 continue
             elif not title and child.font and child.font.strong:
-                title= child.font.strong.text
+                title = child.font.strong.text
             else:
                 for ref in child.find_all('a'):
                     if ref['href'].endswith('.pdf'):
                         info_pdf=ref['href']
                     elif ref['href'].endswith('.doc') or ref['href'].endswith('.docx') :
                         info_doc=ref['href']
-                    else:
-                        print("Other file type:",ref['href'])
+                    #else:
+                        #verbose("Other file type:",ref['href'])
         if title:
-            contensiosos.insert(
-                {
-                    'doc_type':u'source',
-                    'date_creation': datetime.datetime.now().isoformat(' '),
-                    'date_modification':datetime.datetime.now().isoformat(' '),
-                    'title':title,
-                    'source_pdf':info_pdf,
-                    'source_doc':info_doc
-                })
+            result_doc = contensiosos.search(query.source_doc == info_doc)
+            result_pdf = contensiosos.search(query.source_pdf == info_pdf)
+            if len(result_doc) == 0 or len(result_pdf) == 0:
+                verbose("Inserting ", title)
+                contensiosos.insert(
+                    {
+                        'doc_type':u'source',
+                        'date_creation': datetime.datetime.now().isoformat(' '),
+                        'date_modification':datetime.datetime.now().isoformat(' '),
+                        'title':title,
+                        'source_pdf':info_pdf,
+                        'source_doc':info_doc
+                    })
 
-
-    verbose(len(contensiosos)," extracted cases")
+    # Comenzamos a descargar los archivos
     verbose("Starting to download files")
     for case in contensiosos.all():
         if case['source_pdf']:

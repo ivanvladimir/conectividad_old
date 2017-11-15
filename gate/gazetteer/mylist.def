@@ -2,3 +2,6 @@ court_members.lst:court:member:es
 years.lst:date2:year2:es
 months.lst:date2:month2:es
 days.lst:date2:day2:es
+apellido_paterno.lst:person_first::es
+apellido_materno.lst:person_first::es
+nombre.lst:person_first::es

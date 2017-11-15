@@ -27,15 +27,12 @@ from bs4 import BeautifulSoup
 from utils import pdf2text, extract_topics, search_regexp
 
 from string import punctuation
-non_words = list(punctuation)                                                    
-#we add spanish punctuation                                                      
-non_words.extend(['¿', '¡'])                                                     
-non_words.extend(map(str,range(10)))  
+non_words = list(punctuation)
+#we add spanish punctuation
+non_words.extend(['¿', '¡'])
+non_words.extend(map(str,range(10)))
 
 sws=stopwords.words('spanish')
-
-
-
 
 re_articulo=re.compile('[\d\.]+')
 re_articulos=re.compile('art.culos?')
@@ -92,7 +89,7 @@ class bcolors:
 if __name__ == "__main__":
     # Command line options
 
-    p = argparse.ArgumentParser(description="Download files")
+    p = argparse.ArgumentParser(description="Extracti articles")
     p.add_argument("--re_selector",
             default=".*", type=str,
             action="store", dest="re_selector",
@@ -121,14 +118,13 @@ if __name__ == "__main__":
     if args.verbose:
        def verbose(*args):
             print(*args)
-    else:   
-        verbose = lambda *a: None  
+    else:
+        verbose = lambda *a: None
 
+    # Connecting to DB
     verbose("Connecting to DB:",args.dbname)
     db = TinyDB(args.dbname)
     contensiosos = db.table('contensiosos')
-
-
 
     re_selector=re.compile(args.re_selector)
 
@@ -143,7 +139,7 @@ if __name__ == "__main__":
             with open(xmlfile) as fp:
                 soup = BeautifulSoup(fp,'lxml')
         except FileNotFoundError:
-            verbose(bcolors.FAIL +'ARCHIVO FALTANTE '+bcolors.ENDC,xmlfile)
+            verbose(bcolors.FAIL + 'ARCHIVO FALTANTE ' + bcolors.ENDC,xmlfile)
             continue
         prev_source=None
         ##definitions={}
@@ -166,15 +162,14 @@ if __name__ == "__main__":
                     verbose(bcolors.OKGREEN +'> Candidate '+ bcolors.ENDC ,sentence_lower)
                     starts=[]
                     for m in re_en_adelante.finditer(sentence_original):
-                        definitions[m.group(3).lower().replace('la ','').replace('el ','').strip()+" "]=m.group(1) 
+                        definitions[m.group(3).lower().replace('la ','').replace('el ','').strip()+" "]=m.group(1)
                         verbose(bcolors.HEADER +'> Definition '+ bcolors.ENDC,m.group(3),'to',m.group(1))
                         if m.group(4):
-                            definitions[m.group(4).lower().replace('la ','').replace('el ','').strip()+" "]=m.group(1) 
+                            definitions[m.group(4).lower().replace('la ','').replace('el ','').strip()+" "]=m.group(1)
                             verbose(bcolors.HEADER +'> Definition '+ bcolors.ENDC,m.group(4),'to',m.group(1))
                     for m in re_corchetes.finditer(sentence_original):
-                        definitions[m.group(1).lower()]=m.group(1)+" "+m.group(2) 
+                        definitions[m.group(1).lower()]=m.group(1)+" "+m.group(2)
                         verbose(bcolors.HEADER +'> Definition '+ bcolors.ENDC,m.group(1)+" "+m.group(2),'to',m.group(1))
-
 
                     for m in re_articulos.finditer(sentence_lower):
                         start,end=m.span()
@@ -187,10 +182,9 @@ if __name__ == "__main__":
                             verbose(bcolors.FAIL +'> ANAFORA '+ bcolors.ENDC,m.group(0))
                             anafora=m.group(0)
 
-
                     for ini,fin in segs:
                         bit=sentence_lower[ini:fin]
-                       
+
                         m=re_recovery.search(bit)
                         if not m:
                             continue
@@ -199,12 +193,12 @@ if __name__ == "__main__":
                         source_start,source_end=m.span('source')
                         SOURCE=sentence_original[ini+source_start:ini+source_end].strip()
                         mismo=re_mismo.search(SOURCE)
-                        
+
                         if not mismo:
                             continue
                         source=mismo.group(1).strip()
                         print(mismo.groups())
-                     
+
                         definitions_=[(len(k),k) for k in definitions.keys()]
                         definitions_.sort()
                         definitions_.reverse()
@@ -219,7 +213,6 @@ if __name__ == "__main__":
                                 source=definitions[definition]
                                 break
 
-                        
                         if source.startswith('PENDING'):
                             if prev_source:
                                 source=prev_source
@@ -231,7 +224,7 @@ if __name__ == "__main__":
                         arts=m.group('articles')
                         for re_,rep_ in replacements:
                             arts=re_.sub(rep_,arts)
-     
+
                         articles=re_numbers.findall(arts)
                         if len(articles)==0:
                             continue
@@ -266,15 +259,18 @@ JSON["links"]=[]
 id2node={}
 
 re_pais=re.compile(r".*\.([^.]*)$")
-for idd,k in  enumerate(hist_sources.keys()):
+for idd,k in enumerate(hist_sources.keys()):
     if hist_sources[k]>4:
         case=hist_sources_[k]
         m=re_pais.match(case['meta_name']['name'])
         pais="unknown"
         if m:
             pais=m.group(1)
-        JSON['nodes'].append({"id":case.doc_id,"type":1,"country":pais.lower().strip(),"name":case["meta_name"]['name'],"year":case["meta_name"]['date_sentence'][-4:] })
-        name2id[k]=case.doc_id
+        try:
+            JSON['nodes'].append({"id":case.doc_id,"type":1,"country":pais.lower().strip(),"name":case["meta_name"]['name'],"year":case["meta_name"]['date_sentence'][-4:] })
+            name2id[k]=case.doc_id
+        except: ## Penserbjorne
+            continue
 
 nnode=len(contensiosos)+1
 for idd,k in  enumerate(hist_dest.keys()):
@@ -290,8 +286,9 @@ for idd,k in  enumerate(hist_dest.keys()):
 #        name2id[k+":"+a]=nnode
 #        nnode+=1
 
-
-vals,c_max=hist_full.most_common()[0]
+#if len(hist_full.most_common()):
+    #Untab
+#    vals,c_max=hist_full.most_common()[0]
 
 vals=hist_full.most_common()
 vals.reverse()

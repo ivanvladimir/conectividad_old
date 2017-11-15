@@ -436,11 +436,11 @@
             <mapType>gate.util.SimpleFeatureMapImpl</mapType>
             <localMap>
               <entry>
-                <string>annotationAccessors</string>
+                <string>binaryGrammarURL</string>
                 <null/>
               </entry>
               <entry>
-                <string>binaryGrammarURL</string>
+                <string>annotationAccessors</string>
                 <null/>
               </entry>
               <entry>
