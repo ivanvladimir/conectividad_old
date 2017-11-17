@@ -21,12 +21,12 @@ done
 
 if [[ $HELP ]]; then
   echo "
-  Descripción:
-  Scripts necesarios para obtener los documentos necesarios así como los datos y metadatos básicos necesarios.
+  ONE SCRIPT TO RULE THEM ALL!!!
+
+  Descripción: Scripts necesarios para obtener los documentos necesarios así como los datos y metadatos básicos necesarios.
 
   -f : Primer uso. Instala las dependencias necesarias, importa las variables necesarias y crea el entorno virtual.
   -h : Muestra la ayuda.
-  Sin banderas : Ejecuta el script sin la bandera -f .
 
   Uso: ./execute_all.sh [-f][-h]"
   exit
@@ -36,7 +36,10 @@ echo "ONE SCRIPT TO RULE THEM ALL!!!"
 
 echo $(timestamp) " > Begining"
 
-if [[ $FIRST_TIME ]]; then
+if [[ $FIRST_TIME ]] || [[ ! -d "./env" ]]; then
+  if [[ ! -d "./env" ]]; then
+    REQUIREMENTS=true
+  fi
   echo $(timestamp) " > virtualenv -p /usr/bin/python3 env"
   virtualenv -p /usr/bin/python3 env
 fi
@@ -44,10 +47,12 @@ fi
 echo $(timestamp) " > source ./env/bin/activate"
 source ./env/bin/activate
 
-if [[ $FIRST_TIME ]]; then
+if [[ $FIRST_TIME ]] || [[ $REQUIREMENTS ]]; then
   echo $(timestamp) " > pip install -r requirements.txt"
   pip3 install -r requirements.txt
+fi
 
+if [[ $FIRST_TIME ]]; then
   echo $(timestamp) " > export APP_SETTINGS=\"project.server.config.ProductionConfig\""
   export APP_SETTINGS="project.server.config.ProductionConfig"
 

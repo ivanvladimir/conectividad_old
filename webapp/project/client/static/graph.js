@@ -70,7 +70,7 @@ function load_data(data){
 	var nodes_ = [];
 	var edges_ = [];
 
-	
+
 	for(inode in data.nodes){
 		node=data.nodes[inode];
 		if(node.type==1){
@@ -176,16 +176,16 @@ function infoNode(params,info,node){
             		<span class="icon">
             		<i class="fa fa-eye"></i>
             	</span>
-        		</a> 
+        		</a>
         	</td>
         	</tr>
-	
+
 			</tbody>
 		</table>
 		</div>
 	`;
 	}
-	
+
 	var connected_edges = network.getConnectedEdges(node.id);
 
 	var rows_column_two = "";
@@ -238,7 +238,7 @@ function update_graph(ini,fin){
 				var edges_ = network.getConnectedEdges(node.id);
 				for (iedge in edges_){
 					var edge= edges_[iedge];
-					updates_.push({id:edge,hidden:true});	
+					updates_.push({id:edge,hidden:true});
 				}
 			}
 			if(node.hidden==true && (node.year>=ini && node.year<=fin)){
@@ -246,7 +246,7 @@ function update_graph(ini,fin){
 				var edges_ = network.getConnectedEdges(node.id);
 				for (iedge in edges_){
 					var edge= edges_[iedge];
-					updates_.push({id:edge,hidden:false});	
+					updates_.push({id:edge,hidden:false});
 				}
 
 			}
@@ -286,12 +286,12 @@ function update_graph(ini,fin){
 		if (node.hidden == undefined || node.hidden == false){
 			n_nodes+=1;
 			if (node.group==1){
-				n_nodes_1+=1;	
+				n_nodes_1+=1;
 			}
 			if (node.group==2){
-				n_nodes_2+=1;	
+				n_nodes_2+=1;
 			}
-			
+
 		}
 	});
 
@@ -306,6 +306,3 @@ function update_graph(ini,fin){
 	document.getElementById('len_citations').innerHTML = n_nodes_2;
 	document.getElementById('len_arcs').innerHTML = n_edges;
 }
-
-
-

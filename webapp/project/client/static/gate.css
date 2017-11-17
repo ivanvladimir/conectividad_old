@@ -22,54 +22,79 @@ Person       { background-color: rgb(200, 200, 230) }
 Title        { background-color: rgb(200, 230, 230) }
 Unknown      { background-color: rgb(230, 200, 230) }
 Etc          { background-color: rgb(230, 230, 200) }  */
-Date2         { background-color: rgb(230, 150, 150) }
-Articles  { background-color: rgb(150, 230, 150) }
-PersonCourtMembers   { background-color: rgb(150, 150, 230) }
-Case     { background-color: rgb(150, 230, 230) }
-DateSentence     { background-color: rgb(230, 150, 230) }
-Actions        { background-color: rgb(230, 230, 150) }
-ResolutivePoints { background-color: rgb(230, 200, 200) }
+
+Case                { background-color: rgb(150, 230, 230) }
+Actions             { background-color: rgb(230, 230, 150) }
+DateSentence        { background-color: rgb(230, 150, 230) }
+PersonCourtMembers  { background-color: rgb(150, 150, 230) }
+
+Date2               { background-color: rgb(230, 150, 150) }
+Articles            { background-color: rgb(150, 230, 150) }
+ResolutivePoints    { background-color: rgb(230, 200, 200) }
+
 /* The next block is an example for having a small tag
    with the name of the annotation type after each annotation */
 Date2:after {
-content: "Fecha";
-font-size: 65%;
-vertical-align: sub;
-color: rgb(100, 100, 100);
+  content: "Fecha";
+  font-size: 65%;
+  vertical-align: sub;
+  color: rgb(100, 100, 100);
 }
+
 Articles:after {
-content: "Artículo";
-font-size: 65%;
-vertical-align: sub;
-color: rgb(100, 100, 100);
+  content: "Artículo";
+  font-size: 65%;
+  vertical-align: sub;
+  color: rgb(100, 100, 100);
 }
+
 PersonCourtMembers:after {
-content: "Miembro de la Corte";
-font-size: 65%;
-vertical-align: sub;
-color: rgb(100, 100, 100);
+  content: "Miembro de la Corte";
+  font-size: 65%;
+  vertical-align: sub;
+  color: rgb(100, 100, 100);
 }
+
 Case:after {
-content: "Caso";
-font-size: 65%;
-vertical-align: sub;
-color: rgb(100, 100, 100);
+  content: "Caso";
+  font-size: 65%;
+  vertical-align: sub;
+  color: rgb(100, 100, 100);
 }
+
 DateSentence:after {
-content: "Fecha de la sentencia";
-font-size: 65%;
-vertical-align: sub;
-color: rgb(100, 100, 100);
+  content: "Fecha de la sentencia";
+  font-size: 65%;
+  vertical-align: sub;
+  color: rgb(100, 100, 100);
 }
+
 Actions:after {
-content: "Acciones";
-font-size: 65%;
-vertical-align: sub;
-color: rgb(100, 100, 100);
+  content: "Estructura legal";
+  font-size: 65%;
+  vertical-align: sub;
+  color: rgb(100, 100, 100);
 }
+
 ResolutivePoints:after {
-content: "Puntos Resolutivos";
-font-size: 65%;
-vertical-align: sub;
-color: rgb(100, 100, 100);
+  content: "Puntos Resolutivos";
+  font-size: 65%;
+  vertical-align: sub;
+  color: rgb(100, 100, 100);
 }
+
+.nCase                        { background-color: #f5f5f5 }
+.nCase::after                 { content: "" }
+.nActions                     { background-color: #f5f5f5 }
+.nActions::after              { content: "" }
+.nDateSentence                { background-color: #f5f5f5 }
+.nDateSentence::after         { content: "" }
+.nPersonCourtMembers          { background-color: #f5f5f5 }
+.nPersonCourtMembers::after   { content: "" }
+
+.nDate2                       { background-color: #f5f5f5 }
+.nDate2::after                { content: "" }
+.nArticles                    { background-color: #f5f5f5 }
+.nArticles::after             { content: "" }
+.nResolutivePoints            { background-color: #f5f5f5 }
+.nResolutivePoints::after     { content: "" }

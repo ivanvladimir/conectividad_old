@@ -9,133 +9,139 @@
 {% extends "_base.html" %}
 {% from "_formhelpers.html" import render_field %}
 
-
 {% block content %}
 
+  <section class="section">
+    <div class="container">
+      <h1 class="title">Grafos por país</h1>
+      <form action="graph/"  method="POST">
+        <div class="field is-grouped">
+          <div class="control">
+            <label class="label">Países</label>
+          </div>
+
+          <div class="control">
+            <div class="select">
+              <select name="include">
+                <option value="argentina">Argentina</option>
+                <option value="barbados">Barbados</option>
+                <option value="bolivia">Bolivia</option>
+                <option value="brasil">Brasil</option>
+                <option value="chile">Chile</option>
+                <option value="colombia">Colombia</option>
+                <option value="costa rica">Costa Rica</option>
+                <option value="dominicana">Dominicana</option>
+                <option value="ecuador">Ecuador</option>
+                <option value="el salvador">El Salvador</option>
+                <option value="guatemala">Guatemala</option>
+                <option value="granada">Granada</option>
+                <option value="haití">Haití</option>
+                <option value="honduras">Honduras</option>
+                <option value="jamaica">Jamaica</option>
+                <option value="méxico">México</option>
+                <option value="nicaragua">Nicaragua</option>
+                <option value="panama">Panama</option>
+                <option value="paraguay">Paraguay</option>
+                <option value="perú">Perú</option>
+                <option value="república dominicana">República Dominicana</option>
+                <option value="trinidad y tobago">Trinidad y Tobago</option>
+                <option value="surinam">Surinam</option>
+                <option value="uruguay">Uruguay</option>
+                <option value="venezuela">Venezuela</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="control">
+            <label class="checkbox">
+              <input type="checkbox" name="exclude_doc" value="(convención americana sobre derechos humanos|reglamento de la corte)">Excluir citas comunes</input>
+            </label>
+          </div>
+
+          <div class="control">
+            <button class="button is-primary" type="submit">Dibujar</a>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </section>
+
 <section class="section">
+  <div class="container">
+    <h1 class="title">Grafos completo</h1>
+    <div class="field is-grouped">
 
-<div class="container">
-<h1 class="title">Grafos por país</h1>
+      <div class="control">
+        <form action="graph/"  method="POST">
+          <div class="field is-grouped">
+            <div class="control">
+              <input type="hidden" id="exclude_doc" name="exclude_doc" value="(convención americana sobre derechos humanos|reglamento de la corte)">
+              <button class="button is-primary" type="submit">Grafo sin links comunes</a>
+            </div>
+          </div>
+        </form>
+      </div>
 
-<form action="graph/"  method="POST">
-<div class="field">
-<label class="label">Países</label>
-  <div class="control">
-<div class="select">
-<select name="include">
-	<option value="argentina">Argentina</option>
-	<option value="barbados">Barbados</option>
-	<option value="bolivia">Bolivia</option>
-	<option value="brasil">Brasil</option>
-	<option value="chile">Chile</option>
-	<option value="colombia">Colombia</option>
-	<option value="costa rica">Costa Rica</option>
-	<option value="dominicana">Dominicana</option>
-	<option value="ecuador">Ecuador</option>
-	<option value="el salvador">El Salvador</option>
-	<option value="guatemala">Guatemala</option>
-	<option value="granada">Granada</option>
-	<option value="haití">Haití</option>
-	<option value="honduras">Honduras</option>
-	<option value="jamaica">Jamaica</option>
-	<option value="méxico">México</option>
-	<option value="nicaragua">Nicaragua</option>
-	<option value="panama">Panama</option>
-	<option value="paraguay">Paraguay</option>
-	<option value="perú">Perú</option>
-	<option value="república dominicana">República Dominicana</option>
-	<option value="trinidad y tobago">Trinidad y Tobago</option>
-	<option value="surinam">Surinam</option>
-	<option value="uruguay">Uruguay</option>
-	<option value="venezuela">Venezuela</option>
-</select>
-</div>
+      <div class="control">
+        <form action="graph_full"  method="GET">
+          <div class="field is-grouped">
+            <div class="control">
+              <button class="button is-success" type="submit">Grafo completo</a>
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div>
   </div>
-<label class="checkbox">
-  <input type="checkbox" name="exclude_doc" value="(convención americana sobre derechos humanos|reglamento de la corte)">Excluir citas comunes</input>
-</label>
-  </div>
- <button class="button is-primary" type="submit">Dibujar</a>
-</form>
-</div>
 </section>
 
 <section class="section">
+  <div class="container">
+    <h1 class="title">Configurar grafo</h1>
 
-<div class="container">
-<h1 class="title">Grafos completo</h1>
+    <form action="graph/"  method="POST">
+      {{ form.csrf_token }}
 
-<form action="graph/"  method="POST">
-<div class="field is-grouped">
-  <div class="control">
-  <input type="hidden" id="exclude_doc" name="exclude_doc" value="(convención americana sobre derechos humanos|reglamento de la corte)">
-  <button class="button is-primary" type="submit">Grafo sin links comunes</a>
-  </div>
-  </div>
-</form>
+      <div class="field">
+        <label class="label">Incluir sentencias</label>
+        <div class="control">
+          {{ render_field(form.include,None,"Termino a incluir (usar minúsculas)")}}
+        </div>
+      </div>
 
-<form action="graph_full"  method="GET">
-<div class="field is-grouped">
-  <div class="control">
-  <label class="label">Grafo completo</label>
-  <button class="button is-success" type="submit">Grafo completo</a>
-  </div>
-  </div>
-</form>
+      <div class="field">
+        <label class="label">Excluir sentencias</label>
+        <div class="control">
+          {{ render_field(form.exclude,None,"Termino a excluir (usar minúsculas)")}}
+        </input>
+        </div>
+      </div>
 
-</div>
+      <div class="field">
+        <label class="label">Incluir documentos citados</label>
+        <div class="control">
+          {{ render_field(form.include_doc,None,"Termino a incluir (usar minúsculas)")}}
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Excluir documentos citados</label>
+        <div class="control">
+          {{ render_field(form.exclude_doc,None,"Termino a excluir (usar minúsculas)")}}
+          </input>
+        </div>
+      </div>
+
+      <div class="field is-grouped">
+        <div class="control">
+          <button class="button is-primary" type="submit">Dibujar</a>
+        </div>
+      </div>
+    </form>
+    
+  </div>
 </section>
-
-<section class="section">
-
-<div class="container">
-<h1 class="title">Configurar grafo</h1>
-
-<form action="graph/"  method="POST">
-{{ form.csrf_token }}
-
-<div class="field">
-<label class="label">Incluir sentencias</label>
-<div class="control">
-{{ render_field(form.include,None,"Termino a incluir (usar minúsculas)")}} 
-</div>
-</div>
-
-<div class="field">
-<label class="label">Excluir sentencias</label>
-<div class="control">
-{{ render_field(form.exclude,None,"Termino a excluir (usar minúsculas)")}} 
-</input>
-</div>
-</div>
-
-
-<div class="field">
-<label class="label">Incluir documentos citados</label>
-<div class="control">
-{{ render_field(form.include_doc,None,"Termino a incluir (usar minúsculas)")}} 
-</div>
-</div>
-
-<div class="field">
-<label class="label">Excluir documentos citados</label>
-<div class="control">
-{{ render_field(form.exclude_doc,None,"Termino a excluir (usar minúsculas)")}} 
-</input>
-</div>
-</div>
-
-
-<div class="field is-grouped">
-  <div class="control">
-  <button class="button is-primary" type="submit">Dibujar</a>
-  </div>
-  </div>
-</form>
-</div>
-
-</section>
-
-
 
 {% endblock %}

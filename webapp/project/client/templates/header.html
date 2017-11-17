@@ -1,63 +1,62 @@
   <!-- Navigation -->
 <header>
   <nav class="navbar ">
-  
+    <div id="navMainMenu" class="navbar-menu">
+  	  <div class="navbar-start">
+    	  <a class="navbar-item " href="{{ url_for('main.home') }}">
+          <span class="icon">
+    	       <i class="fa fa-2x fa-home"></i>
+    		  </span>
+        </a>
 
+        <a class="navbar-item " href="{{ url_for('main.laws') }}">
+          Sentencias
+        </a>
 
-  <div id="navMainMenu" class="navbar-menu">
-	  <div class="navbar-start">
-	  <a class="navbar-item " href="{{ url_for('main.home') }}">
-	  	<span class="icon">
-	    	<i class="fa fa-2x fa-home"></i>
-		</span>
-      </a>
-    
-      <a class="navbar-item " href="{{ url_for('main.laws') }}">
-        Sentencias
-      </a>
-      <a class="navbar-item " href="{{ url_for('main.graph') }}">
-        Conectividad
-      </a>
-      <a class="navbar-item " href="{{ url_for('main.about') }}">
-        Acerca
-      </a>
-	  </div>
+        <a class="navbar-item " href="{{ url_for('main.graph') }}">
+          Conectividad
+        </a>
 
-
-	  <div class="navbar-end">
-      {% if current_user.is_authenticated %}
-		<a class="navbar-item " href="{{ url_for('main.members') }}">
-        	Miembros
-      	</a>
-	  {% endif %}
-      {% if current_user.is_authenticated %}
-	  <a class="navbar-item " href="{{ url_for('user.logout') }}">
-       <span class="icon" style="color: #333;">
-        <i class="fa fa-sign-out"></i>
-      </span>Salir
-	  </a>
-
-	  {% else %}
-	  <a class="navbar-item " href="{{ url_for('user.login') }}">
-       <span class="icon" style="color: #333;">
-        <i class="fa fa-sign-in"></i>
-      </span> Entrar/Registrarse
-	  </a>
-	  {% endif %}
+        <a class="navbar-item " href="{{ url_for('main.about') }}">
+          Acerca
+        </a>
   	  </div>
-  </div>
-  </nav>
-<section class="hero is-primary">
-  <div class="hero-body">
-    <div class="container">
-      <h1 class="title">
-           <strong>Conectividad Normativa</strong>
-      </h1>
-      <h2 class="subtitle">
-      Visualizador de conectividad de las sentencias de la Corte Interamericana de Derechos Humanos
-      </h2>
-    </div>
-  </div>
-</section>
-</header>
 
+
+  	  <div class="navbar-end">
+        {% if current_user.is_authenticated %}
+        <a class="navbar-item " href="{{ url_for('main.members') }}">
+          Miembros
+        </a>
+        {% endif %}
+        {% if current_user.is_authenticated %}
+        <a class="navbar-item " href="{{ url_for('user.logout') }}">
+          <span class="icon" style="color: #333;">
+            <i class="fa fa-sign-out"></i>
+          </span>Salir
+        </a>
+
+        {% else %}
+        <a class="navbar-item " href="{{ url_for('user.login') }}">
+          <span class="icon" style="color: #333;">
+            <i class="fa fa-sign-in"></i>
+          </span> Entrar/Registrarse
+  	     </a>
+         {% endif %}
+       </div>
+     </div>
+  </nav>
+
+  <section class="hero is-primary">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title">
+             <strong>Conectividad Normativa</strong>
+        </h1>
+        <h2 class="subtitle">
+          Visualizador de conectividad de las sentencias de la Corte Interamericana de Derechos Humanos
+        </h2>
+      </div>
+    </div>
+  </section>
+</header>

@@ -22,7 +22,7 @@ CaseQ = Query()
 #### loading JSONGRPAH ###
 #######################
 import json
-with open('graph.json') as data_file:    
+with open('graph.json') as data_file:
     json_graph = json.load(data_file)
 
 ################
@@ -103,7 +103,7 @@ def graph_full():
 def case_json(case_id):
    case = contensiosos.get(doc_id=case_id)
    return jsonify(case)
- 
+
 
 
 @main_blueprint.route("/graph.json")
@@ -181,7 +181,7 @@ def graph_json():
             targets_.add(edge['target'])
             sources_.add(edge['source'])
 
-   
+
     for node in graph_nodes_:
         if node['type']==1:
             if node['id'] in sources_:
@@ -189,7 +189,7 @@ def graph_json():
         if node['type']==2:
             if node['id'] in targets_:
                 graph_['nodes'].append(node)
-    
+
 
     print(len(graph_['nodes']))
     print(len(graph_['links']))
@@ -204,24 +204,24 @@ def doc(filename):
 
 @main_blueprint.route("/xml/<string:filename>")
 def xml(filename):
-    gate_url=url_for('main.static', filename='gate.css')
+    gate_css_url=url_for('main.static', filename='gate.css')
+    gate_js_url=url_for('main.static', filename='gate.js')
     string="""
 <!DOCTYPE html>
-<html xml:lang="en" lang="en">  
-<head>
-    <base>
-        <title>Conectividad Normativa</title>
-        <link href="{0}" rel="stylesheet" media="screen"></link>
-     </base>
-</head>
-<body>
-{1}
-</body>
+<html xml:lang="en" lang="en">
+    <head>
+        <base>
+            <title>Conectividad Normativa</title>
+            <link href="{0}" rel="stylesheet" media="screen"></link>
+        </base>
+    </head>
+    <body>
+        {2}
+        <script src="{1}" type="text/javascript"></script>
+    </body>
 </html>
 """
     with open('annotatedDocuments/'+filename) as filename:
         lines=filename.readlines()
 
-    return string.format(gate_url,"<br/>".join(lines))
-
-
+    return string.format(gate_css_url,gate_js_url,"<br/>".join(lines))
