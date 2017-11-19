@@ -14,13 +14,15 @@ Para ejecutar todo el proceso utilizar la bandera ```z```, ```execute.sh z```
 
 #### Desplegar sitio web.
 
-Ejecutar el script ```execute_all.sh``` de ```/path/to/project/webapp/```.
+Ejecutar el script ```execute.sh``` de ```/path/to/project/webapp/```.
 
 Si es la primera vez que se ejecuta, utilizar la bandera ```-f```.
 
-```execute_all.sh -f```
+```execute.sh -f```
 
 #### Etiquetar documentos.
+
+* Nota: Actualmente se puede ejecutar el script ```execute.sh``` de ```/path/to/project/src/python/``` con la bandera ```m```, ```execute.sh m```.
 
 Ir al directorio ```/path/to/project/gate/Java/```.
 
