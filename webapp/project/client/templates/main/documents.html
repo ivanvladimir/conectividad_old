@@ -1,95 +1,117 @@
 <!--
  Penserbjorne - Sebastian Aguilar
- 06/2017
+ 2017
  FI-IIMAS-IIJ-UNAM
- Based on https://bl.ocks.org/mbostock/4062045
- Custom HTML for graph
 -->
 
 {% extends "_base.html" %}
 
 {% block content %}
-
-<div class="box">
-
-  <label class="label">Mostrar etiquetas</label>
-
-  <div class="columns">
-    <div class="column">
-      <label class="checkbox">
-        <input type="checkbox" checked id="chkbxCaso">
-        Caso
-      </label>
-    </div>
-
-    <div class="column">
-      <label class="checkbox">
-        <input type="checkbox" checked id="chkbxEsctructura">
-        Estructura legal
-      </label>
-    </div>
-
-    <div class="column">
-      <label class="checkbox">
-        <input type="checkbox" checked id="chkbxFechaSentencia">
-        Fecha de la sentencia
-      </label>
-    </div>
-
-    <div class="column">
-      <label class="checkbox">
-        <input type="checkbox" checked id="chkbxMiembros">
-        Miembros de la corte
-      </label>
-    </div>
-  </div>
-
-  <div class="columns">
-    <div class="column">
-      <label class="checkbox">
-        <input type="checkbox" checked id="chkbxFechas">
-        Fechas
-      </label>
-    </div>
-
-    <div class="column">
-      <label class="checkbox">
-        <input type="checkbox" checked id="chkbxArticulos">
-        Artículos
-      </label>
-    </div>
-
-    <div class="column">
-      <label class="checkbox">
-        <input type="checkbox" checked id="chkbxPuntosResolutivos">
-        Puntos resolutivos
-      </label>
-    </div>
-
-    <div class="column">
-      <label class="checkbox">
-        <input type="checkbox" checked id="chkbxConectores">
-        Conectores semánticos
-      </label>
-    </div>
-  </div>
-
-  <div class="columns">
-    <div class="column"></div>
-    <div class="column"></div>
-    <div class="column"></div>
-
-    <div class="column">
-      <button class="button is-primary" onclick="applyCSS()">Aplicar</button>
-    </div>
-  </div>
-
+<!-- Inicio pestañas -->
+<div class="tabs is-centered" id="meTab">
+  <ul>
+    <li onclick="isActiveTab(this, tab1)" class="is-active"><a>Etiquetas</a></li>
+    <li onclick="isActiveTab(this, tab2)"><a>Music</a></li>
+    <li onclick="isActiveTab(this, tab3)"><a>Videos</a></li>
+    <li onclick="isActiveTab(this, tab4)"><a>Documents</a></li>
+  </ul>
 </div>
+<!-- Fin pestañas -->
+
+<!-- Inicio Contenedores de las pestañas -->
+  <!-- Inicio Seleccionar etiquetas -->
+  <div class="box" id="tab1">
+
+    <label class="label">Mostrar etiquetas</label>
+
+    <div class="columns">
+      <div class="column">
+        <label class="checkbox">
+          <input type="checkbox" checked id="chkbxCaso">
+          Caso
+        </label>
+      </div>
+
+      <div class="column">
+        <label class="checkbox">
+          <input type="checkbox" checked id="chkbxEsctructura">
+          Estructura legal
+        </label>
+      </div>
+
+      <div class="column">
+        <label class="checkbox">
+          <input type="checkbox" checked id="chkbxFechaSentencia">
+          Fecha de la sentencia
+        </label>
+      </div>
+
+      <div class="column">
+        <label class="checkbox">
+          <input type="checkbox" checked id="chkbxMiembros">
+          Miembros de la corte
+        </label>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="column">
+        <label class="checkbox">
+          <input type="checkbox" checked id="chkbxFechas">
+          Fechas
+        </label>
+      </div>
+
+      <div class="column">
+        <label class="checkbox">
+          <input type="checkbox" checked id="chkbxArticulos">
+          Artículos
+        </label>
+      </div>
+
+      <div class="column">
+        <label class="checkbox">
+          <input type="checkbox" checked id="chkbxPuntosResolutivos">
+          Puntos resolutivos
+        </label>
+      </div>
+
+      <div class="column">
+        <label class="checkbox">
+          <input type="checkbox" checked id="chkbxConectores">
+          Conectores semánticos
+        </label>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="column"></div>
+      <div class="column"></div>
+      <div class="column"></div>
+
+      <div class="column">
+        <button class="button is-primary" onclick="applyCSS()">Aplicar</button>
+      </div>
+    </div>
+
+  </div>
+  <!-- Fin Seleccionar etiquetas -->
+
+  <div class="box" id="tab2">
+    Hola tab 2
+  </div>
+  <div class="box" id="tab3">
+    Hola tab 3
+  </div>
+  <div class="box" id="tab4">
+    Hola tab 4
+  </div>
+<!-- Inicio Contenedores de las pestañas -->
 
 <div class="notification">
   <iframe id="documentFrame" width="100%" scrolling="auto" src="{{url_for('main.xml', filename=filename)}}"></iframe>
 </div>
 
-<script src="{{url_for('main.static', filename='annotations.js')}}" type="text/javascript"></script>
+<script src="{{url_for('main.static', filename='documents.js')}}" type="text/javascript"></script>
 
 {% endblock %}

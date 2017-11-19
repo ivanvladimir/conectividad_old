@@ -4,6 +4,10 @@
  FI-IIMAS-IIJ-UNAM
 */
 
+for(var i = 2; i < 5; i++){
+  document.getElementById("tab" + i).style.display = "none";
+}
+
 var documentFrame = document.getElementById('documentFrame').contentWindow;
 
 function applyCSS() {
@@ -54,4 +58,14 @@ function applyCSS() {
     }else {
       documentFrame.applyCSS("conectores","nConectores");
     }
+}
+
+function isActiveTab(me, tab){
+  var tabs = document.getElementById("meTab").getElementsByTagName("LI");
+  for(var i = 0; i < tabs.length; i++){
+    tabs[i].className = "";
+    document.getElementById("tab" + (i+1)).style.display = "none";
+  }
+  me.className = 'is-active';
+  tab.style.display = "block";
 }
