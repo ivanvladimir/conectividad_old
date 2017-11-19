@@ -9,6 +9,16 @@ from flask import render_template, Blueprint, send_from_directory, request
 from flask import jsonify, url_for
 from datetime import datetime
 
+import os.path
+import os
+
+import nltk
+#from nltk import word_tokenize
+from nltk.corpus import stopwords
+from nltk.tokenize import wordpunct_tokenize
+from nltk.probability import FreqDist
+import matplotlib.pyplot as plt
+
 #######################
 #### loading JSONDB ###
 #######################
@@ -72,9 +82,7 @@ def laws():
 def law(idd):
     return render_template("main/law.html",doc=contensiosos.get(eid=idd))
 
-#@main_blueprint.route("/doc/<string:filename>")
-#def doc(filename):
-#    return render_template("main/documents.html",filename=filename+".xml")
+
 @main_blueprint.route("/doc/", methods=["GET","POST"])
 def doc():
     # Para GET
@@ -83,9 +91,43 @@ def doc():
     # Para POST , no funciona actualmente :(
     #xmlName = request.args['docXmlName']
     #docNum = request.args['docNum']
-
     docNum = eval(docNum)
-    return render_template("main/documents.html",filename=xmlName+".xml", doc=contensiosos.get(eid=docNum))
+
+    stop_words = set(stopwords.words('spanish'))
+    stop_words.update(
+        ['.', ',', '“', "”", '"', "'", '¿', '?', '!', '¡', ':', ';', '(', ')', '°',
+        ".(", ").","(”", "”)", "”),", "”).", "),", '[', ']', "[.", ".]", '{', '}',
+        "”.", "].", "[.]", '_','-','/', "_________________________"]
+    )
+
+    with open('contenciosos/'+xmlName) as filename:
+        lines=filename.readlines()
+
+    cleaned = ""
+    for line in lines:
+        cleaned += line + " "
+
+    cleanLines = [i.lower() for i in wordpunct_tokenize(cleaned) if i.lower() not in stop_words]
+
+    fdist = FreqDist(cleanLines)
+
+    xs=[]
+    ws=[]
+    plotRange = 25
+    for w,c in fdist.most_common(plotRange):
+        xs.append(w)
+        ws.append(c)
+
+    fig, ax = plt.subplots()
+    rects1 = ax.bar(range(plotRange), ws, color='g')
+    plt.xticks(range(plotRange), xs, rotation='vertical')
+    plt.subplots_adjust(bottom=0.30)
+    imgPath = "./project/client/static/"
+    imgName = xmlName + ".png"
+    plt.savefig(imgPath + imgName)
+
+    return render_template("main/documents.html",filename=xmlName+".xml",
+        doc=contensiosos.get(eid=docNum),fdist=fdist, vocabImg=imgName)
 
 
 @main_blueprint.route("/xml/<string:filename>")

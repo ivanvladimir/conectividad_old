@@ -1,3 +1,9 @@
+# Importante!
+
+No olvidar ejecutar el comando ```execute.sh z``` de la carpeta 
+```path/to/project/src/python```  para ejecutar todos los 
+procesos previos necesarios.
+
 # ONE SCRIPT TO RULE THEM ALL!!!
 
 Scripts para ejecutar el sistema de manera automatizada.

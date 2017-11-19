@@ -50,6 +50,9 @@ source ./env/bin/activate
 if [[ $FIRST_TIME ]] || [[ $REQUIREMENTS ]]; then
   echo $(timestamp) " > pip install -r requirements.txt"
   pip3 install -r requirements.txt
+
+  echo $(timestamp) " > python3 -m nltk.downloader all"
+  python3 -m nltk.downloader all
 fi
 
 if [[ $FIRST_TIME ]]; then

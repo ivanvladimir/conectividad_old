@@ -3,6 +3,8 @@ migrations/
 os
 DB.json
 graph.json
+temp/
+project/client/static/*.txt.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

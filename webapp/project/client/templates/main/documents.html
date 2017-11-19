@@ -23,6 +23,7 @@
 <!-- Fin pestañas -->
 
 <!-- Inicio Contenedores de las pestañas -->
+  <!-- Resumen -->
   <div class="box" id="tab0">
     <strong>{{doc.meta_name.name}}</strong>
     <hr/>
@@ -83,7 +84,8 @@
 
     <strong>Mostrar etiquetas</strong>
     <hr/>
-    <div class="columns">
+    <div class="columns is-multiline">
+
       <div class="column">
         <label class="checkbox">
           <input type="checkbox" checked id="chkbxCaso">
@@ -111,9 +113,7 @@
           Miembros de la corte
         </label>
       </div>
-    </div>
 
-    <div class="columns">
       <div class="column">
         <label class="checkbox">
           <input type="checkbox" checked id="chkbxFechas">
@@ -141,12 +141,6 @@
           Conectores semánticos
         </label>
       </div>
-    </div>
-
-    <div class="columns">
-      <div class="column"></div>
-      <div class="column"></div>
-      <div class="column"></div>
 
       <div class="column">
         <button class="button is-primary" onclick="applyCSS()">Aplicar</button>
@@ -156,26 +150,55 @@
   </div>
   <!-- Fin Seleccionar etiquetas -->
 
+  <!-- Vocabulario -->
   <div class="box" id="tab2">
-    Vocabulario
+    <strong>Vocabulario</strong> - Palabra(Frecuencia)
+    <hr/>
+
+    <div class="columns">
+      <div class="column">
+
+        <div class="columns is-multiline">
+        {% for par in fdist.most_common(50) %}
+            <div class="column">
+              <strong>{{par[0]}}</strong>({{par[1]}})
+            </div>
+        {% endfor %}
+        </div>
+
+      </div>
+      <div class="column is-half has-text-centered">
+        <img src="{{url_for('main.static', filename=vocabImg)}}" alt="Gráfico de frecuencias de vocabulario"/>
+        Las 20 palabras más frecuentes.
+      </div>
+    </div>
+
   </div>
 
+  <!-- Participantes -->
   <div class="box" id="tab3">
-    Participantes
+    <strong>Participantes</strong>
+    <hr/>
   </div>
 
+  <!-- Leyes y artículos -->
   <div class="box" id="tab4">
-    Leyes y artículos
+    <strong>Leyes y artículos</strong>
+    <hr/>
   </div>
 
+  <!-- Países -->
   <div class="box" id="tab5">
-    Países
+    <strong>Países</strong>
+    <hr/>
   </div>
 
+  <!-- Fechas -->
   <div class="box" id="tab6">
-    Fechas
+    <strong>Fechas</strong>
+    <hr/>
   </div>
-<!-- Inicio Contenedores de las pestañas -->
+<!-- Fin Contenedores de las pestañas -->
 
 <div class="notification">
   <iframe id="documentFrame" width="100%" scrolling="auto" src="{{url_for('main.xml', filename=filename)}}"></iframe>

@@ -42,7 +42,7 @@ if __name__ == "__main__":
     p.add_argument("-v", "--verbose",
             action="store_true", dest="verbose",
             help="Verbose mode [Off]")
- 
+
 
     # Parsing commands line arguments
     args = p.parse_args()
@@ -51,8 +51,8 @@ if __name__ == "__main__":
     if args.verbose:
        def verbose(*args):
             print("".join([str(x) for x in args]),file=sys.stderr)
-    else:   
-        verbose = lambda *a: None  
+    else:
+        verbose = lambda *a: None
 
     verbose("Connecting to DB:",args.dbname)
     db = TinyDB(args.dbname)
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     print("Número total de documentos       : {0}".format(len(raws)))
     print("Longitud promedia de documentos  : {0:10.2f} (caracteres)".format(sum([len(x) for x in raws])/len(raws)))
     print("Longitud promedia de documentos  : {0:10.2f} (líneas)".format(sum([len(x.split('\n')) for x in raws])/len(raws)))
-    
+
     print("Número total de palabras (token) : {0}".format(sum(vocab.values())))
     print("Número total de palabras (type)  : {0}".format(len(vocab.keys())))
 
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     mentions_articulo=Counter()
     for i,text in enumerate(texts):
         verbose('Analysing ',titles[i])
-        mash = nltk.text.TokenSearcher(text) 
+        mash = nltk.text.TokenSearcher(text)
         pattern = mash.findall('(<artículo> <\d+>)')
         mentions_articulo.update([(i,"{0}".format(x[1])) for x in pattern])
 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
     with open(os.path.join("./","graph.graphml"), 'w') as outfile:
         print('<?xml version="1.0" encoding="UTF-8"?>',file=outfile)
-        print('<graphml xmlns="http://graphml.graphdrawing.org/xmlns"',file=outfile)  
+        print('<graphml xmlns="http://graphml.graphdrawing.org/xmlns"',file=outfile)
         print('xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',file=outfile)
         print('xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns',file=outfile)
         print('http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">',file=outfile)
@@ -150,5 +150,3 @@ if __name__ == "__main__":
         print('</graphml>',file=outfile)
 
     extract_topics(raws,sws=sws)
-
-

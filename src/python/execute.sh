@@ -222,7 +222,7 @@ basicStatistics(){
     source ./env/bin/activate
 
     echo $(timestamp) " > basic_statistics.py"
-    python3 basic_statistics.py
+    python3 basic_statistics.py -v
 
     echo $(timestamp) " > deactivate"
     deactivate
@@ -248,6 +248,9 @@ createLinks(){
 
   echo $(timestamp) " > ln -sf ./../src/python/data/annotatedDocuments ./annotatedDocuments"
   ln -sf ./../src/python/data/annotatedDocuments ./annotatedDocuments
+
+  echo $(timestamp) " > ln -sf ./../src/python/data/contenciosos ./contenciosos"
+  ln -sf ./../src/python/data/contenciosos ./contenciosos
 
   echo $(timestamp) " > ln -sf ./../src/python/data/graph.json ./graph.json"
   ln -sf ./../src/python/data/graph.json ./graph.json
