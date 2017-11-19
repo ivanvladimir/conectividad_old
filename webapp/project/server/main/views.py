@@ -50,7 +50,6 @@ class GraphForm(Form):
     include_doc = StringField('include_doc')
     exclude_doc = StringField('exclude_doc')
 
-
 ################
 #### routes ####
 ################
@@ -72,6 +71,46 @@ def laws():
 @main_blueprint.route("/law/<int:idd>")
 def law(idd):
     return render_template("main/law.html",doc=contensiosos.get(eid=idd))
+
+#@main_blueprint.route("/doc/<string:filename>")
+#def doc(filename):
+#    return render_template("main/documents.html",filename=filename+".xml")
+@main_blueprint.route("/doc/", methods=["GET","POST"])
+def doc():
+    # Para GET
+    xmlName = request.args.get('docXmlName')
+    docNum = request.args.get('docNum')
+    # Para POST , no funciona actualmente :(
+    #xmlName = request.args['docXmlName']
+    #docNum = request.args['docNum']
+
+    docNum = eval(docNum)
+    return render_template("main/documents.html",filename=xmlName+".xml", doc=contensiosos.get(eid=docNum))
+
+
+@main_blueprint.route("/xml/<string:filename>")
+def xml(filename):
+    gate_css_url=url_for('main.static', filename='gate.css')
+    gate_js_url=url_for('main.static', filename='gate.js')
+    string="""
+<!DOCTYPE html>
+<html xml:lang="en" lang="en">
+    <head>
+        <base>
+            <title>Conectividad Normativa</title>
+            <link href="{0}" rel="stylesheet" media="screen"></link>
+        </base>
+    </head>
+    <body>
+        {2}
+        <script src="{1}" type="text/javascript"></script>
+    </body>
+</html>
+"""
+    with open('annotatedDocuments/'+filename) as filename:
+        lines=filename.readlines()
+
+    return string.format(gate_css_url,gate_js_url,"<br/>".join(lines))
 
 @main_blueprint.route("/graph/",methods=["GET","POST"])
 def graph():
@@ -194,34 +233,3 @@ def graph_json():
     print(len(graph_['nodes']))
     print(len(graph_['links']))
     return jsonify(graph_)
-
-
-
-@main_blueprint.route("/doc/<string:filename>")
-def doc(filename):
-    return render_template("main/documents.html",filename=filename+".xml")
-
-
-@main_blueprint.route("/xml/<string:filename>")
-def xml(filename):
-    gate_css_url=url_for('main.static', filename='gate.css')
-    gate_js_url=url_for('main.static', filename='gate.js')
-    string="""
-<!DOCTYPE html>
-<html xml:lang="en" lang="en">
-    <head>
-        <base>
-            <title>Conectividad Normativa</title>
-            <link href="{0}" rel="stylesheet" media="screen"></link>
-        </base>
-    </head>
-    <body>
-        {2}
-        <script src="{1}" type="text/javascript"></script>
-    </body>
-</html>
-"""
-    with open('annotatedDocuments/'+filename) as filename:
-        lines=filename.readlines()
-
-    return string.format(gate_css_url,gate_js_url,"<br/>".join(lines))

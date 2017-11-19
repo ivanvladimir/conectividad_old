@@ -43,28 +43,31 @@
 	<em>Visualizaciones</em>
   </div>
   <div class="column is-10">
-  <form id="{{doc.meta_name.name}}" method="POST" action="graph/">
-    
-    <a href="{{doc.source_pdf}}" arget="_blank">
-  		<span class="icon">
-  		<i class="fa fa-file-pdf-o"></i>
-  		</span>
-  	</a>
+    <a href="{{doc.source_pdf}}" arget="_blank" >
+      <span class="icon">
+          <i class="fa fa-file-pdf-o"></i>
+      </span>
+    </a>
 
-  	<a href="{{url_for('main.doc',filename=doc.txt.rsplit("/",1)[1])}}">
-  			<span class="icon">
-          	<i class="fa fa-file-text-o"></i>
-        		</span>
-  	</a>
+    <a onclick="document.getElementById('docForm{{doc.eid}}').submit();">
+      <span class="icon">
+          <i class="fa fa-file-code-o"></i>
+      </span>
+    </a>
 
-    <input type="hidden" id="include" name="include" value="{{doc.meta_name.name | lower}}">
     <a onclick="document.getElementById('{{doc.meta_name.name}}').submit();">
       <span class="icon">
           <i class="fa fa-eye"></i>
-          </span>
+      </span>
     </a>
-  </form>
 
+    <form id="docForm{{doc.eid}}" method="GET" action="doc/">
+      <input type="hidden" id="docXmlName" name="docXmlName" value="{{doc.txt.rsplit("/",1)[1]}}">
+      <input type="hidden" id="docNum" name="docNum" value="{{doc.eid}}">
+    </form>
+    <form id="{{doc.meta_name.name}}" method="POST" action="graph/">
+      <input type="hidden" id="include" name="include" value="{{doc.meta_name.name | lower}}">
+    </form>
   </div>
 </div>
 </div>

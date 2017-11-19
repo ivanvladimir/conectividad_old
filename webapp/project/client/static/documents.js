@@ -4,9 +4,11 @@
  FI-IIMAS-IIJ-UNAM
 */
 
-for(var i = 2; i < 5; i++){
+for(var i = 0; i < 7; i++){
   document.getElementById("tab" + i).style.display = "none";
 }
+
+document.getElementById("tab0").style.display = "block";
 
 var documentFrame = document.getElementById('documentFrame').contentWindow;
 
@@ -64,7 +66,7 @@ function isActiveTab(me, tab){
   var tabs = document.getElementById("meTab").getElementsByTagName("LI");
   for(var i = 0; i < tabs.length; i++){
     tabs[i].className = "";
-    document.getElementById("tab" + (i+1)).style.display = "none";
+    document.getElementById("tab" + i).style.display = "none";
   }
   me.className = 'is-active';
   tab.style.display = "block";

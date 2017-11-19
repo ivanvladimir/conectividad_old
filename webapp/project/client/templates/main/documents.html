@@ -7,23 +7,82 @@
 {% extends "_base.html" %}
 
 {% block content %}
+
 <!-- Inicio pestañas -->
 <div class="tabs is-centered" id="meTab">
   <ul>
-    <li onclick="isActiveTab(this, tab1)" class="is-active"><a>Etiquetas</a></li>
-    <li onclick="isActiveTab(this, tab2)"><a>Music</a></li>
-    <li onclick="isActiveTab(this, tab3)"><a>Videos</a></li>
-    <li onclick="isActiveTab(this, tab4)"><a>Documents</a></li>
+    <li onclick="isActiveTab(this, tab0)" class="is-active"><a>Resumen</a></li>
+    <li onclick="isActiveTab(this, tab1)"><a>Etiquetas</a></li>
+    <li onclick="isActiveTab(this, tab2)"><a>Vocabulario</a></li>
+    <li onclick="isActiveTab(this, tab3)"><a>Particpantes</a></li>
+    <li onclick="isActiveTab(this, tab4)"><a>Leyes y artículos</a></li>
+    <li onclick="isActiveTab(this, tab5)"><a>Países</a></li>
+    <li onclick="isActiveTab(this, tab6)"><a>Fechas</a></li>
   </ul>
 </div>
 <!-- Fin pestañas -->
 
 <!-- Inicio Contenedores de las pestañas -->
+  <div class="box" id="tab0">
+    <strong>{{doc.meta_name.name}}</strong>
+    <hr/>
+    <div class="columns is-multiline">
+
+      <div class="column is-2">
+    	   <strong><em>Corte</em></strong>
+      </div>
+      <div class="column is-2">
+    	   {{doc.meta_name.court}}
+      </div>
+
+      <div class="column is-2">
+         <strong><em>Estructura</em></strong>
+      </div>
+      <div class="column is-6">
+         {{doc.meta_name.actions}}
+      </div>
+
+      <div class="column is-2">
+         <strong><em>Fecha</em></strong>
+      </div>
+      <div class="column is-2">
+         {{doc.meta_name.date_sentence}}
+      </div>
+
+      <div class="column is-2">
+    	   <strong><em>Número</em></strong>
+      </div>
+      <div class="column is-2">
+    	   {{doc.meta_name.number}}
+      </div>
+
+      <div class="column is-2">
+         <strong><em>Fuentes</em></strong>
+      </div>
+      <div class="column is-2">
+
+        <a href="{{doc.source_pdf}}" arget="_blank">
+          <span class="icon">
+          <i class="fa fa-file-pdf-o"></i>
+          </span>
+        </a>
+
+        <a href="{{doc.source_doc}}" arget="_blank">
+          <span class="icon">
+          <i class="fa fa-file-word-o"></i>
+          </span>
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
   <!-- Inicio Seleccionar etiquetas -->
   <div class="box" id="tab1">
 
-    <label class="label">Mostrar etiquetas</label>
-
+    <strong>Mostrar etiquetas</strong>
+    <hr/>
     <div class="columns">
       <div class="column">
         <label class="checkbox">
@@ -98,13 +157,23 @@
   <!-- Fin Seleccionar etiquetas -->
 
   <div class="box" id="tab2">
-    Hola tab 2
+    Vocabulario
   </div>
+
   <div class="box" id="tab3">
-    Hola tab 3
+    Participantes
   </div>
+
   <div class="box" id="tab4">
-    Hola tab 4
+    Leyes y artículos
+  </div>
+
+  <div class="box" id="tab5">
+    Países
+  </div>
+
+  <div class="box" id="tab6">
+    Fechas
   </div>
 <!-- Inicio Contenedores de las pestañas -->
 
