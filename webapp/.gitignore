@@ -4,7 +4,7 @@ os
 DB.json
 graph.json
 temp/
-project/client/static/*.txt.png
+project/client/static/vocabulario/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
