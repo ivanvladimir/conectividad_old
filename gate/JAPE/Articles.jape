@@ -2,7 +2,7 @@
 // FI-IIMAS-IIJ-UNAM
 
 Phase: Articles
-Input: SpaceToken Token LiteralIndex NumericalIndex
+Input: SpaceToken Token LiteralIndex NumericalIndex Lookup
 Options: control = appelt
 
 Rule: Articles
@@ -13,16 +13,21 @@ Rule: Articles
       ({SpaceToken})?
     )+
     (
-      ({Token.string =~ "[\\d\\.]+", !LiteralIndex, !NumericalIndex})?
+      ({Token.string =~ "[\\d\\.,)]+-?", !LiteralIndex, !NumericalIndex})?
       ({Token.string =~ "[a-zA-Z]", Token.length == 1})?
       ({SpaceToken})?
     )+
     (
-      ({Token.string == "de"}|{Token.string == "la"}
-      |{Token.string == "su"}|{Token.string == "del"})?
+      ({Token.string == "de"}|{Token.string == "en"}
+      |{Token.string == "del"}|{Token.string == "esa"}
+      |{Token.string == "el"}|{Token.string == "los"}
+      |{Token.string == "esta"}|{Token.string == "la"})?
       ({SpaceToken})?
     )*
-    ({Token.string =~ "(?i)(mism[oa]|[^,:()]+)"})*
+    (
+      ({Token.string =~ "(?i)(dich[oa]|tambi[ée]n|mism[oa]|fracci[óo]n|inciso|dich[oa]|[uú]ltim[oa]|presente|ley|[^,:()]+)"})?
+      ({Lookup.minorType == rel_articles})?
+    )*
 ):articlesLabel
 -->
 :articlesLabel

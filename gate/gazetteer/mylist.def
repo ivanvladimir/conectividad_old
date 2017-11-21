@@ -5,3 +5,4 @@ days.lst:date2:day2:es
 apellido_paterno.lst:person_first::es
 apellido_materno.lst:person_first::es
 nombre.lst:person_first::es
+rel_articles.lst:articles:rel_articles:es
