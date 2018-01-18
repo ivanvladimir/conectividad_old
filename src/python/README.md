@@ -15,3 +15,10 @@ Descripción: Script útilizado para automátizar la ejecución y despliegue del
 - e) Exit
 
 Uso: ```./execute.sh [hidtmaslrze]```
+
+## Dependencias
+
+Es necesario instalar manualmente las siguientes dependencias para poder ejecutar el proyecto:
+
+- TKinter para python3
+- virtualenv

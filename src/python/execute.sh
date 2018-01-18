@@ -293,8 +293,10 @@ removeData(){
   fi
 }
 
-echo $(timestamp) " > ulimit -m 2097152 => Max. 2 GB"
-ulimit -m 2097152
+#echo $(timestamp) " > ulimit -m 2097152 => Max. 2 GB"
+echo $(timestamp) " > ulimit -m 7340032 => Max. 7 GB"
+#ulimit -m 2097152
+ulimit -m 7340032
 
 count=0
 for var in "$@"
@@ -312,6 +314,10 @@ fi
 
 echo "ONE SCRIPT TO RULE THEM ALL!!!"
 echo "Es necesario instalar tkinter para python3 por separado."
+echo "En Arch es sudo pacman -S tk"
+echo "Es necesario intalar virtualenv por separado."
+echo "En Arch es sudo pacman -S python-virtualenv"
+echo
 
 while [ "$opt" != "e" ] || [ "$opt" != "E" ] ; do
   menu
