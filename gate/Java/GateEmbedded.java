@@ -237,8 +237,8 @@ public class GateEmbedded {
         logger.info("OutOfMemoryError!");
         logger.info("Error el procesar " + docFile);
         System.gc();
-        logger.info("Se ha terminado la ejecucion por un error.");
-        System.exit(1);
+        //logger.info("Se ha terminado la ejecucion por un error.");
+        //System.exit(1);
       }
     } // for each file
 
