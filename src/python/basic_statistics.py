@@ -8,6 +8,8 @@
 # ----------------------------------------------------------------------
 
 # System libraries
+import matplotlib
+matplotlib.use('Agg')
 import argparse
 import sys
 import os.path

@@ -4,7 +4,8 @@
 #################
 #### imports ####
 #################
-
+import matplotlib
+matplotlib.use('Agg')
 from flask import render_template, Blueprint, send_from_directory, request
 from flask import jsonify, url_for
 from datetime import datetime
