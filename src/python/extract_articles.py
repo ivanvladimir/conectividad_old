@@ -36,9 +36,9 @@ sws=stopwords.words('spanish')
 
 re_articulo=re.compile('[\d\.]+')
 re_articulos=re.compile('art.culos?')
-re_recovery=re.compile('(art.culos?|art.culos?) (?P<articles>[\d.,y ixviabc]+-?) (fracción [^,]*, )?(inciso [^,]*, )?(de esa|de esta|de la |del |de su |en la )?(?P<source>(dich[oa] |últim[oa] |presente ley |ley )?[^",;.()]*)[,.;]?')
+re_recovery=re.compile('(art.culos?|art.culos?) (?P<articles>[\d.,y ixviabc]+-?) (fracción [^,]*, )?(inciso [^,]*, )?(de esa|de esta|de la |del |de su |en la )?(?P<source>(dich[oa] |últim[oa] |presente ley |ley (\d+(\.\d+)?)?)?[^",;.()]*)[,.;]?')
 re_numbers=re.compile('([\d.]+|[ixv]+)')
-re_mismo=re.compile('(últim[ao]|mism[oa]|dicha Convención|dich[oa]|presente|esta ley|([A-Z][^ \d]+ *([A-Z][^ \d]+ *|\d +|mexicana|por +|al +|para +|do +|de +|en +|las? +|del +|sobre +|en +|contra +|los? +|\[\w+\][ .,;]+)*)\d*)')
+re_mismo=re.compile('(últim[ao]|mism[oa]|dicha Convención|dich[oa]|presente|esta ley|([A-Z][^ \d]+ *([A-Z][^ \d]+ *|\d +|mexicana|por +|al +|para +|do +|de +|en +|las? +|del +|sobre +|en +|contra +|los? |ley (\d+(\.\d+)?)|\[\w+\][ .,;]+)*)\d*)')
 re_spaces=re.compile("\s+")
 re_en_adelante=re.compile('([A-Z]\w*( [A-Z]\w*| para| y| contra| Prevenir,| Educación, | sobre| del| en| de| la| los| y| el)*) \( ?en *adelante,? *(?:también *)?"([^"]+)"(?: o "([^"]+)")?')
 re_corchetes=re.compile('([A-Z]\w*) \[(.*)\]')
@@ -64,6 +64,8 @@ reductions=[
 (re.compile('Reglamento.*(corte)*'),'Reglamento de la Corte'),
 (re.compile('CP'),'Código Penal'),
 (re.compile('CIDFP'),'Convención Interamericana sobre Desaparición Forzada de Personas'),
+(re.compile('Ley 14'),'Código de Justicia Miliar Ley 14.029'),
+(re.compile('CJM'),'Comisión de Justicia Militar'),
 ]
 
 

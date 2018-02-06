@@ -15,7 +15,6 @@
     <li onclick="isActiveTab(this, tab1)"><a>Etiquetas</a></li>
     <li onclick="isActiveTab(this, tab2)"><a>Vocabulario</a></li>
     <li onclick="isActiveTab(this, tab3)"><a>Participantes</a></li>
-    <li onclick="isActiveTab(this, tab4)"><a>Leyes y artículos</a></li>
     <li onclick="isActiveTab(this, tab5)"><a>Países</a></li>
     <li onclick="isActiveTab(this, tab6)"><a>Fechas</a></li>
   </ul>
@@ -152,19 +151,26 @@
 
   <!-- Vocabulario -->
   <div class="box" id="tab2">
-    <strong>Vocabulario</strong> - Palabra(Frecuencia)
+    <strong>Vocabulario (top {{nvoc}})</strong>
     <hr/>
 
     <div class="columns">
       <div class="column">
-
-        <div class="columns is-multiline">
-        {% for par in fdist.most_common(50) %}
-            <div class="column">
-              <strong>{{par[0]}}</strong>({{par[1]}})
-            </div>
+        <table class="table is-narrow">
+		<tbody>
+		<tr>
+        {% for par in fdist.most_common(nvoc) %}
+			<td>
+              <strong>{{par[0]}}</strong>, {{par[1]}}
+			</td>
+			{% if loop.index%4 == 0 %}
+				</tr>
+				<tr>
+			{% endif %}
         {% endfor %}
-        </div>
+		</tr>
+		<tbody>
+        </table>
 
       </div>
       <div class="column is-half has-text-centered">
@@ -179,7 +185,7 @@
   <div class="box" id="tab3">
     <strong>Participantes</strong> - Hay un total de <strong id="titleParticipantes"></strong> participantes.
     <hr/>
-    <div class="columns is-multiline" id="divParticipantes"></div>
+    <div id="divParticipantes"></div>
   </div>
 
   <!-- Leyes y artículos -->
@@ -200,7 +206,7 @@
   <div class="box" id="tab6">
     <strong>Fechas</strong> - Hay un total de <strong id="titleFechas"></strong> fechas.
     <hr/>
-    <div class="columns is-multiline" id="divFechas"></div>
+    <div id="divFechas"></div>
   </div>
 <!-- Fin Contenedores de las pestañas -->
 

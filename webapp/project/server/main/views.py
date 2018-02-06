@@ -129,7 +129,7 @@ def doc():
     plt.savefig(imgPath + imgName)
 
     return render_template("main/documents.html",filename=xmlName+".xml",
-        doc=contensiosos.get(eid=docNum),fdist=fdist, vocabImg="vocabulario/"+imgName)
+        doc=contensiosos.get(eid=docNum),fdist=fdist, vocabImg="vocabulario/"+imgName,nvoc=100)
 
 
 @main_blueprint.route("/xml/<string:filename>")

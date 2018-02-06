@@ -88,13 +88,13 @@ function isActiveTab(me, tab){
 }
 
 function fillTab(content, title, div){
-  var contenido = documentFrame.getSomething(content)
+  var contenido = documentFrame.getSomething(content);
   document.getElementById(title).innerHTML = contenido.length;
   var divContenido = document.getElementById(div);
   divContenido.innerHTML = ""
   for(var i = 0; i < contenido.length; i++){
-    var tempDiv = document.createElement("DIV");
-    tempDiv.className = "column";
+    var tempDiv = document.createElement("li");
+    tempDiv.className = "";
     tempDiv.innerHTML = contenido[i].innerHTML;
     divContenido.appendChild(tempDiv);
   }
