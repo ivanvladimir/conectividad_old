@@ -21,13 +21,12 @@ help(){
   t) Extract text
   m) Annotated documents
   a) Extract articles
-  s) Basic statistics
-  l) Create links
+  p) Push to production
   r) Remove data
   z) Execute all process
   e) Exit
 
-  Uso: ./execute.sh [hidtmaslrze]"
+  Uso: ./execute.sh [hidtmaprze]"
   exit
 }
 
@@ -41,8 +40,7 @@ menu(){
     t) Extract text
     m) Annotated documents
     a) Extract articles
-    s) Basic statistics
-    l) Create links
+    p) Push to production
     r) Remove data
     z) Execute all process
     e) Exit
@@ -61,10 +59,10 @@ menuOption(){
     annotatedDocuments
   elif [ "$opt" = "a" ] || [ "$opt" = "A" ]; then
     extractArticles
-  elif [ "$opt" = "s" ] || [ "$opt" = "S" ]; then
-    basicStatistics
-  elif [ "$opt" = "l" ] || [ "$opt" = "L" ]; then
-    createLinks
+#  elif [ "$opt" = "s" ] || [ "$opt" = "S" ]; then
+#    basicStatistics
+  elif [ "$opt" = "p" ] || [ "$opt" = "P" ]; then
+    pushToProduction
   elif [ "$opt" = "r" ] || [ "$opt" = "R" ]; then
     removeData
   elif [ "$opt" = "h" ] || [ "$opt" = "H" ]; then
@@ -76,8 +74,8 @@ menuOption(){
     extractText
     annotatedDocuments
     extractArticles
-    basicStatistics
-    createLinks
+#    basicStatistics
+    pushToProduction
     exit
   elif [ "$opt" = "e" ] || [ "$opt" = "E" ]; then
     echo "  See you!"
@@ -235,7 +233,7 @@ basicStatistics(){
   fi
 }
 
-createLinks(){
+pushToProduction(){
   TIME_INI=$(date -u -d "$(timestamp)" +"%s")
   echo
   echo $(timestamp) " > Begining"
@@ -243,17 +241,17 @@ createLinks(){
   echo $(timestamp) " > cd ./../../webapp/"
   cd ./../../webapp/
 
-  echo $(timestamp) " > ln -sf ./../src/python/data/DB.json ./DB.json"
-  ln -sf ./../src/python/data/DB.json ./DB.json
+  echo $(timestamp) " > cp -r ./../src/python/data/DB.json ./DB.json"
+  cp -r ./../src/python/data/DB.json ./DB.json
 
-  echo $(timestamp) " > ln -sf ./../src/python/data/annotatedDocuments ./annotatedDocuments"
-  ln -sf ./../src/python/data/annotatedDocuments ./annotatedDocuments
+  echo $(timestamp) " > cp -r ./../src/python/data/annotatedDocuments ./annotatedDocuments"
+  cp -r ./../src/python/data/annotatedDocuments ./annotatedDocuments
 
-  echo $(timestamp) " > ln -sf ./../src/python/data/contenciosos ./contenciosos"
-  ln -sf ./../src/python/data/contenciosos ./contenciosos
+  echo $(timestamp) " > cp -r ./../src/python/data/contenciosos ./contenciosos"
+  cp -r ./../src/python/data/contenciosos ./contenciosos
 
-  echo $(timestamp) " > ln -sf ./../src/python/data/graph.json ./graph.json"
-  ln -sf ./../src/python/data/graph.json ./graph.json
+  echo $(timestamp) " > cp -r ./../src/python/data/graph.json ./graph.json"
+  cp -r ./../src/python/data/graph.json ./graph.json
 
   echo $(timestamp) " > cd ./../src/python/ "
   cd ./../src/python/
@@ -265,7 +263,7 @@ createLinks(){
 
 removeData(){
   echo  -n "
-  This going to remove all data ( data folder, DB.json, annotatedDocuments and graph.json)
+  This going to remove all data from local enviroment (data folder, DB.json, annotatedDocuments and graph.json)
   Continue? y/n: "
   read opt
 
@@ -276,14 +274,14 @@ removeData(){
     echo $(timestamp) " > rm -rf ./data"
     rm -rf ./data
 
-    echo $(timestamp) " > rm -rf ./../../webapp/DB.json"
-    rm -rf ./../../webapp/DB.json
+#    echo $(timestamp) " > rm -rf ./../../webapp/DB.json"
+#    rm -rf ./../../webapp/DB.json
 
-    echo $(timestamp) " > rm -rf ./../../webapp/annotatedDocuments"
-    rm -rf ./../../webapp/annotatedDocuments
+#    echo $(timestamp) " > rm -rf ./../../webapp/annotatedDocuments"
+#    rm -rf ./../../webapp/annotatedDocuments
 
-    echo $(timestamp) " > rm -rf ./../../webapp/project/client/static/graph.json"
-    rm -rf ./../../webapp/project/client/static/graph.json
+#    echo $(timestamp) " > rm -rf ./../../webapp/project/client/static/graph.json"
+#    rm -rf ./../../webapp/project/client/static/graph.json
 
     TIME_FIN=$(date -u -d "$(timestamp)" +"%s")
     echo "Total time: " $(date -u -d "0 $TIME_FIN sec - $TIME_INI sec" +"%H:%M:%S")
@@ -293,10 +291,10 @@ removeData(){
   fi
 }
 
-#echo $(timestamp) " > ulimit -m 2097152 => Max. 2 GB"
-echo $(timestamp) " > ulimit -m 7340032 => Max. 7 GB"
-#ulimit -m 2097152
-ulimit -m 7340032
+echo $(timestamp) " > ulimit -m 2097152 => Max. 2 GB"
+#echo $(timestamp) " > ulimit -m 7340032 => Max. 7 GB"
+ulimit -m 2097152
+#ulimit -m 7340032
 
 count=0
 for var in "$@"
