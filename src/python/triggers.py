@@ -17,6 +17,44 @@ re_pagenumber_fin = re.compile(r"\s+(?P<num>\d+)$")
 re_footnote_mention = re.compile(r"[a-z](\d+)[,. ]")
 re_footnote = re.compile(r'(?:^|\n)(?P<num>\d+)\n\s\s+\w+')
 
+re_recovery=re.compile(r'(?:art.culos?|art.culos?) '
+                       r'(?P<articles>[\d.,y ixviabc]+-?) '
+                       r'(?:fracción [^,]*, )?(inciso [^,]*, )?'
+                       r'(?:de esa|de esta|de la |del |de su |en la )?'
+                       r'(?P<source>(dich[oa] '
+                       r'|últim[oa] '
+                       r'|presente ley '
+                       r'|ley (\d+(\.\d+)?)?)?'
+                       r'[^",;.()]*)[,.;]?')
+
+
+def articlede(text):
+    spans = []
+    for m in re_recovery.finditer(text):
+        spans.append((m.span('articles'),
+                     m.span('source')))
+    return spans
+
+t_articles = [
+    articlede,
+]
+
+
+def test_articles(par, cntx):
+    arts = []
+    if not par.text:
+        return arts
+    text = par.text
+    text_ = text.lower()
+
+    for t in t_articles:
+        spans = t(text_)
+        for article_span, source_span in spans:
+            article = text[article_span[0]:article_span[1]]
+            source = text[source_span[0]:source_span[1]]
+            arts.append((article, source))
+    return arts
+
 
 def test_format(par):
     res = []
@@ -55,8 +93,6 @@ def namesection(par):
         return number+" "+name
 
 
-
-
 def footnotemention(par):
     all_text = "".join([x for x in par.itertext()])
     footnotes = []
@@ -80,8 +116,8 @@ def footnote(par):
 
 t_formats = [
     (footnotemention, 'footnotemention', True),
-    (pagenumber, 'pagenumber', True),
     (footnote, 'footnote', True),
+    (pagenumber, 'pagenumber', True),
     (namesection, 'namesection', False),
     (numericalindex, 'numericalindex', False)
 ]

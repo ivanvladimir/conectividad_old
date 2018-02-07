@@ -13,7 +13,7 @@ import os.path
 import re
 from tinydb import TinyDB, Query
 import xml.etree.ElementTree as ET
-from triggers import test_format
+from triggers import test_format, test_articles
 
 
 class fg:
@@ -101,14 +101,34 @@ def get_context(par, cntx):
             cntx.footnote(res[1])
 
 
+def preprocess_paragraph(par):
+    for art in par.findall('./Articles'):
+        ntext = art.text+art.tail
+        par.remove(art)
+        if par.text:
+            par.text += ntext
+        else:
+            par.text = ntext
+    return par
+
+
+def process_articles(par, cntx):
+    arts = test_articles(par, cntx)
+    for art in arts:
+        verbose(fg.GREEN, "article: ", fg.GREEN, art)
+
+
 
 def label_xml(root):
     cntx = Context()
     for par in root.findall('.//paragraph'):
-        get_context(par, cntx)
-        verbose(fg.BLUE, "Context: ", fg.BLUE, cntx)
         verbose(fg.YELLOW, "Raw text: ",
                 style.RESET, "".join([x for x in par.itertext()]))
+        # Eliminates article tags
+        get_context(par, cntx)
+        par = preprocess_paragraph(par)
+        process_articles(par, cntx)
+        verbose(fg.BLUE, "Context: ", fg.BLUE, cntx)
 
 
 # MAIN
