@@ -3,6 +3,8 @@ migrations/
 os
 DB.json
 graph.json
+annotatedDocuments/
+contenciosos
 temp/
 project/client/static/vocabulario/
 

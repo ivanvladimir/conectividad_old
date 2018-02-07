@@ -9,10 +9,10 @@ timestamp() {
 
 TIME_INI_t=$(date -u -d "$(timestamp)" +"%s")
 
-#echo $(timestamp) " > ulimit -m 2097152 => Max. 2 GB"
-echo $(timestamp) " > ulimit -m 7340032 => Max. 7 GB"
-#ulimit -m 2097152
-ulimit -m 7340032
+echo $(timestamp) " > ulimit -m 2097152 => Max. 2 GB"
+#echo $(timestamp) " > ulimit -m 7340032 => Max. 7 GB"
+ulimit -m 2097152
+#ulimit -m 7340032
 
 echo $(timestamp) " > Executing"
 
