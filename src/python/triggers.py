@@ -25,7 +25,7 @@ re_recovery=re.compile(r'(?:art.culos?|art.culos?) '
                        r'|últim[oa] '
                        r'|presente ley '
                        r'|ley (\d+(\.\d+)?)?)?'
-                       r'[^",;.()]*)[,.;]?')
+                       r'[^",;.()]*)[ ,.;]')
 
 
 def articlede(text):
@@ -39,21 +39,15 @@ t_articles = [
     articlede,
 ]
 
-
 def test_articles(par, cntx):
     arts = []
-    if not par.text:
-        return arts
-    text = par.text
+    text = "".join([x for x in par.itertext()])
     text_ = text.lower()
 
-    for t in t_articles:
-        spans = t(text_)
-        for article_span, source_span in spans:
-            article = text[article_span[0]:article_span[1]]
-            source = text[source_span[0]:source_span[1]]
-            arts.append((article, source))
-    return arts
+    spans = []
+    for idd, t in enumerate(t_articles):
+        spans.extend(t(text_))
+    return spans
 
 
 def test_format(par):

@@ -83,6 +83,19 @@ class Context:
             res = ["Empty"]
         return ", ".join(res)
 
+    def info(self):
+        res = {}
+        if self.section:
+            res["secction"]=str(self.section)
+        if self.paragraph:
+            res["paragraph"]=str(self.paragraph)
+        if self.page:
+            res["page"]=str(self.page)
+        if len(self.footnotes):
+            res["open_footnotes"]=str(", ".join(list(self.footnotes)))
+        return res
+
+
 
 def get_context(par, cntx):
     results = test_format(par)
@@ -102,33 +115,106 @@ def get_context(par, cntx):
 
 
 def preprocess_paragraph(par):
-    for art in par.findall('./Articles'):
-        ntext = art.text+art.tail
-        par.remove(art)
-        if par.text:
-            par.text += ntext
+    par_ = ET.Element("paragraph")
+    par_.text = par.text
+    par_.tail = par.tail
+    flag=False
+    prev=None
+    for child in par:
+        if child.tag == "Articles":
+            if flag:
+                prev.tail+=child.text+child.tail
+            else:
+                par_.text+=child.text+child.tail
         else:
-            par.text = ntext
-    return par
+            par_.append(child)
+            flag=True
+        prev=child
+    return par_
+
+
+def add_tags(par, info_tags, total=0, offset=0,parent=None):
+    if len(info_tags) <= total:
+        return par,total,offset
+    par_ = ET.Element(par.tag)
+    o_text = par.text
+    cur = o_text
+    prev_tag = None
+    prev_span_end = None
+    ## Check the text
+    for ii, (span, tag, info) in enumerate(info_tags[total:]):
+        if o_text is None or span[1] >= len(o_text):
+            continue
+        middle = o_text[span[0]-offset:span[1]-offset]
+        tag = ET.Element(tag, **info)
+        tag.text = middle
+        par_.append(tag)
+        if ii == 0:
+            cur = o_text[:span[0]-offset]
+        else:
+            prev_tag.tail = o_text[prev_span_end:span[0]-offset]
+        prev_span_end = span[1]-offset
+        prev_tag = tag
+        prev_tag.tail = o_text[prev_span_end:span[0]-offset]
+        total += 1
+    par_.text = cur
+    if o_text:
+        offset+=len(o_text)
+    o_text= par.tail
+    cur = o_text
+    for ii, (span, tag, info) in enumerate(info_tags[total:]):
+        if o_text is None or span[1] >= offset+len(o_text):
+            continue
+        middle = o_text[span[0]-offset:span[1]-offset]
+        tag = ET.Element(tag, **info)
+        tag.text = middle
+        if parent:
+            parent.append(tag)
+        else:
+            par.append(tag)
+        if ii == 0:
+            cur = o_text[:span[0]-offset]
+        else:
+            prev_tag.tail = o_text[prev_span_end:span[0]-offset]
+        prev_span_end = span[1]-offset
+        prev_tag = tag
+        prev_tag.tail = o_text[prev_span_end:span[0]-offset]
+        total += 1
+    par_.tail = cur
+
+    # Check the children
+    for element in par:
+        tag_,total,offset = add_tags(element, info_tags[total:],total=total,offset=offset,parent=par)
+        par_.append(tag_)
+    return par_,total,offset
 
 
 def process_articles(par, cntx):
     arts = test_articles(par, cntx)
-    for art in arts:
-        verbose(fg.GREEN, "article: ", fg.GREEN, art)
-
-
+    tags = []
+    for idd, art in enumerate(arts):
+        info_art=cntx.info()
+        info_doc=cntx.info()
+        info_art['idd'] = str(idd)
+        info_doc['idd'] = str(idd)
+        tags.append((art[0], 'ArticleMention', info_art))
+        tags.append((art[1], 'DocumentMention', info_doc))
+    par_,_,_ = add_tags(par, tags)
+    return par_
 
 def label_xml(root):
     cntx = Context()
     for par in root.findall('.//paragraph'):
+        verbose(fg.BLUE, "Context: ", fg.BLUE, cntx)
         verbose(fg.YELLOW, "Raw text: ",
                 style.RESET, "".join([x for x in par.itertext()]))
+        par = preprocess_paragraph(par)
         # Eliminates article tags
         get_context(par, cntx)
-        par = preprocess_paragraph(par)
-        process_articles(par, cntx)
-        verbose(fg.BLUE, "Context: ", fg.BLUE, cntx)
+        par_ = process_articles(par, cntx)
+        for art in par_.findall('.//DocumentMention'):
+            verbose(fg.GREEN, "Document: ",
+                style.RESET, "".join([x for x in art.itertext()]))
 
 
 # MAIN
