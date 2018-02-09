@@ -14,6 +14,7 @@ import re
 from tinydb import TinyDB, Query
 import xml.etree.ElementTree as ET
 from triggers import test_format, test_articles
+from cleaning import resolve_document
 
 
 class fg:
@@ -45,7 +46,6 @@ class style:
     DIM = '\033[2m'
     NORMAL = '\033[22m'
     RESET = '\033[0m'
-
 
 # Section, paragraph
 class Context:
@@ -94,7 +94,6 @@ class Context:
         if len(self.footnotes):
             res["open_footnotes"]=str(", ".join(list(self.footnotes)))
         return res
-
 
 
 def get_context(par, cntx):
@@ -213,9 +212,14 @@ def label_xml(root):
         get_context(par, cntx)
         par_ = process_articles(par, cntx)
         for art in par_.findall('.//DocumentMention'):
-            verbose(fg.GREEN, "Document: ",
-                style.RESET, "".join([x for x in art.itertext()]))
-
+            verbose(fg.GREEN, "Mention: ", art.text)
+            resolution=resolve_document(art.text,cntx)
+            art.attrib['document_name']=resolution
+            verbose(fg.GREEN, "Document name: ",bg.WHITE, resolution)
+        for art in par_.findall('.//ArticleMention'):
+            verbose(fg.BLUE, "Article: ",bg.WHITE,
+                    "".join([x for x in art.itertext()]))
+            
 
 # MAIN
 if __name__ == "__main__":

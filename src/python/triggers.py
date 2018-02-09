@@ -28,6 +28,49 @@ re_recovery=re.compile(r'(?:art.culos?|art.culos?) '
                        r'[^",;.()]*)[ ,.;]')
 
 
+
+re_en_adelante=re.compile(r'en adelante.*“(?P<term>[^”"]+)”')
+
+
+def get_splits(spans):
+    splits=[]
+    if len(spans)==0:
+        return None
+    for span in spans[1:]:
+        splits.append(span[0][0])
+    if len(splits)==0:
+        return [spans[0][0]]
+    return splits
+
+
+
+def enadelante(text,spans):
+    splits=get_splits(spans)
+    if not splits:
+        splits=[len(text)]
+    for s in splits:
+        text_=text[s:s+1]
+        for m in re_en_adelante.finditer(text_):
+            spans.append((m.span('articles'),
+                         m.span('source')))
+    return spans
+
+t_definitions = [
+    enadelante,
+]
+
+def test_definition(par, spans,cntx):
+    deff = []
+    text = "".join([x for x in par.itertext()])
+    text_ = text.lower()
+
+    definitions = []
+    for idd, t in enumerate(t_definitions):
+        definitions.extend(t(text_,spans))
+    print("---->",definitions)
+    return definitions
+
+
 def articlede(text):
     spans = []
     for m in re_recovery.finditer(text):
@@ -45,8 +88,13 @@ def test_articles(par, cntx):
     text_ = text.lower()
 
     spans = []
+    definitions = []
     for idd, t in enumerate(t_articles):
-        spans.extend(t(text_))
+        spans_=t(text_)
+        spans.extend(spans)
+        definitions_ = test_definition(par,spans,cntx)
+        definitions.extend(definitions_)
+
     return spans
 
 
