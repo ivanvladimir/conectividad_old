@@ -9,16 +9,19 @@
 
 # System libraries
 import re
-import exceptions
 
-re_enters=re.compile(r"\n+")
-re_spaces=re.compile(r"\s+")
-re_fromltoc=re.compile(r"^[a-z ]+(?P<caption>[A-Z]+.*)")
+re_enters = re.compile(r"\n+")
+re_spaces = re.compile(r"\s+")
+re_fromltoc = re.compile(r"^[a-z ]+(?P<caption>[A-Z]+.*)")
 
-def resolve_document(text,cntx):
-    text = re_enters.sub(" ",text)
-    text = re_spaces.sub(" ",text)
-    for lower,red,res in reductions:
+
+def resolve_document(text, cntx):
+    text = re_enters.sub(" ", text)
+    text = re_spaces.sub(" ", text)
+    if text in cntx.definitions_:
+        return cntx.definitions_[text]
+
+    for lower, red, res in reductions:
         if lower:
             m = red.match(text.lower())
         else:
@@ -27,55 +30,49 @@ def resolve_document(text,cntx):
             return res
     m = re_fromltoc.match(text)
     if m:
-        text=m.group('caption')
+        text = m.group('caption')
     return text
 
 
-reductions=[
-    (False, re.compile('mism[ao]'),
+reductions = [
+    (False, re.compile(r'mism[ao]'),
         'PENDING'),
-    (False, re.compile('MISM[AO]'),
+    (False, re.compile(r'MISM[AO]'),
         'PENDING'),
-    (False, re.compile('dicha Convención'),
+    (False, re.compile(r'dicha Convención'),
         'Convención'),
-    (False, re.compile('dich[oa]'),
+    (False, re.compile(r'dich[oa]'),
         'PENDING'),
-    (False, re.compile('presente'),
+    (False, re.compile(r'presente'),
         'PENDING'),
-    (False, re.compile('esta ley'),
+    (False, re.compile(r'esta ley'),
         'PENDING'),
-    (False, re.compile('Son'),
+    (False, re.compile(r'Son'),
         'PENDING'),
-    (False, re.compile('est[ae] últim[oa]'),
+    (False, re.compile(r'est[ae] últim[oa]'),
         'PENDING'),
-    (False, re.compile('Convención [I|i]\w*'),
+    (False, re.compile(r'Convención [I|i]\w*'),
         'Convención Interamericana de Derechos Humanos'),
-    (False, re.compile('Convención [A|a]\w*'),
+    (False, re.compile(r'Convención [A|a]\w*'),
         'Convención Americana sobre Derechos Humanos'),
-    (False, re.compile('RAAN'),
+    (False, re.compile(r'RAAN'),
         'Regiones Autónomas del Atlántico Norte'),
-    (False, re.compile('MARENA'),
+    (False, re.compile(r'MARENA'),
         'Ministerio del Ambiente y Recursos Naturales de Nicaragua'),
-    (False, re.compile('RAAS'),
+    (False, re.compile(r'RAAS'),
         'Regiones Autónomas del Atlántico Sur'),
-    (False, re.compile('CONVENCIÓN [I|i]\w*'),
+    (False, re.compile(r'CONVENCIÓN [I|i]\w*'),
         'Convención Interamericana de Derechos Humanos'),
-    (False, re.compile('CONVENCIÓN [A|a]\w*'),
+    (False, re.compile(r'CONVENCIÓN [A|a]\w*'),
         'Convención Americana de Derechos Humanos'),
-    (False, re.compile('Estatuto.*(corte)*'),
+    (False, re.compile(r'Estatuto.*(corte)*'),
         'Estatuto de la Corte'),
-    (True,  re.compile('reglamento.*tribunal'),
-        'Reglamento de la Corte'),
-    (False, re.compile('Reglamento.*(corte)*'),
-        'Reglamento de la Corte'),
-    (False, re.compile('CP'),
+    (False, re.compile(r'CP'),
         'Código Penal'),
-    (False, re.compile('CIDFP'),
+    (False, re.compile(r'CIDFP'),
         'Convención Interamericana sobre Desaparición Forzada de Personas'),
-    (False, re.compile('Ley 14'),
+    (False, re.compile(r'Ley 14'),
         'Código de Justicia Miliar Ley 14.029'),
-    (False, re.compile('CJM'),
+    (False, re.compile(r'CJM'),
         'Comisión de Justicia Militar'),
 ]
-   
-

@@ -8,7 +8,6 @@
 # ----------------------------------------------------------------------
 
 # System libraries
-import xml.etree.ElementTree as ET
 import re
 import exceptions
 
@@ -17,84 +16,134 @@ re_pagenumber_fin = re.compile(r"\s+(?P<num>\d+)$")
 re_footnote_mention = re.compile(r"[a-z](\d+)[,. ]")
 re_footnote = re.compile(r'(?:^|\n)(?P<num>\d+)\n\s\s+\w+')
 
-re_recovery=re.compile(r'(?:art.culos?|art.culos?) '
-                       r'(?P<articles>[\d.,y ixviabc]+-?) '
-                       r'(?:fracción [^,]*, )?(inciso [^,]*, )?'
-                       r'(?:de esa|de esta|de la |del |de su |en la )?'
-                       r'(?P<source>(dich[oa] '
-                       r'|últim[oa] '
-                       r'|presente ley '
-                       r'|ley (\d+(\.\d+)?)?)?'
-                       r'[^",;.()]*)[ ,.;]')
+article_mention = r'(?:art.culos?) '\
+                  r'(?P<articles>[\d.,y ixviabc]+-?) '\
+                  r'(?:fracción [^,]*, )?(inciso [^,]*, )?'
 
 
+re_articlede = re.compile(article_mention +
+                          r'(?:de esa|de esta|de la |del |de su |en la )?'
+                          r'(?P<source>(dich[oa] '
+                          r'|últim[oa] '
+                          r'|presente ley '
+                          r'|ley (\d+(\.\d+)?)?)?'
+                          r'[^",;.()]*)[ ,.;]')
 
-re_en_adelante=re.compile(r'en adelante.*“(?P<term>[^”"]+)”')
+
+re_en_adelante = re.compile(r'en[ \n]*adelante[ \n]*.*')
+re_definitions = re.compile(r'[“"](?P<term>[^”"]+)["”]')
 
 
 def get_splits(spans):
-    splits=[]
-    if len(spans)==0:
-        return None
-    for span in spans[1:]:
-        splits.append(span[0][0])
-    if len(splits)==0:
-        return [spans[0][0]]
+    splits = []
+    for spani, spanf in zip(spans, spans[1:]):
+        splits.append((spani[1][1], spanf[0][0]))
+    splits.append((spans[-1][1][1], None))
     return splits
 
 
+def enadelante(text, spans):
+    if not spans:
+        return [[]]
+    splits = get_splits(spans)
+    defis_span = []
+    for ini, fin in splits:
+        defis = []
+        if not fin:
+            fin = len(text)
+        text_ = text[ini:fin]
+        m = re_en_adelante.search(text_)
+        if m:
+            for defi in re_definitions.finditer(text_):
+                span_ = defi.span("term")
+                defis.append((span_[0]+ini, span_[1]+ini))
+        defis_span.append(defis)
+    return defis_span
 
-def enadelante(text,spans):
-    splits=get_splits(spans)
-    if not splits:
-        splits=[len(text)]
-    for s in splits:
-        text_=text[s:s+1]
-        for m in re_en_adelante.finditer(text_):
-            spans.append((m.span('articles'),
-                         m.span('source')))
-    return spans
 
 t_definitions = [
     enadelante,
 ]
 
-def test_definition(par, spans,cntx):
-    deff = []
+
+def test_definition(par, spans, cntx):
     text = "".join([x for x in par.itertext()])
     text_ = text.lower()
 
     definitions = []
     for idd, t in enumerate(t_definitions):
-        definitions.extend(t(text_,spans))
-    print("---->",definitions)
+        definitions.extend(t(text_, spans))
     return definitions
 
 
-def articlede(text):
+def articlede(text, cntx):
     spans = []
-    for m in re_recovery.finditer(text):
+    for m in re_articlede.finditer(text):
         spans.append((m.span('articles'),
-                     m.span('source')))
+                      m.span('source')))
     return spans
 
+
+def article_mention_definition(text, cntx):
+    spans = []
+    for phrase, defis in cntx.definitions.items():
+        re_mention = article_mention + r"(?:de )"\
+                     r"(?P<source>" +\
+                     r"|".join([d.lower() for d in defis]) +\
+                     r")"
+        for m in re.finditer(re_mention, text):
+            spans.append((m.span('articles'),
+                          m.span('source')))
+    return spans
+
+
 t_articles = [
+    article_mention_definition,
     articlede,
 ]
 
+
+def compatible_spans(spans1, spans):
+    spans_ = []
+    ii = 0
+    jj = 0
+    fin = 0
+    if len(spans) == 0:
+        return spans1
+    spans__ = []
+    for s, d in spans:
+        spans__.append(s)
+    spans = spans__
+    while ii < len(spans) and jj < len(spans1):
+        span = spans[ii][1]
+        span1 = spans1[jj][1]
+        if span[0] > fin and span[0] < span1[0]:
+            fin = span[1]
+            ii += 1
+        elif span1[0] > fin and span1[0] < span[0]:
+            spans_.append(spans1[jj])
+            fin = span[1]
+            jj += 1
+        if span[0] < fin:
+            ii += 1
+        if span1[0] < fin:
+            jj += 1
+    return spans_
+
+
 def test_articles(par, cntx):
-    arts = []
     text = "".join([x for x in par.itertext()])
+    text = text.replace('\n', ' ')
     text_ = text.lower()
 
     spans = []
-    definitions = []
     for idd, t in enumerate(t_articles):
-        spans_=t(text_)
-        spans.extend(spans)
-        definitions_ = test_definition(par,spans,cntx)
-        definitions.extend(definitions_)
-
+        spans_ = t(text_, cntx)
+        if len(spans_) == 0:
+            continue
+        spans_ = compatible_spans(spans_, spans)
+        definitions_ = test_definition(par, spans_, cntx)
+        spans.extend(zip(spans_, definitions_))
     return spans
 
 
