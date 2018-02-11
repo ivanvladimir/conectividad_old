@@ -19,6 +19,7 @@ def resolve_document(text, cntx):
     text = re_enters.sub(" ", text)
     text = re_spaces.sub(" ", text)
     if text in cntx.definitions_:
+        print(cntx.definitions_[text])
         return cntx.definitions_[text]
 
     for lower, red, res in reductions:
@@ -67,6 +68,8 @@ reductions = [
         'Convención Americana de Derechos Humanos'),
     (False, re.compile(r'Estatuto.*(corte)*'),
         'Estatuto de la Corte'),
+    (False, re.compile(r'^Reglamento$'),
+        'Reglamento de la Corte'),
     (False, re.compile(r'CP'),
         'Código Penal'),
     (False, re.compile(r'CIDFP'),
@@ -75,4 +78,9 @@ reductions = [
         'Código de Justicia Miliar Ley 14.029'),
     (False, re.compile(r'CJM'),
         'Comisión de Justicia Militar'),
+    (False,
+     re.compile(
+       r'^Sentencia de Excepción Preliminar, Fondo, Reparaciones y Costas.*'),
+        'Sentencia de Excepción Preliminar, Fondo, Reparaciones y Costas'),
+
 ]

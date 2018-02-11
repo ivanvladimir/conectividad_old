@@ -13,7 +13,7 @@ import os.path
 import re
 from tinydb import TinyDB, Query
 import xml.etree.ElementTree as ET
-from triggers import test_format, test_articles
+from triggers import test_format, test_articles, test_docs
 from cleaning import resolve_document
 from collections import Counter
 
@@ -134,48 +134,66 @@ def preprocess_paragraph(par):
     for child in par:
         if child.tag == "Articles":
             if prev is not None:
-                prev.tail += child.text+child.tail
+                prev.tail += child.text + child.tail
             else:
-                par_.text += child.text+ child.tail
+                par_.text += child.text + child.tail
+        elif child.tag == "Actions":
+            if prev is not None:
+                prev.tail += child.text + child.tail
+            else:
+                par_.text += child.text + child.tail
         else:
             par_.append(child)
             prev = child
     return par_
 
 
-def add_tags(par, info_tags, total=0, offset=0, parent=None, gp=None):
+def add_tags(par, info_tags, offset=0, parent=None):
     if len(info_tags) == 0:
-        return [par], total, offset
-    total_ini = total
+        return [par], info_tags, offset
     par_ = [ET.Element(par.tag)]
     o_text = par.text
     cur = o_text
     prev_tag = None
     prev_span_end = None
     # Check the text
-    for ii, (span, tag, info) in enumerate(info_tags):
+    first=False
+    while len(info_tags)>0:
+        span, tag, info = info_tags[0]
         if o_text is None or span[1] >= len(o_text):
-            continue
+            break
         middle = o_text[span[0]-offset:span[1]-offset]
         tag = ET.Element(tag, **info)
         tag.text = middle
         par_[0].append(tag)
-        if ii == 0:
+        if not first:
             cur = o_text[:span[0]-offset]
+            first=True
         else:
             prev_tag.tail = o_text[prev_span_end:span[0]-offset]
         prev_span_end = span[1]-offset
         prev_tag = tag
         prev_tag.tail = o_text[prev_span_end:span[0]-offset]
-        total += 1
+        info_tags.pop(0)
     par_[0].text = cur
     if o_text:
         offset += len(o_text)
     o_text = par.tail
     cur = o_text
-    for ii, (span, tag, info) in enumerate(info_tags[total-total_ini:]):
+    # Check the children
+    for element in par:
+        tag_, info_tags, offset = add_tags(element,
+                                       info_tags,
+                                       offset=offset,
+                                       parent=par_)
+        for t_ in tag_:
+            par_[0].append(t_)
+    # Check TAIL
+    first=False
+    while len(info_tags)>0:
+        span, tag, info = info_tags[0]
         if o_text is None or span[1] >= offset+len(o_text):
-            continue
+            break
         middle = o_text[span[0]-offset:span[1]-offset]
         tag = ET.Element(tag, **info)
         tag.text = middle
@@ -184,37 +202,32 @@ def add_tags(par, info_tags, total=0, offset=0, parent=None, gp=None):
         else:
             par_[0].append(tag)
 
-        if ii == 0:
+        if not first:
             cur = o_text[:span[0]-offset]
+            first=True
         else:
             prev_tag.tail = o_text[prev_span_end:span[0]-offset]
         prev_span_end = span[1]-offset
         prev_tag = tag
         prev_tag.tail = o_text[prev_span_end:span[0]-offset]
-        total += 1
+        info_tags.pop(0)
     par_[0].tail = cur
-    # Check the children
-    for element in par:
-        tag_, total, offset = add_tags(element,
-                                           info_tags[total:],
-                                           total=total,
-                                           offset=offset,
-                                           parent=par_)
-
-        for t_ in tag_:
-            par_[0].append(t_)
-    return par_, total, len(o_text)+offset
+    if o_text:
+        return par_, info_tags, len(o_text)+offset
+    else:
+        return par_, info_tags, offset
 
 
 def process_articles(par, cntx, counter):
     arts = test_articles(par, cntx)
+    docs = test_docs(par, cntx)
     tags = []
     for idd, (art, definitions) in enumerate(arts):
         counter.update(["art", "doc"])
         info_art = {}
         info_doc = {}
-        info_art['ref'] = str(counter["doc"])
         info_art['id'] = str(counter["art"])
+        info_art['ref'] = str(counter["doc"])
         info_doc['id'] = str(counter["doc"])
         tags.append((art[0], 'ArticleMention', info_art))
         tags.append((art[1], 'DocumentMention', info_doc))
@@ -222,7 +235,18 @@ def process_articles(par, cntx, counter):
             counter["def"] += 1
             info_def = {'id': str(counter["def"]), "ref": str(counter["doc"])}
             tags.append((defi, 'Definition', info_def))
+    for idd, (doc, definitions) in enumerate(docs):
+            counter.update(["doc"])
+            info_doc = {}
+            info_doc['id'] = str(counter["doc"])
+            tags.append((doc, 'DocumentMention', info_doc))
+            for defi in definitions:
+                counter["def"] += 1
+                info_def = {'id': str(counter["def"]),
+                            "ref": str(counter["doc"])}
+                tags.append((defi, 'Definition', info_def))
     par_, _, _ = add_tags(par, tags)
+    print(ET.tostring(par_[0]))
     return par_[0]
 
 
@@ -244,7 +268,6 @@ def label_xml(root):
         art_flag = False
         # Shows some labelling in the document
         for doc in par_.findall('.//DocumentMention'):
-            art_flag = True
             resolution = resolve_document(doc.text, cntx)
             doc.attrib['document_name'] = resolution
             verbose(fg.GREEN, "Document: ",
@@ -255,11 +278,11 @@ def label_xml(root):
                 verbose(fg.YELLOW, "Definition: ", bg.WHITE,
                         "".join([x for x in defi.itertext()]),
                         bg.RESET, "->", resolution)
-
-        for art in par_.findall('.//ArticleMention'):
-            verbose(fg.BLUE, "Article: ", bg.WHITE,
-                    "".join([x for x in art.itertext()]))
-        pass
+            for art in par_.findall('.//ArticleMention[@ref="{0}"]'
+                                    .format(doc.attrib['id'])):
+                verbose(fg.BLUE, "Article: ", bg.WHITE,
+                        "".join([x for x in art.itertext()]))
+            pass
 
 
 # MAIN

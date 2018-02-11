@@ -20,6 +20,10 @@ article_mention = r'(?:art.culos?) '\
                   r'(?P<articles>[\d.,y ixviabc]+-?) '\
                   r'(?:fracción [^,]*, )?(inciso [^,]*, )?'
 
+title_rest = r'(?:(\w+[ \n]+)*(?:[A-Z]\w+,?[ \n]*)+)*'
+re_interpretacion_sentencia =\
+   re.compile(
+     r'(?P<doc>(?:Interpretación (\w+ )*)?Sentencia[^"”\.,]{0})'.format(title_rest))
 
 re_articlede = re.compile(article_mention +
                           r'(?:de esa|de esta|de la |del |de su |en la )?'
@@ -36,9 +40,14 @@ re_definitions = re.compile(r'[“"](?P<term>[^”"]+)["”]')
 
 def get_splits(spans):
     splits = []
-    for spani, spanf in zip(spans, spans[1:]):
-        splits.append((spani[1][1], spanf[0][0]))
-    splits.append((spans[-1][1][1], None))
+    if isinstance(spans[-1][1],int):
+        for spani, spanf in zip(spans, spans[1:]):
+            splits.append((spani[1], spanf[0]))
+        splits.append((spans[-1][1], None))
+    else:
+        for spani, spanf in zip(spans, spans[1:]):
+            splits.append((spani[1][1], spanf[0][0]))
+        splits.append((spans[-1][1][1], None))
     return splits
 
 
@@ -50,7 +59,7 @@ def enadelante(text, spans):
     for ini, fin in splits:
         defis = []
         if not fin:
-            fin = len(text)
+            fin = ini+100
         text_ = text[ini:fin]
         m = re_en_adelante.search(text_)
         if m:
@@ -73,7 +82,35 @@ def test_definition(par, spans, cntx):
     definitions = []
     for idd, t in enumerate(t_definitions):
         definitions.extend(t(text_, spans))
+
     return definitions
+
+
+def sentencia(text, cntx):
+    docs = []
+    for doc in re_interpretacion_sentencia.finditer(text):
+        span = doc.span("doc")
+        docs.append(span)
+    return docs
+
+
+t_docs = [
+    sentencia,
+]
+
+
+def test_docs(par, cntx):
+    text_ = "".join([x for x in par.itertext()])
+
+    spans = []
+    for idd, t in enumerate(t_docs):
+        spans_ = t(text_, cntx)
+        if len(spans_) == 0:
+            continue
+        spans_ = compatible_spans(spans_, spans)
+        definitions_ = test_definition(par, spans_, cntx)
+        spans.extend(zip(spans_, definitions_))
+    return spans
 
 
 def articlede(text, cntx):
