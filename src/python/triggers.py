@@ -23,8 +23,8 @@ article_mention = r'(?:art.culos?) '\
 title_rest = r'(?:(\w+[ \n]+)*(?:[A-Z]\w+,?[ \n]*)+)*'
 re_interpretacion_sentencia =\
    re.compile(
-     r'(?P<doc>(?:Interpretación (\w+ )*)?Sentencia[^"”\.,]{0})'.format(title_rest))
-
+     r'(?P<doc>(?:Interpretación (\w+ )*)?Sentencia[^"”\.,]{0})'
+     .format(title_rest))
 re_articlede = re.compile(article_mention +
                           r'(?:de esa|de esta|de la |del |de su |en la )?'
                           r'(?P<source>(dich[oa] '
@@ -36,11 +36,15 @@ re_articlede = re.compile(article_mention +
 
 re_en_adelante = re.compile(r'en[ \n]*adelante[ \n]*.*')
 re_definitions = re.compile(r'[“"](?P<term>[^”"]+)["”]')
+re_institutions = re.compile(r"(?P<inst>{0})".format(r"|"
+                             .join(
+                              [ins.replace(" ","[ \n]") for ins
+                               in exceptions.institutions])))
 
 
 def get_splits(spans):
     splits = []
-    if isinstance(spans[-1][1],int):
+    if isinstance(spans[-1][1], int):
         for spani, spanf in zip(spans, spans[1:]):
             splits.append((spani[1], spanf[0]))
         splits.append((spans[-1][1], None))
@@ -86,16 +90,57 @@ def test_definition(par, spans, cntx):
     return definitions
 
 
+def institutions(text, cntx):
+    insts = []
+    for inst in re_institutions.finditer(text):
+        span = inst.span("inst")
+        insts.append(span)
+    return insts
+
+
+t_institutions = [
+    institutions,
+]
+
+
+def test_institutions(par, cntx):
+    text_ = "".join([x for x in par.itertext()])
+
+    spans = []
+    for idd, t in enumerate(t_institutions):
+        spans_ = t(text_, cntx)
+        if len(spans_) == 0:
+            continue
+        spans_ = compatible_spans(spans_, spans)
+        definitions_ = test_definition(par, spans_, cntx)
+        spans.extend(zip(spans_, definitions_))
+    return spans
+
+
 def sentencia(text, cntx):
     docs = []
     for doc in re_interpretacion_sentencia.finditer(text):
-        span = doc.span("doc")
-        docs.append(span)
+        doc_name = doc.group("doc")
+        if not len(doc_name.split()) == 1:
+            span = doc.span("doc")
+            docs.append(span)
     return docs
+
+
+def mention_definition(text, cntx):
+    spans = []
+    for phrase, defis in cntx.definitions.items():
+        re_mention = r"(?P<source>" +\
+                     r"|".join([d for d in defis]) +\
+                     r")"
+        for m in re.finditer(re_mention, text):
+            spans.append(m.span('source'))
+    return spans
 
 
 t_docs = [
     sentencia,
+    mention_definition,
 ]
 
 
@@ -107,9 +152,13 @@ def test_docs(par, cntx):
         spans_ = t(text_, cntx)
         if len(spans_) == 0:
             continue
-        spans_ = compatible_spans(spans_, spans)
-        definitions_ = test_definition(par, spans_, cntx)
-        spans.extend(zip(spans_, definitions_))
+        flat_spans_ = compatible_spans(spans_, flat_spans(spans))
+        final_spans_ = []
+        for span_ in spans_:
+            if span_[0] in flat_spans_:
+                final_spans_.append(span_)
+        definitions_ = test_definition(par, final_spans_, cntx)
+        spans.extend(zip(final_spans_, definitions_))
     return spans
 
 
@@ -145,18 +194,17 @@ def compatible_spans(spans1, spans):
     ii = 0
     jj = 0
     fin = 0
-    if len(spans) == 0:
+    if len(spans) == 0 or len(spans1) == 0:
         return spans1
-    spans__ = []
-    for s, d in spans:
-        spans__.append(s)
-    spans = spans__
     while ii < len(spans) and jj < len(spans1):
-        span = spans[ii][1]
-        span1 = spans1[jj][1]
-        if span[0] > fin and span[0] < span1[0]:
+        span = spans[ii]
+        span1 = spans1[jj]
+        if span[0] > fin and span[1] < span1[0]:
             fin = span[1]
             ii += 1
+        if span1[0] > span[0] and span1[0] <= span[1]:
+            fin = span[1]
+            jj += 1
         elif span1[0] > fin and span1[0] < span[0]:
             spans_.append(spans1[jj])
             fin = span[1]
@@ -165,22 +213,51 @@ def compatible_spans(spans1, spans):
             ii += 1
         if span1[0] < fin:
             jj += 1
+        if span1 == span:
+            ii += 1
+            jj += 1
+    for span1 in spans1[jj:]:
+        spans_.append(spans1)
     return spans_
+
+
+def flat_spans(spans):
+    flat = []
+    for span, defi in spans:
+        if isinstance(span[0], int):
+            flat.extend([span] + defi)
+        else:
+            flat.extend([span[0], span[1]] + defi)
+    return flat
+
+
+def flat_article_spans(spans):
+    flat = []
+    for span in spans:
+        if isinstance(span[0], int):
+            flat.extend([span])
+        else:
+            flat.extend([span[0], span[1]])
+    return flat
 
 
 def test_articles(par, cntx):
     text = "".join([x for x in par.itertext()])
     text = text.replace('\n', ' ')
     text_ = text.lower()
-
     spans = []
     for idd, t in enumerate(t_articles):
         spans_ = t(text_, cntx)
         if len(spans_) == 0:
             continue
-        spans_ = compatible_spans(spans_, spans)
-        definitions_ = test_definition(par, spans_, cntx)
-        spans.extend(zip(spans_, definitions_))
+        flat_spans_ = flat_article_spans(spans_)
+        flat_spans_ = compatible_spans(flat_spans_, flat_spans(spans))
+        final_spans_ = []
+        for span_ in spans_:
+            if span_[0] in flat_spans_ and span_[1] in flat_spans_:
+                final_spans_.append(span_)
+        definitions_ = test_definition(par, final_spans_, cntx)
+        spans.extend(zip(final_spans_, definitions_))
     return spans
 
 
@@ -249,5 +326,3 @@ t_formats = [
     (namesection, 'namesection', False),
     (numericalindex, 'numericalindex', False)
 ]
-
-

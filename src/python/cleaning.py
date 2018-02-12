@@ -19,7 +19,6 @@ def resolve_document(text, cntx):
     text = re_enters.sub(" ", text)
     text = re_spaces.sub(" ", text)
     if text in cntx.definitions_:
-        print(cntx.definitions_[text])
         return cntx.definitions_[text]
 
     for lower, red, res in reductions:

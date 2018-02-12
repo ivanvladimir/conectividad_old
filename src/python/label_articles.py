@@ -13,9 +13,13 @@ import os.path
 import re
 from tinydb import TinyDB, Query
 import xml.etree.ElementTree as ET
-from triggers import test_format, test_articles, test_docs
+from triggers import (test_format, test_articles, test_docs, test_institutions,
+                      compatible_spans, flat_spans)
 from cleaning import resolve_document
 from collections import Counter
+
+
+re_space_or_enter = re.compile(r"[ \n]")
 
 
 class fg:
@@ -73,11 +77,15 @@ class Context:
             if fn in self.footnotes:
                 self.footnotes.remove(fn)
 
+    def escape_phrase(self, phrase):
+        phrase = re_space_or_enter.sub("[ \n]", phrase)
+        return phrase
+
     def add_definition(self, doc, phrase):
         try:
-            self.definitions[doc].append(phrase)
+            self.definitions[doc].append(self.escape_phrase(phrase))
         except KeyError:
-            self.definitions[doc] = [phrase]
+            self.definitions[doc] = [self.escape_phrase(phrase)]
         self.definitions_[phrase] = doc
 
     def __str__(self):
@@ -88,12 +96,10 @@ class Context:
             res.append("par. "+str(self.paragraph))
         if self.page:
             res.append(" pp. "+str(self.page))
-        if len(self.footnotes):
-            res.append("\nfn. "+str(", ".join(list(self.footnotes))))
-        if len(self.definitions):
-            res.append("\n"+str(self.definitions))
-        if len(res) == 0:
-            res = ["Empty"]
+        # if len(self.footnotes):
+        #     res.append("\nfn. "+str(", ".join(list(self.footnotes))))
+        # if len(self.definitions):
+        #     res.append("\n"+str(self.definitions))
         return ", ".join(res)
 
     def info(self):
@@ -157,8 +163,8 @@ def add_tags(par, info_tags, offset=0, parent=None):
     prev_tag = None
     prev_span_end = None
     # Check the text
-    first=False
-    while len(info_tags)>0:
+    first = False
+    while len(info_tags) > 0:
         span, tag, info = info_tags[0]
         if o_text is None or span[1] >= len(o_text):
             break
@@ -168,7 +174,7 @@ def add_tags(par, info_tags, offset=0, parent=None):
         par_[0].append(tag)
         if not first:
             cur = o_text[:span[0]-offset]
-            first=True
+            first = True
         else:
             prev_tag.tail = o_text[prev_span_end:span[0]-offset]
         prev_span_end = span[1]-offset
@@ -183,14 +189,14 @@ def add_tags(par, info_tags, offset=0, parent=None):
     # Check the children
     for element in par:
         tag_, info_tags, offset = add_tags(element,
-                                       info_tags,
-                                       offset=offset,
-                                       parent=par_)
+                                           info_tags,
+                                           offset=offset,
+                                           parent=par_)
         for t_ in tag_:
             par_[0].append(t_)
     # Check TAIL
-    first=False
-    while len(info_tags)>0:
+    first = False
+    while len(info_tags) > 0:
         span, tag, info = info_tags[0]
         if o_text is None or span[1] >= offset+len(o_text):
             break
@@ -204,7 +210,7 @@ def add_tags(par, info_tags, offset=0, parent=None):
 
         if not first:
             cur = o_text[:span[0]-offset]
-            first=True
+            first = True
         else:
             prev_tag.tail = o_text[prev_span_end:span[0]-offset]
         prev_span_end = span[1]-offset
@@ -218,22 +224,41 @@ def add_tags(par, info_tags, offset=0, parent=None):
         return par_, info_tags, offset
 
 
+def compatible_tags(candidates, gs_labeling):
+    candidates_ = []
+    for span_, defi_ in candidates:
+        ini_len = len(defi_)
+        flag = True
+        for gs_tags in gs_labeling:
+            span__ = compatible_spans([span_]+defi_,
+                                     flat_spans(gs_tags))
+            if not ini_len == len(span__)-1:
+                flag = False
+        if flag:
+            candidates_.append((span_, defi_))
+    return candidates_
+
+
 def process_articles(par, cntx, counter):
     arts = test_articles(par, cntx)
     docs = test_docs(par, cntx)
+    docs = compatible_tags(docs, [arts])
+    insts = test_institutions(par, cntx)
+    insts = compatible_tags(insts, [arts, docs])
     tags = []
     for idd, (art, definitions) in enumerate(arts):
         counter.update(["art", "doc"])
         info_art = {}
         info_doc = {}
         info_art['id'] = str(counter["art"])
-        info_art['ref'] = str(counter["doc"])
+        info_art['document'] = str(counter["doc"])
         info_doc['id'] = str(counter["doc"])
         tags.append((art[0], 'ArticleMention', info_art))
         tags.append((art[1], 'DocumentMention', info_doc))
         for defi in definitions:
             counter["def"] += 1
-            info_def = {'id': str(counter["def"]), "ref": str(counter["doc"])}
+            info_def = {'id': str(counter["def"]),
+                        "document": str(counter["doc"])}
             tags.append((defi, 'Definition', info_def))
     for idd, (doc, definitions) in enumerate(docs):
             counter.update(["doc"])
@@ -243,10 +268,19 @@ def process_articles(par, cntx, counter):
             for defi in definitions:
                 counter["def"] += 1
                 info_def = {'id': str(counter["def"]),
-                            "ref": str(counter["doc"])}
+                            "document": str(counter["doc"])}
+                tags.append((defi, 'Definition', info_def))
+    for idd, (inst, definitions) in enumerate(insts):
+            counter.update(["inst"])
+            info_inst = {}
+            info_inst['id'] = str(counter["inst"])
+            tags.append((inst, 'InstitutionMention', info_inst))
+            for defi in definitions:
+                counter["def"] += 1
+                info_def = {'id': str(counter["def"]),
+                            "institution": str(counter["inst"])}
                 tags.append((defi, 'Definition', info_def))
     par_, _, _ = add_tags(par, tags)
-    print(ET.tostring(par_[0]))
     return par_[0]
 
 
@@ -255,9 +289,10 @@ def label_xml(root):
     counter = Counter([])
     for par in root.findall('.//paragraph'):
         counter.update(["par"])
-        verbose(fg.BLUE, "Context: ", fg.BLUE, cntx)
+        verbose(fg.YELLOW, "")
         verbose(fg.YELLOW, "Raw text: ",
                 style.RESET, "".join([x for x in par.itertext()]))
+        verbose(fg.BLUE, "Context: ", fg.BLUE, cntx)
         par = preprocess_paragraph(par)
         # Eliminates article tags
         get_context(par, cntx)
@@ -265,24 +300,37 @@ def label_xml(root):
         for k, i in cntx.info().items():
             par_.attrib[k] = i
 
-        art_flag = False
         # Shows some labelling in the document
         for doc in par_.findall('.//DocumentMention'):
             resolution = resolve_document(doc.text, cntx)
-            doc.attrib['document_name'] = resolution
+            doc.attrib['name'] = resolution
             verbose(fg.GREEN, "Document: ",
                     bg.WHITE, resolution, bg.RESET, "/", doc.text)
-            for defi in par_.findall('.//Definition[@ref="{0}"]'
+            for defi in par_.findall('.//Definition[@document="{0}"]'
                                      .format(doc.attrib['id'])):
                 cntx.add_definition(resolution, defi.text)
                 verbose(fg.YELLOW, "Definition: ", bg.WHITE,
                         "".join([x for x in defi.itertext()]),
                         bg.RESET, "->", resolution)
-            for art in par_.findall('.//ArticleMention[@ref="{0}"]'
+            for art in par_.findall('.//ArticleMention[@document="{0}"]'
                                     .format(doc.attrib['id'])):
                 verbose(fg.BLUE, "Article: ", bg.WHITE,
                         "".join([x for x in art.itertext()]))
             pass
+        # Shows some labelling in the document
+        for inst in par_.findall('.//InstitutionMention'):
+            resolution = resolve_document(inst.text, cntx)
+            inst.attrib['name'] = resolution
+            verbose(fg.MAGENTA, "Institution: ",
+                    bg.WHITE, resolution, bg.RESET, "/", inst.text)
+            for defi in par_.findall('.//Definition[@institution="{0}"]'
+                                     .format(inst.attrib['id'])):
+                cntx.add_definition(resolution, defi.text)
+                verbose(fg.YELLOW, "Definition: ", bg.WHITE,
+                        "".join([x for x in defi.itertext()]),
+                        bg.RESET, "->", resolution)
+
+        verbose(fg.CYAN, bg.WHITE, "Paragraph: ", bg.RESET,ET.tostring(par_))
 
 
 # MAIN

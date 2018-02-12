@@ -12,3 +12,9 @@ footnotementions = [
     ('decisión 6,', 6),
     ('oportunamente 8.', 8),
 ]
+
+institutions = [
+    "Corte Interamericana de Derechos Humanos",
+    "Comisión Interamericana de Derechos Humanos",
+    "Defensores Interamericanos",
+]
