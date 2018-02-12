@@ -15,11 +15,8 @@ from tinydb import TinyDB, Query
 import xml.etree.ElementTree as ET
 from triggers import (test_format, test_articles, test_docs, test_institutions,
                       compatible_spans, flat_spans)
-from cleaning import resolve_document
+from cleaning import resolve_document, re_espace_or_enter, split_arts
 from collections import Counter
-
-
-re_space_or_enter = re.compile(r"[ \n]")
 
 
 class fg:
@@ -64,6 +61,8 @@ class Context:
         self.footnotes_ = set([])
         self.definitions = {}
         self.definitions_ = {}
+        self.t_definitions_ = {}
+        self.type = "normal"
 
     def add_footnotes(self, fns):
         for fn in fns:
@@ -78,15 +77,17 @@ class Context:
                 self.footnotes.remove(fn)
 
     def escape_phrase(self, phrase):
-        phrase = re_space_or_enter.sub("[ \n]", phrase)
+        phrase = re_espace_or_enter.sub("[ \n]", phrase)
         return phrase
 
-    def add_definition(self, doc, phrase):
+    def add_definition(self, doc, phrase, t):
+        escaped_phrase = self.escape_phrase(phrase)
         try:
-            self.definitions[doc].append(self.escape_phrase(phrase))
+            self.definitions[doc].append(escaped_phrase)
         except KeyError:
-            self.definitions[doc] = [self.escape_phrase(phrase)]
-        self.definitions_[phrase] = doc
+            self.definitions[doc] = [escaped_phrase]
+        self.definitions_[escaped_phrase] = doc
+        self.t_definitions_[escaped_phrase] = t
 
     def __str__(self):
         res = []
@@ -112,24 +113,37 @@ class Context:
             res["page"] = str(self.page)
         if len(self.footnotes):
             res["open_footnotes"] = str(", ".join(list(self.footnotes)))
+        if self.type:
+            res["type"] = str(self.type)
         return res
 
 
 def get_context(par, cntx):
     results = test_format(par)
+    cntx.type = "normal"
     for res in results:
         if res[0] is None:
             return None
         if res[0].startswith('namesection'):
-            cntx.section = res[1]
+            if len(res[1]) > 0:
+                cntx.section = res[1]
+                cntx.type = "title"
         elif res[0].startswith('numericalindex'):
-            cntx.paragraph = res[1]
+            if len(res[1]) > 0:
+                cntx.paragraph = res[1]
+                cntx.type = "normal"
         elif res[0].startswith('pagenumber'):
-            cntx.page = res[1]
+            if len(res[1]) > 0:
+                cntx.page = res[1]
+                cntx.type = "pagenumber"
         elif res[0].startswith('footnotemention'):
-            cntx.add_footnotes(res[1])
+            if len(res[1]) > 0:
+                cntx.add_footnotes(res[1])
+                cntx.type = "normal"
         elif res[0].startswith('footnote'):
-            cntx.footnote(res[1])
+            if len(res[1]) > 0:
+                cntx.footnote(res[1])
+                cntx.type = "footnote"
 
 
 def preprocess_paragraph(par):
@@ -143,9 +157,16 @@ def preprocess_paragraph(par):
                 prev.tail += child.text + child.tail
             else:
                 par_.text += child.text + child.tail
-        elif child.tag == "Actions":
+        elif child.tag == "Date2":
             if prev is not None:
                 prev.tail += child.text + child.tail
+            else:
+                par_.text += child.text + child.tail
+        elif child.tag == "Actions":
+            if prev is not None:
+                prev.tail += child.text
+                if child.tail:
+                    prev.tail += child.tail
             else:
                 par_.text += child.text + child.tail
         else:
@@ -163,7 +184,7 @@ def add_tags(par, info_tags, offset=0, parent=None):
     prev_tag = None
     prev_span_end = None
     # Check the text
-    first = False
+    first = True
     while len(info_tags) > 0:
         span, tag, info = info_tags[0]
         if o_text is None or span[1] >= len(o_text):
@@ -172,9 +193,9 @@ def add_tags(par, info_tags, offset=0, parent=None):
         tag = ET.Element(tag, **info)
         tag.text = middle
         par_[0].append(tag)
-        if not first:
+        if first:
             cur = o_text[:span[0]-offset]
-            first = True
+            first = False
         else:
             prev_tag.tail = o_text[prev_span_end:span[0]-offset]
         prev_span_end = span[1]-offset
@@ -182,6 +203,9 @@ def add_tags(par, info_tags, offset=0, parent=None):
         prev_tag.tail = o_text[prev_span_end:span[0]-offset]
         info_tags.pop(0)
     par_[0].text = cur
+    if not first:
+        prev_tag.tail = o_text[prev_span_end:]
+
     if o_text:
         offset += len(o_text)
     o_text = par.tail
@@ -195,7 +219,7 @@ def add_tags(par, info_tags, offset=0, parent=None):
         for t_ in tag_:
             par_[0].append(t_)
     # Check TAIL
-    first = False
+    first = True
     while len(info_tags) > 0:
         span, tag, info = info_tags[0]
         if o_text is None or span[1] >= offset+len(o_text):
@@ -208,9 +232,9 @@ def add_tags(par, info_tags, offset=0, parent=None):
         else:
             par_[0].append(tag)
 
-        if not first:
+        if first:
             cur = o_text[:span[0]-offset]
-            first = True
+            first = False
         else:
             prev_tag.tail = o_text[prev_span_end:span[0]-offset]
         prev_span_end = span[1]-offset
@@ -218,6 +242,8 @@ def add_tags(par, info_tags, offset=0, parent=None):
         prev_tag.tail = o_text[prev_span_end:span[0]-offset]
         info_tags.pop(0)
     par_[0].tail = cur
+    if not first:
+        prev_tag.tail = o_text[prev_span_end:]
     if o_text:
         return par_, info_tags, len(o_text)+offset
     else:
@@ -261,15 +287,15 @@ def process_articles(par, cntx, counter):
                         "document": str(counter["doc"])}
             tags.append((defi, 'Definition', info_def))
     for idd, (doc, definitions) in enumerate(docs):
-            counter.update(["doc"])
-            info_doc = {}
-            info_doc['id'] = str(counter["doc"])
-            tags.append((doc, 'DocumentMention', info_doc))
-            for defi in definitions:
-                counter["def"] += 1
-                info_def = {'id': str(counter["def"]),
-                            "document": str(counter["doc"])}
-                tags.append((defi, 'Definition', info_def))
+        counter.update(["doc"])
+        info_doc = {}
+        info_doc['id'] = str(counter["doc"])
+        tags.append((doc, 'DocumentMention', info_doc))
+        for defi in definitions:
+            counter["def"] += 1
+            info_def = {'id': str(counter["def"]),
+                        "document": str(counter["doc"])}
+            tags.append((defi, 'Definition', info_def))
     for idd, (inst, definitions) in enumerate(insts):
             counter.update(["inst"])
             info_inst = {}
@@ -280,6 +306,7 @@ def process_articles(par, cntx, counter):
                 info_def = {'id': str(counter["def"]),
                             "institution": str(counter["inst"])}
                 tags.append((defi, 'Definition', info_def))
+    tags = sorted(tags, key=lambda x: x[0])
     par_, _, _ = add_tags(par, tags)
     return par_[0]
 
@@ -302,35 +329,40 @@ def label_xml(root):
 
         # Shows some labelling in the document
         for doc in par_.findall('.//DocumentMention'):
-            resolution = resolve_document(doc.text, cntx)
+            definitions = par_.findall('.//Definition[@document="{0}"]'
+                                       .format(doc.attrib['id']))
+            resolution, t = resolve_document(doc.text, cntx, len(definitions))
             doc.attrib['name'] = resolution
+            doc.attrib['type'] = t
             verbose(fg.GREEN, "Document: ",
                     bg.WHITE, resolution, bg.RESET, "/", doc.text)
-            for defi in par_.findall('.//Definition[@document="{0}"]'
-                                     .format(doc.attrib['id'])):
-                cntx.add_definition(resolution, defi.text)
+            for defi in definitions:
+                cntx.add_definition(resolution, defi.text, "document")
                 verbose(fg.YELLOW, "Definition: ", bg.WHITE,
                         "".join([x for x in defi.itertext()]),
                         bg.RESET, "->", resolution)
             for art in par_.findall('.//ArticleMention[@document="{0}"]'
                                     .format(doc.attrib['id'])):
-                verbose(fg.BLUE, "Article: ", bg.WHITE,
-                        "".join([x for x in art.itertext()]))
+                art.attrib["articles"] = split_arts(art.text)
+                verbose(fg.BLUE, "Article: ", bg.WHITE, art.text,
+                        bg.RESET, '->', art.attrib["articles"])
             pass
         # Shows some labelling in the document
         for inst in par_.findall('.//InstitutionMention'):
-            resolution = resolve_document(inst.text, cntx)
+            definitions = par_.findall('.//Definition[@institution="{0}"]'
+                                       .format(inst.attrib['id']))
+            resolution, t = resolve_document(inst.text, cntx, len(definitions))
             inst.attrib['name'] = resolution
+            inst.attrib['type'] = t
             verbose(fg.MAGENTA, "Institution: ",
                     bg.WHITE, resolution, bg.RESET, "/", inst.text)
-            for defi in par_.findall('.//Definition[@institution="{0}"]'
-                                     .format(inst.attrib['id'])):
-                cntx.add_definition(resolution, defi.text)
+            for defi in definitions:
+                cntx.add_definition(resolution, defi.text, "institution")
                 verbose(fg.YELLOW, "Definition: ", bg.WHITE,
                         "".join([x for x in defi.itertext()]),
                         bg.RESET, "->", resolution)
 
-        verbose(fg.CYAN, bg.WHITE, "Paragraph: ", bg.RESET,ET.tostring(par_))
+        verbose(fg.CYAN, bg.WHITE, "Paragraph: ", bg.RESET, ET.tostring(par_))
 
 
 # MAIN

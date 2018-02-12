@@ -13,73 +13,87 @@ import re
 re_enters = re.compile(r"\n+")
 re_spaces = re.compile(r"\s+")
 re_fromltoc = re.compile(r"^[a-z ]+(?P<caption>[A-Z]+.*)")
+re_espace_or_enter = re.compile(r"[ \n]")
+re_numbers = re.compile(r'([\d.]+|[IXVixv]+)')
 
 
-def resolve_document(text, cntx):
+def split_arts(text):
+    return " ".join(re_numbers.findall(text))
+
+
+def resolve_document(text, cntx, definitions):
     text = re_enters.sub(" ", text)
     text = re_spaces.sub(" ", text)
-    if text in cntx.definitions_:
-        return cntx.definitions_[text]
-
-    for lower, red, res in reductions:
+    text_ = re_espace_or_enter.sub("[ \n]", text)
+    if definitions == 0:
+        for defi in cntx.definitions_.keys():
+            if text_.find(defi) >= 0:
+                return cntx.definitions_[defi], cntx.t_definitions_[defi]
+    for lower, red, res, t in reductions:
         if lower:
             m = red.match(text.lower())
         else:
             m = red.match(text)
         if m:
-            return res
+            return res, t
     m = re_fromltoc.match(text)
     if m:
         text = m.group('caption')
-    return text
+    return text, "document"
 
 
 reductions = [
     (False, re.compile(r'mism[ao]'),
-        'PENDING'),
+        'PENDING', "pending"),
     (False, re.compile(r'MISM[AO]'),
-        'PENDING'),
+        'PENDING', "pending"),
     (False, re.compile(r'dicha Convención'),
-        'Convención'),
+        'Convención', "pending"),
     (False, re.compile(r'dich[oa]'),
-        'PENDING'),
+        'PENDING', "pending"),
     (False, re.compile(r'presente'),
-        'PENDING'),
+        'PENDING', "pending"),
     (False, re.compile(r'esta ley'),
-        'PENDING'),
+        'PENDING', "pending"),
     (False, re.compile(r'Son'),
-        'PENDING'),
+        'PENDING', "pending"),
     (False, re.compile(r'est[ae] últim[oa]'),
-        'PENDING'),
+        'PENDING', "pending"),
     (False, re.compile(r'Convención [I|i]\w*'),
-        'Convención Interamericana de Derechos Humanos'),
+        'Convención Interamericana de Derechos Humanos', "document"),
     (False, re.compile(r'Convención [A|a]\w*'),
-        'Convención Americana sobre Derechos Humanos'),
+        'Convención Americana sobre Derechos Humanos', "document"),
     (False, re.compile(r'RAAN'),
-        'Regiones Autónomas del Atlántico Norte'),
+        'Regiones Autónomas del Atlántico Norte', "institution"),
     (False, re.compile(r'MARENA'),
-        'Ministerio del Ambiente y Recursos Naturales de Nicaragua'),
+        'Ministerio del Ambiente y Recursos Naturales de Nicaragua',
+        "instiution"),
     (False, re.compile(r'RAAS'),
-        'Regiones Autónomas del Atlántico Sur'),
+        'Regiones Autónomas del Atlántico Sur', "institution"),
     (False, re.compile(r'CONVENCIÓN [I|i]\w*'),
-        'Convención Interamericana de Derechos Humanos'),
+        'Convención Interamericana de Derechos Humanos', "document"),
     (False, re.compile(r'CONVENCIÓN [A|a]\w*'),
-        'Convención Americana de Derechos Humanos'),
+        'Convención Americana de Derechos Humanos', "document"),
     (False, re.compile(r'Estatuto.*(corte)*'),
-        'Estatuto de la Corte'),
+        'Estatuto de la Corte', "document"),
     (False, re.compile(r'^Reglamento$'),
-        'Reglamento de la Corte'),
+        'Reglamento de la Corte', "document"),
     (False, re.compile(r'CP'),
-        'Código Penal'),
+        'Código Penal', 'document'),
     (False, re.compile(r'CIDFP'),
-        'Convención Interamericana sobre Desaparición Forzada de Personas'),
+        'Convención Interamericana sobre Desaparición Forzada de Personas',
+        'document'),
     (False, re.compile(r'Ley 14'),
-        'Código de Justicia Miliar Ley 14.029'),
+        'Código de Justicia Miliar Ley 14.029', "document"),
     (False, re.compile(r'CJM'),
-        'Comisión de Justicia Militar'),
+        'Comisión de Justicia Militar', "document"),
     (False,
      re.compile(
        r'^Sentencia de Excepción Preliminar, Fondo, Reparaciones y Costas.*'),
-        'Sentencia de Excepción Preliminar, Fondo, Reparaciones y Costas'),
-
+        'Sentencia de Excepción Preliminar, Fondo, Reparaciones y Costas',
+        "document"),
+    (False, re.compile(r'Reglamento establece'),
+        'Reglamento de la Corte', "document"),
+    (False, re.compile(r'de su Reglamento'),
+        'Reglamento de la Corte', "document"),
 ]

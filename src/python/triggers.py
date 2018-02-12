@@ -16,30 +16,71 @@ re_pagenumber_fin = re.compile(r"\s+(?P<num>\d+)$")
 re_footnote_mention = re.compile(r"[a-z](\d+)[,. ]")
 re_footnote = re.compile(r'(?:^|\n)(?P<num>\d+)\n\s\s+\w+')
 
-article_mention = r'(?:art.culos?) '\
-                  r'(?P<articles>[\d.,y ixviabc]+-?) '\
-                  r'(?:fracción [^,]*, )?(inciso [^,]*, )?'
+re_parrafodela = re.compile(
+                    r'p.rrafo[ \n](?P<parr>\d+)[ \n]de[ \n]'
+                    r'(?P<source>la sentencia)')
 
-title_rest = r'(?:(\w+[ \n]+)*(?:[A-Z]\w+,?[ \n]*)+)*'
+#artículos 31.3 y 68
+article_mention = r'(?:art.culos?[\n ])'\
+                  r'(?P<articles>[\d\.,y ixvabc]+-?)[\n ]'\
+                  r'(?:fracción [^,]*, )?(inciso [^,]*, )?'
+source_mention = r'(?P<source>(?:de[\n ]esa|'\
+                 r'de[\n ]esta[\n ]+|'\
+                 r'de[\n ]la[\n ]+|'\
+                 r'del[ \n]+|'\
+                 r'de[\n ]su[\n ]+|'\
+                 r'en[\n ]la[\n ]+)'\
+                 r'(?:\w+[ \n]){0,8}\w+)'
+
+
+title_rest = r'(?:(\w+[ \n]+){0,3}(?:[A-Z]\w+,?[ \n]*)+)*'
 re_interpretacion_sentencia =\
    re.compile(
      r'(?P<doc>(?:Interpretación (\w+ )*)?Sentencia[^"”\.,]{0})'
      .format(title_rest))
-re_articlede = re.compile(article_mention +
-                          r'(?:de esa|de esta|de la |del |de su |en la )?'
-                          r'(?P<source>(dich[oa] '
-                          r'|últim[oa] '
-                          r'|presente ley '
-                          r'|ley (\d+(\.\d+)?)?)?'
-                          r'[^",;.()]*)[ ,.;]')
+
+re_articlede = re.compile(article_mention + source_mention)
+re_yarticle = re.compile(r' y '
+                         r'(?P<articles>[\d.y ]+)'
+                         r' del (?P<source>(?:\w+ ?)+)\.')
 
 
-re_en_adelante = re.compile(r'en[ \n]*adelante[ \n]*.*')
+re_enadelante = re.compile(r'en[ \n]*adelante[ \n]*.*')
 re_definitions = re.compile(r'[“"](?P<term>[^”"]+)["”]')
+re_documents = re.compile(r"(?P<doc>{0})".format(r"|"
+                          .join(
+                                [doc.replace(" ", "[ \n]") for doc
+                                 in exceptions.documents])))
 re_institutions = re.compile(r"(?P<inst>{0})".format(r"|"
                              .join(
-                              [ins.replace(" ","[ \n]") for ins
+                              [ins.replace(" ", "[ \n]") for ins
                                in exceptions.institutions])))
+re_avoid_defs_arts = re.compile(r"(?P<inst>{0})".format(r"|"
+                                .join(
+                                  [ins.lower().replace(" ", "[ \n]") for ins
+                                   in exceptions.avoid_defs_arts])))
+re_avoid_defs_mentions = re.compile(r"(?P<inst>{0})".format(r"|"
+                                    .join(
+                                      [ins.replace(" ", "[ \n]")
+                                       for ins
+                                       in exceptions.avoid_defs_mentions])))
+#
+#
+# Caso Loayza Tamayo Vs. Perú. Interpretación de la Sentencia de Fondo.
+# Resolución de la Corte Interamericana de Derechos Humanos de 8 de marzo
+# de 1998. Serie C No. 47, párr. 16,
+re_fullcase = re.compile(r'(?P<case>Caso[ \n][\n \w\(\)]+Vs\.'
+                         r'[ \n](?:[A-Z]\w+[\n ]?)+)\.'
+                         r'[ \n]Interpretaci.n[^\.]+\.'
+                         r'(?P<resolution>[ \n]Resoluci.n[^\.]+)?\.?'
+                         r'(?P<case_name>[ \n]Sentencia[^\.]+)?\.?'
+                         r'(?P<serie>[ \n]Serie[^,]+)?\,?'
+                         r'(?P<paragraph>[ \n]p.rr\.[ \n]\d+)'
+                         )
+# Caso Loayza Tamayo Vs. Perú.
+re_case = re.compile(r"(?P<case>Caso .*) Vs. ([A-Z]\w+ ?)+")
+# Informe de Admisibilidad 40/02
+re_informe = re.compile(r"(?P<doc>[\n ]Informe[^\d]+\d+/\d+)")
 
 
 def get_splits(spans):
@@ -62,10 +103,15 @@ def enadelante(text, spans):
     defis_span = []
     for ini, fin in splits:
         defis = []
-        if not fin:
-            fin = ini+100
+        limit = 200
+        for w in [".", "caso", ")"]:
+            limit_ = text[ini:].find(w)
+            if limit_ >= 0:
+                if limit_ < limit:
+                    limit = limit_
+        fin = ini+limit
         text_ = text[ini:fin]
-        m = re_en_adelante.search(text_)
+        m = re_enadelante.search(text_)
         if m:
             for defi in re_definitions.finditer(text_):
                 span_ = defi.span("term")
@@ -98,6 +144,8 @@ def institutions(text, cntx):
     return insts
 
 
+
+
 t_institutions = [
     institutions,
 ]
@@ -111,9 +159,14 @@ def test_institutions(par, cntx):
         spans_ = t(text_, cntx)
         if len(spans_) == 0:
             continue
-        spans_ = compatible_spans(spans_, spans)
-        definitions_ = test_definition(par, spans_, cntx)
-        spans.extend(zip(spans_, definitions_))
+        flat_spans_ = compatible_spans(spans_, flat_spans(spans))
+        final_spans_ = []
+        for span_ in spans_:
+            if span_ in flat_spans_:
+                final_spans_.append(span_)
+        definitions_ = test_definition(par, final_spans_, cntx)
+        spans.extend(zip(final_spans_, definitions_))
+
     return spans
 
 
@@ -124,8 +177,38 @@ def sentencia(text, cntx):
         if not len(doc_name.split()) == 1:
             span = doc.span("doc")
             docs.append(span)
-    return docs
+    return docs, True
 
+
+
+def fullcase(text, cntx):
+    spans = []
+    for m in re_fullcase.finditer(text):
+        spans.append(m.span(0))
+    return spans, True
+
+
+def case(text, cntx):
+    spans = []
+    for m in re_case.finditer(text):
+        spans.append(m.span('case'))
+    return spans, True
+
+
+def documents(text, cntx):
+    docs = []
+    for doc in re_documents.finditer(text):
+        span = doc.span("doc")
+        docs.append(span)
+    return docs, True
+
+
+def informe(text, cntx):
+    docs = []
+    for doc in re_informe.finditer(text):
+        span = doc.span("doc")
+        docs.append(span)
+    return docs, True
 
 def mention_definition(text, cntx):
     spans = []
@@ -135,11 +218,20 @@ def mention_definition(text, cntx):
                      r")"
         for m in re.finditer(re_mention, text):
             spans.append(m.span('source'))
-    return spans
+    if not re_avoid_defs_mentions.search(text):
+        definitions_ = True
+    else:
+        definitions_ = False
+    return spans, definitions_
+
 
 
 t_docs = [
+    informe,
+    fullcase,
     sentencia,
+    documents,
+    case,
     mention_definition,
 ]
 
@@ -149,15 +241,18 @@ def test_docs(par, cntx):
 
     spans = []
     for idd, t in enumerate(t_docs):
-        spans_ = t(text_, cntx)
+        spans_,flag_def = t(text_, cntx)
         if len(spans_) == 0:
             continue
         flat_spans_ = compatible_spans(spans_, flat_spans(spans))
         final_spans_ = []
         for span_ in spans_:
-            if span_[0] in flat_spans_:
+            if span_ in flat_spans_:
                 final_spans_.append(span_)
-        definitions_ = test_definition(par, final_spans_, cntx)
+        if flag_def:
+            definitions_ = test_definition(par, final_spans_, cntx)
+        else:
+            definitions_ = []
         spans.extend(zip(final_spans_, definitions_))
     return spans
 
@@ -166,6 +261,23 @@ def articlede(text, cntx):
     spans = []
     for m in re_articlede.finditer(text):
         spans.append((m.span('articles'),
+                      m.span('source')))
+        print("===>",m.group(0))
+    return spans
+
+
+def yarticle(text, cntx):
+    spans = []
+    for m in re_yarticle.finditer(text):
+        spans.append((m.span('articles'),
+                      m.span('source')))
+    return spans
+
+
+def parrafodela(text, cntx):
+    spans = []
+    for m in re_parrafodela.finditer(text):
+        spans.append((m.span('parr'),
                       m.span('source')))
     return spans
 
@@ -184,12 +296,15 @@ def article_mention_definition(text, cntx):
 
 
 t_articles = [
-    article_mention_definition,
+    yarticle,
     articlede,
+    article_mention_definition,
+    parrafodela,
 ]
 
 
 def compatible_spans(spans1, spans):
+    spans = sorted(spans, key=lambda x: x[0])
     spans_ = []
     ii = 0
     jj = 0
@@ -202,13 +317,21 @@ def compatible_spans(spans1, spans):
         if span[0] > fin and span[1] < span1[0]:
             fin = span[1]
             ii += 1
+            continue
+        elif span1[0] > fin and span1[0] < span[0] and span1[1] < span[0]:
+            spans_.append(spans1[jj])
+            fin = span1[1]
+            jj += 1
+            continue
         if span1[0] > span[0] and span1[0] <= span[1]:
             fin = span[1]
             jj += 1
-        elif span1[0] > fin and span1[0] < span[0]:
-            spans_.append(spans1[jj])
+            continue
+        if span1[0] <= span[0] and span1[1] <= span[1]:
             fin = span[1]
             jj += 1
+            continue
+
         if span[0] < fin:
             ii += 1
         if span1[0] < fin:
@@ -217,7 +340,8 @@ def compatible_spans(spans1, spans):
             ii += 1
             jj += 1
     for span1 in spans1[jj:]:
-        spans_.append(spans1)
+        if span1 not in spans_:
+            spans_.append(span1)
     return spans_
 
 
@@ -256,20 +380,13 @@ def test_articles(par, cntx):
         for span_ in spans_:
             if span_[0] in flat_spans_ and span_[1] in flat_spans_:
                 final_spans_.append(span_)
-        definitions_ = test_definition(par, final_spans_, cntx)
+        if not re_avoid_defs_arts.search(text_):
+            definitions_ = test_definition(par, final_spans_, cntx)
+        else:
+            definitions_ = []
         spans.extend(zip(final_spans_, definitions_))
     return spans
 
-
-def test_format(par):
-    res = []
-    for t, flag, continuation in t_formats:
-        val = t(par)
-        if val is not None:
-            res.append((flag, val))
-        if not continuation and len(res) > 0:
-            break
-    return res
 
 
 def numericalindex(par):
@@ -326,3 +443,14 @@ t_formats = [
     (namesection, 'namesection', False),
     (numericalindex, 'numericalindex', False)
 ]
+
+
+def test_format(par):
+    res = []
+    for t, flag, continuation in t_formats:
+        val = t(par)
+        if val is not None:
+            res.append((flag, val))
+        if not continuation and val is not None:
+            break
+    return res
