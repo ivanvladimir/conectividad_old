@@ -71,11 +71,12 @@ re_avoid_defs_mentions = re.compile(r"(?P<inst>{0})".format(r"|"
 # de 1998. Serie C No. 47, párr. 16,
 re_fullcase = re.compile(r'(?P<case>Caso[ \n][\n \w\(\)]+Vs\.'
                          r'[ \n](?:[A-Z]\w+[\n ]?)+)\.'
-                         r'[ \n]Interpretaci.n[^\.]+\.'
-                         r'(?P<resolution>[ \n]Resoluci.n[^\.]+)?\.?'
-                         r'(?P<case_name>[ \n]Sentencia[^\.]+)?\.?'
-                         r'(?P<serie>[ \n]Serie[^,]+)?\,?'
-                         r'(?P<paragraph>[ \n]p.rr\.[ \n]\d+)'
+                         r'(?P<exception>[ \n]Excepciones[^\.]+\.)?'
+                         r'(?P<interpretations>[ \n]Interpretaci.n[^\.]+\.)?'
+                         r'(?P<resolution>[ \n]Resoluci.n[^\.]+\.)?'
+                         r'(?P<case_name>[ \n]Sentencia[^\.]+\.)?'
+                         r'(?P<serie>[ \n]Serie[^,]+\,)?'
+                         r'(?P<paragraph>[ \n]p.rr\.[ \n][^,]+)+[,\.]'
                          )
 # Caso Loayza Tamayo Vs. Perú.
 re_case = re.compile(r"(?P<case>Caso .*) Vs. ([A-Z]\w+ ?)+")
@@ -182,10 +183,15 @@ def sentencia(text, cntx):
 
 
 def fullcase(text, cntx):
-    spans = []
-    for m in re_fullcase.finditer(text):
-        spans.append(m.span(0))
-    return spans, True
+    spans_ = []
+    for m in re.finditer("Caso",text):
+        ini,fin=m.span()
+        if len(spans_)>0:
+            spans_[-1][1]=ini-1
+        spans_.append([ini,fin])
+    if len(spans_)>0:
+        spans_[-1][1] = len(text)
+    return [tuple(x) for x in spans_], True
 
 
 def case(text, cntx):

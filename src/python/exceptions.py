@@ -20,6 +20,7 @@ institutions = [
     "Comisión Interamericana de Derechos Humanos",
     "Defensores Interamericanos",
     "República Argentina",
+    "OEA"
 ]
 
 documents = [

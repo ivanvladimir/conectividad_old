@@ -25,6 +25,18 @@ def resolve_document(text, cntx, definitions):
     text = re_enters.sub(" ", text)
     text = re_spaces.sub(" ", text)
     text_ = re_espace_or_enter.sub("[ \n]", text)
+    # Avoid solving
+    flag = False
+    for exception in exceptions:
+        if exception.search(""):
+            flag = True
+            break
+
+    if flag:
+        return text_, "document"
+
+
+    # Solve definitions
     if definitions == 0:
         for defi in cntx.definitions_.keys():
             if text_.find(defi) >= 0:
@@ -87,6 +99,8 @@ reductions = [
         'Código de Justicia Miliar Ley 14.029', "document"),
     (False, re.compile(r'CJM'),
         'Comisión de Justicia Militar', "document"),
+    (False, re.compile(r'OEA'),
+        'Organización de Estados Americanos', "institutions"),
     (False,
      re.compile(
        r'^Sentencia de Excepción Preliminar, Fondo, Reparaciones y Costas.*'),
@@ -96,4 +110,8 @@ reductions = [
         'Reglamento de la Corte', "document"),
     (False, re.compile(r'de su Reglamento'),
         'Reglamento de la Corte', "document"),
+]
+
+exceptions = [
+    re.compile(r"Caso.*")
 ]
