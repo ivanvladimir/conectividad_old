@@ -42,7 +42,7 @@ re_interpretacion_sentencia =\
 re_articlede = re.compile(article_mention + source_mention)
 re_yarticle = re.compile(r' y '
                          r'(?P<articles>[\d.y ]+)'
-                         r' del (?P<source>(?:\w+ ?)+)\.')
+                         r' del (?P<source>(?:(\w+[\n ]+)+\w+))\.')
 
 
 re_enadelante = re.compile(r'en[ \n]*adelante[ \n]*.*')
@@ -268,7 +268,6 @@ def articlede(text, cntx):
     for m in re_articlede.finditer(text):
         spans.append((m.span('articles'),
                       m.span('source')))
-        print("===>",m.group(0))
     return spans
 
 
@@ -337,6 +336,10 @@ def compatible_spans(spans1, spans):
             fin = span[1]
             jj += 1
             continue
+
+        if span1[0] <= span[0] and span1[1] >= span[1]:
+            fin = span[1]
+            jj += 1
 
         if span[0] < fin:
             ii += 1
@@ -416,9 +419,9 @@ def namesection(par):
     res = par.find('.//RomanNumeralIndex')
     if res is not None:
         number = res.text
-        if len(res.tail) > 0:
+        if res.tail and len(res.tail) > 0:
             name = res.tail.strip()
-        return number+" "+name
+            return number+" "+name
 
 
 def footnotemention(par):

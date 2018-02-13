@@ -154,21 +154,57 @@ def preprocess_paragraph(par):
     for child in par:
         if child.tag == "Articles":
             if prev is not None:
-                prev.tail += child.text + child.tail
-            else:
-                par_.text += child.text + child.tail
-        elif child.tag == "Date2":
-            if prev is not None:
-                prev.tail += child.text + child.tail
-            else:
-                par_.text += child.text + child.tail
-        elif child.tag == "Actions":
-            if prev is not None:
-                prev.tail += child.text
+                if child.text:
+                    prev.tail += child.text
                 if child.tail:
                     prev.tail += child.tail
             else:
-                par_.text += child.text + child.tail
+                if par_.text is not None:
+                    if child.text:
+                        par_.text += child.text
+                    if child.tail:
+                        par_.text += child.tail
+                else:
+                    if child.text:
+                        par_.text = child.text
+                    if child.tail:
+                        par_.text = child.tail
+
+        elif child.tag == "Date2":
+            if prev is not None:
+                if child.text:
+                    prev.tail += child.text
+                if child.tail:
+                    prev.tail += child.tail
+            else:
+                if par_.text:
+                    if child.text is not None:
+                        par_.text += child.text
+                    if child.tail is not None:
+                        par_.text += child.tail
+                else:
+                    if child.text is not None:
+                        par_.text = child.text
+                    if child.tail is not None:
+                        par_.text = child.tail
+
+        elif child.tag == "Actions":
+            if prev is not None:
+                if child.text:
+                    prev.tail += child.text
+                if child.tail:
+                    prev.tail += child.tail
+            else:
+                if par_.text:
+                    if child.text is not None:
+                        par_.text += child.text
+                    if child.tail is not None:
+                        par_.text += child.tail
+                else:
+                    if child.text is not None:
+                        par_.text = child.text
+                    if child.tail is not None:
+                        par_.text = child.tail
         else:
             par_.append(child)
             prev = child

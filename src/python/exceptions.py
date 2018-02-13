@@ -20,7 +20,10 @@ institutions = [
     "Comisión Interamericana de Derechos Humanos",
     "Defensores Interamericanos",
     "República Argentina",
-    "OEA"
+    "OEA",
+    "Estados Unidos de América",
+    "Gobierno de Honduras",
+    "Universidad Nacional Autónoma de Honduras"
 ]
 
 documents = [
