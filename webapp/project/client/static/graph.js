@@ -2,7 +2,6 @@
  Penserbjorne - Sebastian Aguilar
  06/2017
  FI-IIMAS-IIJ-UNAM
- Based on https://bl.ocks.org/mbostock/4062045
  Custom javascript for graph
 */
 
@@ -305,4 +304,19 @@ function update_graph(ini,fin){
 	document.getElementById('len_sntcs').innerHTML = n_nodes_1;
 	document.getElementById('len_citations').innerHTML = n_nodes_2;
 	document.getElementById('len_arcs').innerHTML = n_edges;
+}
+
+function showInfoPageGrafo(){
+	document.getElementById("myModalGrafo").classList.add('is-active');
+}
+
+function closeInfoPageGrafo(){
+	document.getElementById("myModalGrafo").classList.remove('is-active');
+}
+
+function countryChange(me){
+  //alert(me.id.substr(1));
+	//alert(country2color[me.id.substr(1)]);
+	//years=handlesSlider.noUiSlider.get();
+	//update_graph(years[0],years[1]);
 }

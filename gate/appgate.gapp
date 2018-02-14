@@ -252,14 +252,14 @@
             <mapType>gate.util.SimpleFeatureMapImpl</mapType>
             <localMap>
               <entry>
-                <string>encoding</string>
-                <string>UTF-8</string>
-              </entry>
-              <entry>
                 <string>gazetteerListsURL</string>
                 <gate.util.persistence.PersistenceManager-URLHolder>
                   <urlString>$gatehome$plugins/ANNIE/resources/sentenceSplitter/gazetteer/lists.def</urlString>
                 </gate.util.persistence.PersistenceManager-URLHolder>
+              </entry>
+              <entry>
+                <string>encoding</string>
+                <string>UTF-8</string>
               </entry>
               <entry>
                 <string>transducerURL</string>

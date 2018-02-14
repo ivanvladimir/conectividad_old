@@ -28,11 +28,3 @@ function myFilterLaw() {
     }
   }
 }
-
-function showInfoPageGrafo(){
-	document.getElementById("myModalGrafo").classList.add('is-active');
-}
-
-function closeInfoPageGrafo(){
-	document.getElementById("myModalGrafo").classList.remove('is-active');
-}

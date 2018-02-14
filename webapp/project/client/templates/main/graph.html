@@ -133,6 +133,264 @@
 
 <div class="container">
   	<div style="top:0; left:0; right:0; bottom:0; height:600px;" id="graph-ctn"></div>
+
+    {% if not params['include'] %}
+
+    <div id="meta" class="field is-grouped is-grouped-multiline">
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cargentina">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Argentina</span>
+          <span class="tag" style="background-color: #922B21;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cbarbados">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Barbados</span>
+          <span class="tag" style="background-color: #CB4335;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cbolivia">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Bolivia</span>
+          <span class="tag" style="background-color: #884EA0;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cbrasil">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Brasil</span>
+          <span class="tag" style="background-color: #7D3C98;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cchile">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Chile</span>
+          <span class="tag" style="background-color: #2471A3;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="ccolombia">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Colombia</span>
+          <span class="tag" style="background-color: #2E86C1;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="ccosta rica">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Costa Rica</span>
+          <span class="tag" style="background-color: #2E86C1;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cdominicana">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Dominicana</span>
+          <span class="tag" style="background-color: #17A589;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cecuador">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Ecuador</span>
+          <span class="tag" style="background-color: #138D75;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cel salvador">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">El Salvador</span>
+          <span class="tag" style="background-color: #F1C40F;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cguatemala">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Guatemala</span>
+          <span class="tag" style="background-color: #D68910;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cgranada">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Granada</span>
+          <span class="tag" style="background-color: #D68910;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="chaití">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Haití</span>
+          <span class="tag" style="background-color: #800000;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="chonduras">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Honduras</span>
+          <span class="tag" style="background-color: #008080;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cjamaica">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Jamaica</span>
+          <span class="tag" style="background-color: #FFFF00;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cméxico">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">México</span>
+          <span class="tag" style="background-color: #008000;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cnicaragua">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Nicaragua</span>
+          <span class="tag" style="background-color: #0000FF;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cpanama">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Panama</span>
+          <span class="tag" style="background-color: #000080;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cparaguay">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Paraguay</span>
+          <span class="tag" style="background-color: #800080;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cperú">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Perú</span>
+          <span class="tag" style="background-color: #FF0000;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="crepública dominicana">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">República Dominicana</span>
+          <span class="tag" style="background-color: #FF5733;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="ctrinidad y tobago">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Trinidad y Tobago</span>
+          <span class="tag" style="background-color: #808000;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="csurinam">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Surinam</span>
+          <span class="tag" style="background-color: #FFCE00;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="curuguay">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Uruguay</span>
+          <span class="tag" style="background-color: #5AC8D8;"></span>
+        </div>
+      </div>
+    </label>
+
+    <label class="checkbox control">
+      <input type="checkbox" checked onclick="countryChange(this);" id="cvenezuela">
+      <div class="control" style="display: inline-block;">
+        <div class="tags has-addons">
+          <span class="tag">Venezuela</span>
+          <span class="tag" style="background-color: #CF0A2C;"></span>
+        </div>
+      </div>
+    </label>
+
+      </div>
+      <br>
+    {% endif %}
 <br/>
 
 <div class="field">
@@ -148,7 +406,7 @@
 
 </div>
 
-<div class="modal is-active" id="myModalGrafo">
+<div class="modal" id="myModalGrafo">
   <div class="modal-background"></div>
   <div class="modal-card">
     <header class="modal-card-head">
