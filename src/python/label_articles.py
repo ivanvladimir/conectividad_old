@@ -342,7 +342,7 @@ def process_articles(par, cntx, counter):
                 info_def = {'id': str(counter["def"]),
                             "institution": str(counter["inst"])}
                 tags.append((defi, 'Definition', info_def))
-    tags = sorted(tags, key=lambda x: x[0])
+    tags = sorted([t for t in tags if t[0]], key=lambda x: x[0])
     par_, _, _ = add_tags(par, tags)
     return par_[0]
 

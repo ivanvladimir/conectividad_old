@@ -43,6 +43,10 @@ re_articlede = re.compile(article_mention + source_mention)
 re_yarticle = re.compile(r' y '
                          r'(?P<articles>[\d.y ]+)'
                          r' del (?P<source>(?:(\w+[\n ]+)+\w+))\.')
+#los artículos 4 (Derecho a la Vida)
+re_articlenum = re.compile(r'(?:art.culos?[ \n])(?P<articles>\d+[\n ]'
+                            r"\(.+\))[ \n]de[ \n]la[ \n]"+
+                            r'(?P<source>\w*)')
 
 
 re_enadelante = re.compile(r'en[ \n]*adelante[ \n]*.*')
@@ -83,6 +87,8 @@ re_case = re.compile(r"(?P<case>Caso .*) Vs. ([A-Z]\w+ ?)+")
 # Informe de Admisibilidad 40/02
 re_informe = re.compile(r"(?P<doc>[\n ]Informe[^\d]+\d+/\d+)")
 
+# resolución 30/83
+re_resolucion = re.compile(r"(?P<doc>resoluci.n[\ ]+\d+/\d+)")
 
 def get_splits(spans):
     splits = []
@@ -92,8 +98,16 @@ def get_splits(spans):
         splits.append((spans[-1][1], None))
     else:
         for spani, spanf in zip(spans, spans[1:]):
-            splits.append((spani[1][1], spanf[0][0]))
-        splits.append((spans[-1][1][1], None))
+            if spans[-1][1] is not None:
+                splits.append((spani[1][1], spanf[0][0]))
+            else:
+                splits.append((spani[0][1], spanf[0][0]))
+
+        if spans[-1][1] is not None:
+            splits.append((spans[-1][1][1], None))
+        else:
+            splits.append((spans[-1][0][1], None))
+
     return splits
 
 
@@ -216,6 +230,16 @@ def informe(text, cntx):
         docs.append(span)
     return docs, True
 
+
+def resolucion(text, cntx):
+    docs = []
+    for doc in re_resolucion.finditer(text):
+        span = doc.span("doc")
+        docs.append(span)
+    return docs, True
+
+
+
 def mention_definition(text, cntx):
     spans = []
     for phrase, defis in cntx.definitions.items():
@@ -238,6 +262,7 @@ t_docs = [
     sentencia,
     documents,
     case,
+    resolucion,
     mention_definition,
 ]
 
@@ -267,8 +292,17 @@ def articlede(text, cntx):
     spans = []
     for m in re_articlede.finditer(text):
         spans.append((m.span('articles'),
+                      m.span("source")))
+    return spans
+
+
+def articlenum(text, cntx):
+    spans = []
+    for m in re_articlenum.finditer(text):
+        spans.append((m.span('articles'),
                       m.span('source')))
     return spans
+
 
 
 def yarticle(text, cntx):
@@ -304,12 +338,13 @@ t_articles = [
     yarticle,
     articlede,
     article_mention_definition,
+    articlenum,
     parrafodela,
 ]
 
 
 def compatible_spans(spans1, spans):
-    spans = sorted(spans, key=lambda x: x[0])
+    spans = sorted([s for s in spans if s], key=lambda x: x[0])
     spans_ = []
     ii = 0
     jj = 0

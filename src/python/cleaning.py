@@ -14,7 +14,7 @@ re_enters = re.compile(r"\n+")
 re_spaces = re.compile(r"\s+")
 re_fromltoc = re.compile(r"^[a-z ]+(?P<caption>[A-Z]+.*)")
 re_espace_or_enter = re.compile(r"[ \n]")
-re_numbers = re.compile(r'([\d.]+|[IXVixv]+)')
+re_numbers = re.compile(r'([\d.]+| [IXVixv]+ )')
 
 
 def split_arts(text):

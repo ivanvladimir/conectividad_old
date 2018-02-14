@@ -16,14 +16,20 @@ footnotementions = [
 ]
 
 institutions = [
-    "Corte Interamericana de Derechos Humanos",
-    "Comisión Interamericana de Derechos Humanos",
-    "Defensores Interamericanos",
-    "República Argentina",
-    "OEA",
-    "Estados Unidos de América",
-    "Gobierno de Honduras",
-    "Universidad Nacional Autónoma de Honduras"
+    r"Corte Interamericana de Derechos Humanos",
+    r"Comisión Interamericana de Derechos Humanos",
+    r"Defensores Interamericanos",
+    r"República Argentina",
+    r"República Honduras",
+    r"OEA",
+    r"Estados Unidos de América",
+    r"Gobierno de Honduras",
+    r"Universidad Nacional Autónoma de Honduras",
+    r"Dirección Nacional de Investigación",
+    r"Fuerzas Armadas de Honduras",
+    r"Fuerza de Seguridad Pública",
+    r"Centro por la Justicia y el Derecho Internacional",
+    r"La Asociación Paz y Esperanza"
 ]
 
 documents = [
