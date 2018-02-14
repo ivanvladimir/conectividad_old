@@ -5,7 +5,7 @@ $( document ).ready(function() {
 });
 
 function myFilterLaw() {
-  // Declare variables 
+  // Declare variables
   var input, filter, table, tr, td, i;
   input = document.getElementById("myFilterLaw");
   filter = input.value.toUpperCase();
@@ -25,6 +25,14 @@ function myFilterLaw() {
       } else {
         tr[i].style.display = "none";
       }
-    } 
+    }
   }
+}
+
+function showInfoPageGrafo(){
+	document.getElementById("myModalGrafo").classList.add('is-active');
+}
+
+function closeInfoPageGrafo(){
+	document.getElementById("myModalGrafo").classList.remove('is-active');
 }
