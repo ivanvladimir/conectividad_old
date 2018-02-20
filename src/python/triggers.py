@@ -84,17 +84,108 @@ re_fullcase = re.compile(r'(?P<case>Caso[ \n][\n \w\(\)]+Vs\.'
                          )
 # Caso Loayza Tamayo Vs. Perú.
 re_case = re.compile(r"(?P<case>Caso .*) Vs. ([A-Z]\w+ ?)+")
-# Informe de Admisibilidad 40/02
-re_informe = re.compile(r"(?P<doc>[\n ]Informe[^\d]+\d+/\d+)")
 
 # resolución 30/83
 re_resolucion = re.compile(r"(?P<doc>resoluci.n[\ ]+\d+/\d+)")
+# Acta 
+capitals_words = r'([A-Z]\w+[\n ]'\
+                 r'|[a-zñ]{0,6}[\n ]|Vs\.[\n ])+[A-Z]\w+[a-z](?:[ \n]\d+)?'
+
+re_capitals= re.compile(capitals_words)
+capitals_types=[
+    ("acta", re.compile(r"Acta[\n ]")),
+    ("acuerdo", re.compile(r"Acuerdo[\n ]")),
+    ("agencia", re.compile(r"Agencia[\n ]")),
+    ("archivo", re.compile(r"Archivos?[\n ]")),
+    ("asamblea", re.compile(r"Asamblea[\n ]")),
+    ("asociacion", re.compile(r"Asociación[\n ]")),
+    ("banco", re.compile(r"Banc.[\n ]")),
+    ("boletin", re.compile(r"Bolet.n[\n ]")),
+    ("batallon", re.compile(r"Batall.n[\n ]")),
+    ("bases", re.compile(r"Bases?[\n ]")),
+    ("brigada", re.compile(r"Brigada[\n ]")),
+    ("carta", re.compile(r"Carta[\n ]")),
+    ("caso", re.compile(r"Case[\n ]")),
+    ("caso", re.compile(r"Caso[\n ]")),
+    ("centro", re.compile(r"Centro[\n ]")),
+    ("certificacion", re.compile(r"Certifica...?.?[\n ]")),
+    ("clinica", re.compile(r"Cl.nica[\n ]")),
+    ("colegio", re.compile(r"Colegio[\n ]")),
+    ("comandancia", re.compile(r"Comandancia[\n ]")),
+    ("comando", re.compile(r"Comando[\n ]")),
+    ("comisaria", re.compile(r"Comisar.a[\n ]")),
+    ("comision", re.compile(r"Comisi.n.?.?[\n ][^y]+[\n ]")),
+    ("comite", re.compile(r"Comit.[\n ][^y]+[\n ]")),
+    ("compania", re.compile(r"Compa..a[\n ]")),
+    ("corporacion", re.compile(r"Corporaci.n[\n ]")),
+    ("conferencia", re.compile(r"Conferencias?[\n ]")),
+    ("congreso", re.compile(r"Congreso[\n ]")),
+    ("consejo", re.compile(r"Consejo[\n ]")),
+    ("constitucion", re.compile(r"Constituci.n[\n ][^y]+[\n ]")),
+    ("consulado", re.compile(r"Consulado[\n ]")),
+    ("convencion", re.compile(r"Convenci.n.?.?[\n ]")),
+    ("corte", re.compile(r"Corte[\n ]")),
+    ("cuartel", re.compile(r"Cuartel[\n ]")),
+    ("camara", re.compile(r"C.mara[\n ]")),
+    ("codigo", re.compile(r"C.digo[\n ]")),
+    ("decision", re.compile(r"Decisi.n.?.?[\n ]")),
+    ("decreto", re.compile(r"Decreto[\n ]")),
+    ("defensor", re.compile(r"Defens..?.?.?[\n ]")),
+    ("departamento", re.compile(r"Departamento[\n ]")),
+    ("dictament", re.compile(r"Dictamen[\n ]")),
+    ("direccion", re.compile(r"Direcci.n[\n ](General|Provincial|Nacional)[\n ]")),
+    ("documento", re.compile(r"Ej.rcito[\n ]")),
+    ("embajada", re.compile(r"Embajada[\n ]")),
+    ("escrito", re.compile(r"Escrito[\n ]")),
+    ("fiscalia", re.compile(r"Fiscal.a[\n ]")),
+    ("fondo", re.compile(r"Fondo[\n ]")),
+    ("fuerza", re.compile(r"Fuerza[\n ]")),
+    ("fundacion", re.compile(r"Fundaci.n[\n ]")),
+    ("gobernador", re.compile(r"Gobernador[\n ]")),
+    ("gobernacion", re.compile(r"Gobernaci.nr[\n ]")),
+    ("grupo", re.compile(r"Grupo[\n ]")),
+    ("informe", re.compile(r"Informe[\n ]")),
+    ("instituto", re.compile(r"Instituto[\n ]")),
+    ("international", re.compile(r"International[\n ]")),
+    ("jefatura", re.compile(r"Jefatura[\n ]")),
+    ("juzgado", re.compile(r"Juzgado[\n ]")),
+    ("laboratorio", re.compile(r"Laboratorio[\n ]")),
+    ("ley", re.compile(r"Ley[\n ]")),
+    ("ministerio", re.compile(r"Ministerio[\n ]")),
+    ("movimiento", re.compile(r"Movimiento[\n ]")),
+    ("notaria", re.compile(r"Notaria[\n ]")),
+    ("oficialia", re.compile(r"Oficilia[\n ]")),
+    ("oficina", re.compile(r"Oficina[\n ]")),
+    ("organizacion", re.compile(r"Organiza...n[\n ]")),
+    ("oficio", re.compile(r"Oficio[\n ]")),
+    ("pacto", re.compile(r"Pacto[\n ]")),
+    ("plan", re.compile(r"Plan[\n ]")),
+    ("poder", re.compile(r"Poder[\n ]")),
+    ("policia", re.compile(r"Policia[\n ]")),
+    ("presidencia", re.compile(r"Precidencia[\n ]")),
+    ("principios", re.compile(r"Principios[\n ]")),
+    ("procedimiento", re.compile(r"Procedimiento[\n ]")),
+    ("programa", re.compile(r"Programa[\n ]")),
+    ("protocolo", re.compile(r"Protoc.lo[\n ]")),
+    ("proyecto", re.compile(r"Proyecto[\n ]")),
+    ("registro", re.compile(r"Registro[\n ]")),
+    ("reglamento", re.compile(r"Reglamento[\n ]")),
+    ("sala", re.compile(r"Sala[\n ]")),
+    ("secretaria", re.compile(r"Secreatar.a[\n ]")),
+    ("sala", re.compile(r"Sala[\n ]")),
+    ("the", re.compile(r"The[\n ]")),
+    ("tratado", re.compile(r"Tratado[\n ]")),
+    ("tribunal", re.compile(r"Tribunal[\n ]")),
+    ("unidad", re.compile(r"Unidad[\n ]")),
+    ("universidad", re.compile(r"Universidad[\n ]")),
+]
+
 
 def get_splits(spans):
     splits = []
     if isinstance(spans[-1][1], int):
         for spani, spanf in zip(spans, spans[1:]):
-            splits.append((spani[1], spanf[0]))
+            splits.append((spani[1], spanf[1]))
         splits.append((spans[-1][1], None))
     else:
         for spani, spanf in zip(spans, spans[1:]):
@@ -223,14 +314,6 @@ def documents(text, cntx):
     return docs, True
 
 
-def informe(text, cntx):
-    docs = []
-    for doc in re_informe.finditer(text):
-        span = doc.span("doc")
-        docs.append(span)
-    return docs, True
-
-
 def resolucion(text, cntx):
     docs = []
     for doc in re_resolucion.finditer(text):
@@ -239,13 +322,12 @@ def resolucion(text, cntx):
     return docs, True
 
 
-
 def mention_definition(text, cntx):
     spans = []
     for phrase, defis in cntx.definitions.items():
         re_mention = r"(?P<source>" +\
-                     r"|".join([d for d in defis]) +\
-                     r")"
+                     r"|".join([d.replace("*",'\*').replace("(","\(").replace(")","\)") for d in defis if len(d)>0]) +\
+                     r")+"
         for m in re.finditer(re_mention, text):
             spans.append(m.span('source'))
     if not re_avoid_defs_mentions.search(text):
@@ -255,15 +337,26 @@ def mention_definition(text, cntx):
     return spans, definitions_
 
 
+def capital_docs(text, cntx):
+    spans = []
+    
+    for doc in re_capitals.finditer(text):
+        span = doc.span(0)
+        text = doc.group(0)
+        for type_,re_ in capitals_types:
+            if re_.match(text):
+                spans.append(span)
+                break
+    return spans, []
 
 t_docs = [
-    informe,
     fullcase,
     sentencia,
     documents,
     case,
     resolucion,
     mention_definition,
+    capital_docs,
 ]
 
 
@@ -326,7 +419,7 @@ def article_mention_definition(text, cntx):
     for phrase, defis in cntx.definitions.items():
         re_mention = article_mention + r"(?:de )"\
                      r"(?P<source>" +\
-                     r"|".join([d.lower() for d in defis]) +\
+                     r"|".join([d.replace("*",'').replace("(","\(").replace(")","\)").lower() for d in defis]) +\
                      r")"
         for m in re.finditer(re_mention, text):
             spans.append((m.span('articles'),
@@ -371,11 +464,12 @@ def compatible_spans(spans1, spans):
             fin = span[1]
             jj += 1
             continue
-
         if span1[0] <= span[0] and span1[1] >= span[1]:
             fin = span[1]
             jj += 1
-
+        if span1[0] >= span[0] and span1[1] >= span[1]:
+            fin = span[1]
+            ii += 1
         if span[0] < fin:
             ii += 1
         if span1[0] < fin:
@@ -402,6 +496,8 @@ def flat_spans(spans):
 def flat_article_spans(spans):
     flat = []
     for span in spans:
+        if span[0]==span[1]:
+            continue
         if isinstance(span[0], int):
             flat.extend([span])
         else:

@@ -146,7 +146,7 @@ def get_context(par, cntx):
                 cntx.type = "footnote"
 
 
-def preprocess_paragraph(par):
+def preprocess_paragraph(par,cntx):
     par_ = ET.Element("paragraph")
     par_.text = par.text
     par_.tail = par.tail
@@ -208,6 +208,7 @@ def preprocess_paragraph(par):
         else:
             par_.append(child)
             prev = child
+
     return par_
 
 
@@ -263,19 +264,20 @@ def add_tags(par, info_tags, offset=0, parent=None):
         middle = o_text[span[0]-offset:span[1]-offset]
         tag = ET.Element(tag, **info)
         tag.text = middle
-        if parent:
-            par_.append(tag)
-        else:
-            par_[0].append(tag)
+        if len(middle.strip())>0:
+            if parent:
+                par_.append(tag)
+            else:
+                par_[0].append(tag)
 
-        if first:
-            cur = o_text[:span[0]-offset]
-            first = False
-        else:
+            if first:
+                cur = o_text[:span[0]-offset]
+                first = False
+            else:
+                prev_tag.tail = o_text[prev_span_end:span[0]-offset]
+            prev_span_end = span[1]-offset
+            prev_tag = tag
             prev_tag.tail = o_text[prev_span_end:span[0]-offset]
-        prev_span_end = span[1]-offset
-        prev_tag = tag
-        prev_tag.tail = o_text[prev_span_end:span[0]-offset]
         info_tags.pop(0)
     par_[0].tail = cur
     if not first:
@@ -350,13 +352,15 @@ def process_articles(par, cntx, counter):
 def label_xml(root):
     cntx = Context()
     counter = Counter([])
+    root_ = ET.Element('root')
     for par in root.findall('.//paragraph'):
         counter.update(["par"])
         verbose(fg.YELLOW, "")
         verbose(fg.YELLOW, "Raw text: ",
                 style.RESET, "".join([x for x in par.itertext()]))
         verbose(fg.BLUE, "Context: ", fg.BLUE, cntx)
-        par = preprocess_paragraph(par)
+        par = preprocess_paragraph(par,cntx)
+
         # Eliminates article tags
         get_context(par, cntx)
         par_ = process_articles(par, cntx, counter)
@@ -399,6 +403,8 @@ def label_xml(root):
                         bg.RESET, "->", resolution)
 
         verbose(fg.CYAN, bg.WHITE, "Paragraph: ", bg.RESET, ET.tostring(par_))
+        root_.append(par_)
+    return root_
 
 
 # MAIN
@@ -420,10 +426,6 @@ if __name__ == "__main__":
                    default="data/DB.json", type=str,
                    action="store", dest="dbname",
                    help="Name for the db file")
-    p.add_argument("--graph",
-                   default="data/graph.json", type=str,
-                   action="store", dest="graph",
-                   help="Name for the grap file")
     p.add_argument("-v", "--verbose",
                    action="store_true", dest="verbose",
                    help="Verbose mode [Off]")
@@ -468,11 +470,11 @@ if __name__ == "__main__":
             verbose(fg.RED + 'ARCHIVO FALTANTE', style.NORMAL, xmlinfilename)
             continue
 
-        label_xml(root)
+        root_=label_xml(root)
 
         # Writing out the XML
         xmloutfilename = os.path.join(args.labelled_dir,
                                       os.path.basename(case['txt']) + ".xml")
 
         verbose(style.BRIGHT, 'Saving file ', xmloutfilename)
-        ET.ElementTree(root).write(xmloutfilename)
+        ET.ElementTree(root_).write(xmloutfilename)
