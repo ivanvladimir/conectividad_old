@@ -6,6 +6,13 @@
 
 {% extends "_base.html" %}
 
+{% block css %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+
+{% endblock %}
+
+
+
 {% block content %}
 
 <!-- Inicio pestañas -->
@@ -174,8 +181,44 @@
 
       </div>
       <div class="column is-half has-text-centered">
-        <img src="{{url_for('main.static', filename=vocabImg)}}" alt="Gráfico de frecuencias de vocabulario"/>
-        Las 20 palabras más frecuentes.
+
+	<canvas id="histogram" width="400" height="400"></canvas>
+
+	<script>
+var ctx = document.getElementById("histogram");
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: [
+		{% for x,y in fdist.most_common(nwords) %}
+			"{{x}}",
+		{% endfor %}
+		],
+        datasets: [{
+            label: '# of words',
+            data: [
+			{% for x,y in fdist.most_common(nwords) %}
+			"{{y}}",
+			{% endfor %}
+			],
+			backgroundColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+</script>
+
+
+
       </div>
     </div>
 

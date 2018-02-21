@@ -112,24 +112,9 @@ def doc():
 
     fdist = FreqDist(cleanLines)
 
-    xs=[]
-    ws=[]
-    plotRange = 25
-    for w,c in fdist.most_common(plotRange):
-        xs.append(w)
-        ws.append(c)
-
-    fig, ax = plt.subplots()
-    rects1 = ax.bar(range(plotRange), ws, color='g')
-    plt.xticks(range(plotRange), xs, rotation='vertical')
-    plt.subplots_adjust(bottom=0.30)
-    imgPath = "./project/client/static/vocabulario/"
-    os.makedirs(os.path.dirname(imgPath), exist_ok=True)
-    imgName = xmlName + ".png"
-    plt.savefig(imgPath + imgName)
 
     return render_template("main/documents.html",filename=xmlName+".xml",
-        doc=contensiosos.get(eid=docNum),fdist=fdist, vocabImg="vocabulario/"+imgName,nvoc=100)
+        doc=contensiosos.get(eid=docNum),fdist=fdist,nwords=20,nvoc=100)
 
 
 @main_blueprint.route("/xml/<string:filename>")
