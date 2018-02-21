@@ -326,7 +326,7 @@ def process_articles(par, cntx, counter):
             tags.append((defi, 'Definition', info_def))
     for doc, definitions, vals in docs:
         counter.update(["doc"])
-        info_doc = {}
+        info_doc = dict(vals)
         info_doc['id'] = str(counter["doc"])
         tags.append((doc, 'DocumentMention', info_doc))
         for defi in definitions:
@@ -336,7 +336,7 @@ def process_articles(par, cntx, counter):
             tags.append((defi, 'Definition', info_def))
     for inst, definitions, vals in insts:
             counter.update(["inst"])
-            info_inst = {}
+            info_inst = dict(vals)
             info_inst['id'] = str(counter["inst"])
             tags.append((inst, 'InstitutionMention', info_inst))
             for defi in definitions:
