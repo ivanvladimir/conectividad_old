@@ -29,7 +29,10 @@ DateSentence        { background-color: rgb(230, 150, 230) }
 PersonCourtMembers  { background-color: rgb(150, 150, 230) }
 
 Date2               { background-color: rgb(230, 150, 150) }
-Articles            { background-color: rgb(150, 230, 150) }
+ArticleMention      { background-color: rgb(170,  57,  57) }
+DocumentMention     { background-color: rgb(212, 106, 106) }
+InstitutionMention  { background-color: rgb( 81,  44, 115) }
+Definition          { background-color: rgb(255, 255,   4) }
 ResolutivePoints    { background-color: rgb(230, 200, 200) }
 
 /* The next block is an example for having a small tag
@@ -41,12 +44,37 @@ Date2:after {
   color: rgb(100, 100, 100);
 }
 
-Articles:after {
+ArticlesMention:after {
   content: "Artículo";
   font-size: 65%;
   vertical-align: sub;
   color: rgb(100, 100, 100);
 }
+
+DocumentMention:after {
+  content: "Documento";
+  font-size: 65%;
+  vertical-align: sub;
+  color: rgb(100, 100, 100);
+}
+
+
+InstitutionMention:after {
+  content: "Institution";
+  font-size: 65%;
+  vertical-align: sub;
+  color: rgb(100, 100, 100);
+}
+
+Definition:after {
+  content: "Definición";
+  font-size: 65%;
+  vertical-align: sub;
+  color: rgb(100, 100, 100);
+}
+
+
+
 
 PersonCourtMembers:after {
   content: "Miembro de la Corte";

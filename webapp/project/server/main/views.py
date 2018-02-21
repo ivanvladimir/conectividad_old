@@ -151,7 +151,7 @@ def xml(filename):
     </body>
 </html>
 """
-    with open('annotatedDocuments/'+filename) as filename:
+    with open('labelledDocuments/'+filename) as filename:
         lines=filename.readlines()
 
     return string.format(gate_css_url,gate_js_url,"<br/>".join(lines))
