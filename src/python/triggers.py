@@ -87,7 +87,7 @@ re_case = re.compile(r"(?P<case>Caso .*) Vs. ([A-Z]\w+ ?)+")
 
 # resolución 30/83
 re_resolucion = re.compile(r"(?P<doc>resoluci.n[\ ]+\d+/\d+)")
-# Acta 
+# Acta
 capitals_words = r'([A-Z]\w+[\n ]'\
                  r'|[a-zñ]{0,6}[\n ]|Vs\.[\n ])+[A-Z]\w+[a-z](?:[ \n]\d+)?'
 
@@ -181,6 +181,10 @@ capitals_types=[
 ]
 
 
+def groups2dic(m):
+    return m.groupdict()
+
+
 def get_splits(spans):
     splits = []
     if isinstance(spans[-1][1], int):
@@ -242,18 +246,17 @@ def test_definition(par, spans, cntx):
     return definitions
 
 
+# Procesa instituciones
 def institutions(text, cntx):
     insts = []
     for inst in re_institutions.finditer(text):
         span = inst.span("inst")
-        insts.append(span)
+        insts.append((span, groups2dic(inst)))
     return insts
 
 
-
-
 t_institutions = [
-    institutions,
+    ("institutions", institutions),
 ]
 
 
@@ -261,48 +264,54 @@ def test_institutions(par, cntx):
     text_ = "".join([x for x in par.itertext()])
 
     spans = []
-    for idd, t in enumerate(t_institutions):
-        spans_ = t(text_, cntx)
-        if len(spans_) == 0:
+    values = []
+    for type_, t in t_institutions:
+        spans_m = t(text_, cntx)
+        if len(spans_m) == 0:
             continue
+        spans_m_dict = dict(spans_m)
+        spans_ = [s for s, m in spans_m]
         flat_spans_ = compatible_spans(spans_, flat_spans(spans))
         final_spans_ = []
         for span_ in spans_:
             if span_ in flat_spans_:
                 final_spans_.append(span_)
+                vals = spans_m_dict[span_]
+                vals["extraction"] = type_
+                values.append(vals)
         definitions_ = test_definition(par, final_spans_, cntx)
-        spans.extend(zip(final_spans_, definitions_))
-
+        spans.extend(zip(final_spans_, definitions_, values))
     return spans
 
 
+# Procesa documentos
 def sentencia(text, cntx):
     docs = []
     for doc in re_interpretacion_sentencia.finditer(text):
         doc_name = doc.group("doc")
         if not len(doc_name.split()) == 1:
             span = doc.span("doc")
-            docs.append(span)
+            docs.append((span, groups2dic(doc)))
     return docs, True
-
 
 
 def fullcase(text, cntx):
     spans_ = []
-    for m in re.finditer("Caso",text):
-        ini,fin=m.span()
-        if len(spans_)>0:
-            spans_[-1][1]=ini-1
-        spans_.append([ini,fin])
-    if len(spans_)>0:
-        spans_[-1][1] = len(text)
-    return [tuple(x) for x in spans_], True
+    for m in re.finditer("Caso", text):
+        ini, fin = m.span()
+        if len(spans_) > 0:
+            spans_[-1][0][1] = ini - 1
+        spans_.append(([ini, fin], groups2dic(m)))
+    if len(spans_) > 0:
+        spans_[-1][0][1] = len(text)
+    return [(tuple(s), m) for s, m in spans_], True
 
 
 def case(text, cntx):
     spans = []
-    for m in re_case.finditer(text):
-        spans.append(m.span('case'))
+    for case in re_case.finditer(text):
+        span = case.span('case')
+        spans.append((span, groups2dic(case)))
     return spans, True
 
 
@@ -310,7 +319,7 @@ def documents(text, cntx):
     docs = []
     for doc in re_documents.finditer(text):
         span = doc.span("doc")
-        docs.append(span)
+        docs.append((span, groups2dic(doc)))
     return docs, True
 
 
@@ -318,7 +327,7 @@ def resolucion(text, cntx):
     docs = []
     for doc in re_resolucion.finditer(text):
         span = doc.span("doc")
-        docs.append(span)
+        docs.append((span, groups2dic(doc)))
     return docs, True
 
 
@@ -326,10 +335,13 @@ def mention_definition(text, cntx):
     spans = []
     for phrase, defis in cntx.definitions.items():
         re_mention = r"(?P<source>" +\
-                     r"|".join([d.replace("*",'\*').replace("(","\(").replace(")","\)") for d in defis if len(d)>0]) +\
+                     r"|".join([d.replace("*", '\*')
+                                 .replace("(", "\(")
+                                 .replace(")", "\)") for d in defis
+                                                     if len(d) > 0]) +\
                      r")+"
         for m in re.finditer(re_mention, text):
-            spans.append(m.span('source'))
+            spans.append((m.span('source'), groups2dic(m)))
     if not re_avoid_defs_mentions.search(text):
         definitions_ = True
     else:
@@ -339,24 +351,25 @@ def mention_definition(text, cntx):
 
 def capital_docs(text, cntx):
     spans = []
-    
+
     for doc in re_capitals.finditer(text):
         span = doc.span(0)
         text = doc.group(0)
-        for type_,re_ in capitals_types:
-            if re_.match(text):
-                spans.append(span)
+        for type_, re_ in capitals_types:
+            m = re_.match(text)
+            if m:
+                spans.append((span, groups2dic(m)))
                 break
     return spans, []
 
 t_docs = [
-    fullcase,
-    sentencia,
-    documents,
-    case,
-    resolucion,
-    mention_definition,
-    capital_docs,
+    ("fullcalse", fullcase),
+    ("sentencia", sentencia),
+    ("docuemnts", documents),
+    ("case", case),
+    ("resolucion", resolucion),
+    ("mention_definition", mention_definition),
+    ("capital", capital_docs),
 ]
 
 
@@ -364,53 +377,59 @@ def test_docs(par, cntx):
     text_ = "".join([x for x in par.itertext()])
 
     spans = []
-    for idd, t in enumerate(t_docs):
-        spans_,flag_def = t(text_, cntx)
-        if len(spans_) == 0:
+    values = []
+    for type_, t in t_docs:
+        spans_m, flag_def = t(text_, cntx)
+        spans_m_dict = dict(spans_m)
+        if len(spans_m) == 0:
             continue
+        spans_ = [s for s, m in spans_m]
         flat_spans_ = compatible_spans(spans_, flat_spans(spans))
         final_spans_ = []
         for span_ in spans_:
             if span_ in flat_spans_:
                 final_spans_.append(span_)
+                vals = spans_m_dict[span_]
+                vals['extraction'] = type_
+                values.append(vals)
         if flag_def:
             definitions_ = test_definition(par, final_spans_, cntx)
         else:
             definitions_ = []
-        spans.extend(zip(final_spans_, definitions_))
+        spans.extend(zip(final_spans_, definitions_, values))
     return spans
 
 
+# Functions to extract article information
 def articlede(text, cntx):
     spans = []
     for m in re_articlede.finditer(text):
-        spans.append((m.span('articles'),
-                      m.span("source")))
+        spans.append(((m.span('articles'),
+                       m.span("source")), groups2dic(m)))
     return spans
 
 
 def articlenum(text, cntx):
     spans = []
     for m in re_articlenum.finditer(text):
-        spans.append((m.span('articles'),
-                      m.span('source')))
+        spans.append(((m.span('articles'),
+                      m.span('source')), groups2dic(m)))
     return spans
-
 
 
 def yarticle(text, cntx):
     spans = []
     for m in re_yarticle.finditer(text):
-        spans.append((m.span('articles'),
-                      m.span('source')))
+        spans.append(((m.span('articles'),
+                      m.span('source')), groups2dic(m)))
     return spans
 
 
 def parrafodela(text, cntx):
     spans = []
     for m in re_parrafodela.finditer(text):
-        spans.append((m.span('parr'),
-                      m.span('source')))
+        spans.append(((m.span('parr'),
+                      m.span('source')), groups2dic(m)))
     return spans
 
 
@@ -419,20 +438,23 @@ def article_mention_definition(text, cntx):
     for phrase, defis in cntx.definitions.items():
         re_mention = article_mention + r"(?:de )"\
                      r"(?P<source>" +\
-                     r"|".join([d.replace("*",'').replace("(","\(").replace(")","\)").lower() for d in defis]) +\
+                     r"|".join([d.replace("*", '')
+                                 .replace("(", "\(")
+                                 .replace(")", "\)")
+                                 .lower() for d in defis]) +\
                      r")"
         for m in re.finditer(re_mention, text):
-            spans.append((m.span('articles'),
-                          m.span('source')))
+            spans.append(((m.span('articles'),
+                          m.span('source')), groups2dic(m)))
     return spans
 
 
 t_articles = [
-    yarticle,
-    articlede,
-    article_mention_definition,
-    articlenum,
-    parrafodela,
+    ("yarticle", yarticle),
+    ("articlede", articlede),
+    ("article_mention_definition", article_mention_definition),
+    ("article_num", articlenum),
+    ("parrafodela", parrafodela),
 ]
 
 
@@ -485,7 +507,7 @@ def compatible_spans(spans1, spans):
 
 def flat_spans(spans):
     flat = []
-    for span, defi in spans:
+    for span, defi, vals in spans:
         if isinstance(span[0], int):
             flat.extend([span] + defi)
         else:
@@ -496,7 +518,7 @@ def flat_spans(spans):
 def flat_article_spans(spans):
     flat = []
     for span in spans:
-        if span[0]==span[1]:
+        if span[0] == span[1]:
             continue
         if isinstance(span[0], int):
             flat.extend([span])
@@ -510,21 +532,27 @@ def test_articles(par, cntx):
     text = text.replace('\n', ' ')
     text_ = text.lower()
     spans = []
-    for idd, t in enumerate(t_articles):
-        spans_ = t(text_, cntx)
-        if len(spans_) == 0:
+    for type_, t in t_articles:
+        spans_m = t(text_, cntx)
+        if len(spans_m) == 0:
             continue
+        spans_m_dict = dict(spans_m)
+        spans_ = [s for s, m in spans_m]
         flat_spans_ = flat_article_spans(spans_)
         flat_spans_ = compatible_spans(flat_spans_, flat_spans(spans))
         final_spans_ = []
+        values = []
         for span_ in spans_:
             if span_[0] in flat_spans_ and span_[1] in flat_spans_:
                 final_spans_.append(span_)
+                vals = spans_m_dict[span_]
+                vals['extraction'] = type_
+                values.append(vals)
         if not re_avoid_defs_arts.search(text_):
             definitions_ = test_definition(par, final_spans_, cntx)
         else:
             definitions_ = []
-        spans.extend(zip(final_spans_, definitions_))
+        spans.extend(zip(final_spans_, definitions_, values))
     return spans
 
 

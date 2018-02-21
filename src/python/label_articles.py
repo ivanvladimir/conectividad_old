@@ -290,16 +290,16 @@ def add_tags(par, info_tags, offset=0, parent=None):
 
 def compatible_tags(candidates, gs_labeling):
     candidates_ = []
-    for span_, defi_ in candidates:
+    for span_, defi_, vals in candidates:
         ini_len = len(defi_)
         flag = True
         for gs_tags in gs_labeling:
             span__ = compatible_spans([span_]+defi_,
-                                     flat_spans(gs_tags))
+                                      flat_spans(gs_tags))
             if not ini_len == len(span__)-1:
                 flag = False
         if flag:
-            candidates_.append((span_, defi_))
+            candidates_.append((span_, defi_, vals))
     return candidates_
 
 
@@ -310,10 +310,10 @@ def process_articles(par, cntx, counter):
     insts = test_institutions(par, cntx)
     insts = compatible_tags(insts, [arts, docs])
     tags = []
-    for idd, (art, definitions) in enumerate(arts):
+    for art, definitions, vals in arts:
         counter.update(["art", "doc"])
-        info_art = {}
-        info_doc = {}
+        info_art = dict(vals)
+        info_doc = dict(vals)
         info_art['id'] = str(counter["art"])
         info_art['document'] = str(counter["doc"])
         info_doc['id'] = str(counter["doc"])
@@ -324,7 +324,7 @@ def process_articles(par, cntx, counter):
             info_def = {'id': str(counter["def"]),
                         "document": str(counter["doc"])}
             tags.append((defi, 'Definition', info_def))
-    for idd, (doc, definitions) in enumerate(docs):
+    for doc, definitions, vals in docs:
         counter.update(["doc"])
         info_doc = {}
         info_doc['id'] = str(counter["doc"])
@@ -334,7 +334,7 @@ def process_articles(par, cntx, counter):
             info_def = {'id': str(counter["def"]),
                         "document": str(counter["doc"])}
             tags.append((defi, 'Definition', info_def))
-    for idd, (inst, definitions) in enumerate(insts):
+    for inst, definitions, vals in insts:
             counter.update(["inst"])
             info_inst = {}
             info_inst['id'] = str(counter["inst"])
