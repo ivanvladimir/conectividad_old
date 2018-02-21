@@ -10,56 +10,31 @@ for(var i = 0; i < 7; i++){
 
 document.getElementById("tab0").style.display = "block";
 
-var documentFrame = document.getElementById('documentFrame').contentWindow;
-
-function applyCSS() {
-    if(document.getElementById('chkbxCaso').checked){
-      documentFrame.applyCSS("case","");
+function changeCSS(element_id,doc,nDoc) {
+    if(document.getElementById(element_id).checked){
+      applyCSS(doc,"");
     }else {
-      documentFrame.applyCSS("case","nCase");
+      applyCSS(doc,nDoc);
     }
+}
 
-    if(document.getElementById('chkbxEsctructura').checked){
-      documentFrame.applyCSS("actions","");
-    }else {
-      documentFrame.applyCSS("actions","nActions");
-    }
 
-    if(document.getElementById('chkbxFechaSentencia').checked){
-      documentFrame.applyCSS("datesentence","");
-    }else {
-      documentFrame.applyCSS("datesentence","nDateSentence");
-    }
+function something_click(event){
+	el=event.srcElement;
+	info=document.getElementById("info-tag");
+	console.log(event);
+	if(["articlemention","documentmention","definition","institutionmention"].indexOf(el.tagName.toLowerCase())>=0){
+		for (var i = 0; i < el.attributes.length; i++) {
+			var attrib = el.attributes[i];
+			if (attrib.specified) {
+				console.log(attrib.name + " = " + attrib.value);
+				info.textContent+=attrib.name+":"+attrib.value;
+			}
+		}
 
-    if(document.getElementById('chkbxMiembros').checked){
-      documentFrame.applyCSS("personcourtmembers","");
-    }else {
-      documentFrame.applyCSS("personcourtmembers","nPersonCourtMembers");
-    }
-
-    if(document.getElementById('chkbxFechas').checked){
-      documentFrame.applyCSS("date2","");
-    }else {
-      documentFrame.applyCSS("date2","nDate2");
-    }
-
-    if(document.getElementById('chkbxArticulos').checked){
-      documentFrame.applyCSS("articles","");
-    }else {
-      documentFrame.applyCSS("articles","nArticles");
-    }
-
-    if(document.getElementById('chkbxPuntosResolutivos').checked){
-      documentFrame.applyCSS("resolutivepoints","");
-    }else {
-      documentFrame.applyCSS("resolutivepoints","nResolutivePoints");
-    }
-
-    if(document.getElementById('chkbxConectores').checked){
-      documentFrame.applyCSS("conectores","");
-    }else {
-      documentFrame.applyCSS("conectores","nConectores");
-    }
+	}else{
+		info.textContent="";
+	}
 }
 
 function isActiveTab(me, tab){

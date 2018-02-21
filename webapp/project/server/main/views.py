@@ -113,7 +113,13 @@ def doc():
     fdist = FreqDist(cleanLines)
 
 
-    return render_template("main/documents.html",filename=xmlName+".xml",
+    with open('labelledDocuments/'+xmlName+".xml") as filename:
+        lines=filename.readlines()
+        lines=[line.replace("\n",'') for line in lines]
+
+
+
+    return render_template("main/documents.html",filename=xmlName+".xml", xml=lines,
         doc=contensiosos.get(eid=docNum),fdist=fdist,nwords=20,nvoc=100)
 
 

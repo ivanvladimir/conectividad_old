@@ -44,7 +44,7 @@ Date2:after {
   color: rgb(100, 100, 100);
 }
 
-ArticlesMention:after {
+ArticleMention:after {
   content: "Artículo";
   font-size: 65%;
   vertical-align: sub;
@@ -60,7 +60,7 @@ DocumentMention:after {
 
 
 InstitutionMention:after {
-  content: "Institution";
+  content: "Institución";
   font-size: 65%;
   vertical-align: sub;
   color: rgb(100, 100, 100);
@@ -73,8 +73,10 @@ Definition:after {
   color: rgb(100, 100, 100);
 }
 
-
-
+paragraph {
+    white-space: pre;
+    text-align : left;
+}
 
 PersonCourtMembers:after {
   content: "Miembro de la Corte";
@@ -122,7 +124,14 @@ ResolutivePoints:after {
 
 .nDate2                       { background-color: #f5f5f5 }
 .nDate2::after                { content: "" }
-.nArticles                    { background-color: #f5f5f5 }
-.nArticles::after             { content: "" }
+.nArticleMention              { background-color: #f5f5f5 }
+.nArticleMention::after       { content: "" }
+.nDocumentMention             { background-color: #f5f5f5 }
+.nDocumentMention::after      { content: "" }
+.nInstitutionMention          { background-color: #f5f5f5 }
+.nInstitutionMention::after   { content: "" }
+.nDefinition                  { background-color: #f5f5f5 }
+.nDefinition::after           { content: "" }
+.
 .nResolutivePoints            { background-color: #f5f5f5 }
 .nResolutivePoints::after     { content: "" }
