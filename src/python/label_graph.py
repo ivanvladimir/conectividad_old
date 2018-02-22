@@ -13,8 +13,12 @@ import os.path
 import re
 from tinydb import TinyDB, Query
 import xml.etree.ElementTree as ET
-from collections import Counter
+from collections import Counter, OrderedDict
 import json
+
+re_year = re.compile("\d\d\d\d")
+re_pais = re.compile(r".*\.([^.]*)$")
+
 
 
 class fg:
@@ -51,21 +55,36 @@ class style:
 def build_graph(data):
     nodes=[]
     nodes_={}
-    for idd,node in enumerate(data[0]):
-        nodes.append({"name":node,
+    for idd,(name,node) in enumerate(data[0].items()):
+        if 'type' in node and node['type']=="institution":
+            continue
+        nodes.append({"name":name,
                       "id":idd,
-                      "type":1})
-        nodes_[node]=idd
+                      "type":2})
+        for k,v in node.items():
+            nodes[-1][k]=v
+ 
+        nodes_[name]=idd
 
     links=[]
+    linked = set()
     for d1,c in data[1].items():
         for d2,val in c.items():
-            links.append({"source":nodes_[d1],
-                          "target":nodes_[d2],
-                          "value":val
-                         })
+            if val > 5:
+                links.append({"source":nodes_[d1],
+                              "target":nodes_[d2],
+                              "value":val
+                             })
+                linked.add(nodes_[d1])
+                linked.add(nodes_[d2])
+
+    print(nodes)
+    for node in nodes:
+        if not 'id' in node:
+            print(node)
+
     return {"links":links,
-            "nodes":nodes}
+            "nodes":[node for node in nodes if node['id'] in linked]}
         
 
 
@@ -75,9 +94,9 @@ def extract_graph(root,case,data):
         # Shows some labelling in the document
         for doc in par.findall('.//DocumentMention'):
             try:
-                data[0][doc.attrib["name"]]+=1
+                data[0][doc.attrib["name"]].update([])
             except KeyError:
-                data[0][doc.attrib["name"]]=1
+                data[0][doc.attrib["name"]]={}
             try:
                 data[1][case['title']].update([doc.attrib["name"]])
             except KeyError:
@@ -142,14 +161,27 @@ if __name__ == "__main__":
     Filter = Query()
     
     # load graph into data
-    data=({},{})
+    data=(OrderedDict(),OrderedDict())
 
     # Polulate data with names
     filter_new_cases=set()
-    for case in contensiosos.search(Filter.title.search(re_selector)):
-        if case['title'] not in data[0]:
-            data[0][case['title']]=0
-            filter_new_cases.add(case['title'])
+    for idd,case in enumerate(contensiosos.search(Filter.title.search(re_selector))):
+        if case['title'] in data[0]:
+            continue
+        filter_new_cases.add(case['title'])
+        m = re_year.search(case['title'])
+        if m:
+             year=m.group(0)
+        m=re_pais.match(case['meta_name']['name'])
+        pais="unknown"
+        if m:
+            pais=m.group(1).strip()
+        data[0][case['title']]={'year':year}
+        data[0][case['title']]['type']=1
+        data[0][case['title']]['country']=pais.lower()
+        data[0][case['title']]['name']=case['meta_name']['name']
+
+            
 
     for case in contensiosos.search(Filter.title.search(re_selector)):
         if case['title'] not in filter_new_cases:
