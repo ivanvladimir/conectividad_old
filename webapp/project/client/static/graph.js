@@ -73,7 +73,7 @@ function load_data(data){
 	for(inode in data.nodes){
 		node=data.nodes[inode];
 		if(node.type==1){
-			nodes_.push({'group':node.type,'id':node.id, 'label':node.name,'clicked':false, 'year':node.year,'color':country2color[node.country],'size':35});
+			nodes_.push({'group':node.type,'id':node.id, 'case_id':node.case_id, 'label':node.name,'clicked':false, 'year':node.year, 'color':country2color[node.country],'size':35});
 		}else if(node.type==2){
 			nodes_.push({'group':node.type,'id':node.id, 'label':node.name,'clicked':false, 'year':node.year});
 		}
@@ -120,7 +120,7 @@ function load_data(data){
 		if(params.nodes.length>0){
 			var node = nodes.get(params.nodes[0]);
 			if(node.group==1){
-				$.getJSON('contensioso/'+node.id,function(data){
+				$.getJSON('contensioso/'+node.case_id,function(data){
 					document.getElementById('infoNode').innerHTML = infoNode(params,data,node);
 				});
 			}else{
@@ -136,6 +136,18 @@ function load_data(data){
 
 }
 
+function dynamicSort(property) {
+    var sortOrder = 1;
+    if(property[0] === "-") {
+        sortOrder = -1;
+        property = property.substr(1);
+    }
+    return function (a,b) {
+        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+		console.log(result,a[property],b[property]);
+        return result * sortOrder;
+    }
+}
 
 function infoNode(params,info,node){
 	var tipo = "Arco";
@@ -186,10 +198,16 @@ function infoNode(params,info,node){
 	}
 
 	var connected_edges = network.getConnectedEdges(node.id);
-
-	var rows_column_two = "";
+	var connected_edges_ = [];
 	connected_edges.forEach(function(connected_edge){
 		connected_edge=edges.get(connected_edge);
+		connected_edges_.push(connected_edge);
+	});
+
+	connected_edges_.sort(dynamicSort("-value"));
+
+	var rows_column_two = "";
+	connected_edges_.forEach(function(connected_edge){
 		if(node.group==1){
 			connected_node=nodes.get(connected_edge.to);
 			rows_column_two+=`<tr><td>${connected_node.label}</td><td>${connected_edge.value}</td></tr>`

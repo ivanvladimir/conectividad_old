@@ -9,10 +9,11 @@
 
 # System libraries
 import re
+from tinydb import Query
 
 re_enters = re.compile(r"\n+")
 re_spaces = re.compile(r"\s+")
-re_fromltoc = re.compile(r"^[a-z ]+(?P<caption>[A-Z]+.*)")
+re_fromltoc = re.compile(r"^[a-z ]+(?P<caption>[A-Z]+\D*)")
 re_espace_or_enter = re.compile(r"[ \n]")
 re_numbers = re.compile(r'([\d.]+| [IXVixv]+ )')
 
@@ -21,7 +22,9 @@ def split_arts(text):
     return " ".join(re_numbers.findall(text))
 
 
-def resolve_document(text, cntx, definitions):
+def resolve_document(tag, cntx, definitions, db):
+    text = tag.text
+    attrib = tag.attrib
     text = re_enters.sub(" ", text)
     text = re_spaces.sub(" ", text)
     text_ = re_espace_or_enter.sub("[ \n]", text)
@@ -32,8 +35,17 @@ def resolve_document(text, cntx, definitions):
             flag = True
             break
 
+
     if flag:
         return text_, "document"
+
+    # Solve cases
+    if text_.startswith("Caso"):
+        Filter = Query()
+        if "serie" in attrib:
+            doc = db.get(Filter.meta_name.number.search(attrib['serie']))
+            if doc:
+                return str(doc.doc_id), "case_cidh"
 
 
     # Solve definitions
@@ -113,5 +125,6 @@ reductions = [
 ]
 
 exceptions = [
-    re.compile(r"Caso.*")
+    re.compile(r"Caso.*"),
+    re.compile(r".*.eglamento de la .omisi.n")
 ]

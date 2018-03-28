@@ -24,6 +24,7 @@ re_parrafodela = re.compile(
 article_mention = r'(?:art.culos?[\n ])'\
                   r'(?P<articles>[\d\.,y ixvabc]+-?)[\n ]'\
                   r'(?:fracción [^,]*, )?(inciso [^,]*, )?'
+re_article_mention = re.compile(article_mention)
 source_mention = r'(?P<source>(?:de[\n ]esa|'\
                  r'de[\n ]esta[\n ]+|'\
                  r'de[\n ]la[\n ]+|'\
@@ -43,13 +44,14 @@ re_articlede = re.compile(article_mention + source_mention)
 re_yarticle = re.compile(r' y '
                          r'(?P<articles>[\d.y ]+)'
                          r' del (?P<source>(?:(\w+[\n ]+)+\w+))\.')
-#los artículos 4 (Derecho a la Vida)
+
+# los artículos 4 (Derecho a la Vida)
 re_articlenum = re.compile(r'(?:art.culos?[ \n])(?P<articles>\d+[\n ]'
-                            r"\(.+\))[ \n]de[ \n]la[ \n]"+
-                            r'(?P<source>\w*)')
+                           r"\(.+\))[ \n]de[ \n]la[ \n]"+
+                           r'(?P<source>\w+(?:[\n ]+\w+)*)')
 
 
-re_enadelante = re.compile(r'en[ \n]*adelante[ \n]*.*')
+re_enadelante = re.compile(r'en[ \n]*adelante\,?[ \n]*.*')
 re_definitions = re.compile(r'[“"](?P<term>[^”"]+)["”]')
 re_documents = re.compile(r"(?P<doc>{0})".format(r"|"
                           .join(
@@ -73,13 +75,17 @@ re_avoid_defs_mentions = re.compile(r"(?P<inst>{0})".format(r"|"
 # Caso Loayza Tamayo Vs. Perú. Interpretación de la Sentencia de Fondo.
 # Resolución de la Corte Interamericana de Derechos Humanos de 8 de marzo
 # de 1998. Serie C No. 47, párr. 16,
+#
+# Caso de los 19 Comerciantes Vs. Colombia.
+# Excepción Preliminar. Sentencia de 12 de junio de 2002. Serie C No. 93, párr.
+# 33.
 re_fullcase = re.compile(r'(?P<case>Caso[ \n][\n \w\(\)]+Vs\.'
                          r'[ \n](?:[A-Z]\w+[\n ]?)+)\.'
-                         r'(?P<exception>[ \n]Excepciones[^\.]+\.)?'
+                         r'(?P<exception>[ \n]Excepci.n.?.?[^\.]+\.)?'
                          r'(?P<interpretations>[ \n]Interpretaci.n[^\.]+\.)?'
                          r'(?P<resolution>[ \n]Resoluci.n[^\.]+\.)?'
-                         r'(?P<case_name>[ \n]Sentencia[^\.]+\.)?'
-                         r'(?P<serie>[ \n]Serie[^,]+\,)?'
+                         r'(?P<sentence>[ \n]Sentencia[^\.]+\.)?'
+                         r'(?:(?P<serie>[ \n]Serie[^,]+)\,)?'
                          r'(?P<paragraph>[ \n]p.rr\.[ \n][^,]+)+[,\.]'
                          )
 # Caso Loayza Tamayo Vs. Perú.
@@ -182,7 +188,13 @@ capitals_types=[
 
 
 def groups2dic(m):
-    return m.groupdict()
+    d = m.groupdict()
+    res = {}
+    for k,v in d.items():
+        if v:
+            res[k]=v.strip()
+
+    return res
 
 
 def get_splits(spans):
@@ -214,7 +226,7 @@ def enadelante(text, spans):
     for ini, fin in splits:
         defis = []
         limit = 200
-        for w in [".", "caso", ")"]:
+        for w in [".", "caso", ")","república"]:
             limit_ = text[ini:].find(w)
             if limit_ >= 0:
                 if limit_ < limit:
@@ -297,14 +309,21 @@ def sentencia(text, cntx):
 
 def fullcase(text, cntx):
     spans_ = []
-    for m in re.finditer("Caso", text):
+    spans = []
+    for m in re.finditer("Caso|cfr|Cfr", text):
         ini, fin = m.span()
         if len(spans_) > 0:
-            spans_[-1][0][1] = ini - 1
-        spans_.append(([ini, fin], groups2dic(m)))
+            spans_[-1][1] = ini - 1
+        spans_.append([ini, fin])
     if len(spans_) > 0:
-        spans_[-1][0][1] = len(text)
-    return [(tuple(s), m) for s, m in spans_], True
+        spans_[-1][1] = len(text)
+
+    for sini, sfin in spans_:
+        m = re_fullcase.search(text[sini:sfin])
+        if m:
+            ini, fin = m.span()
+            spans.append(([sini+ini, sini+fin], groups2dic(m)))
+    return [(tuple(s), m) for s, m in spans], True
 
 
 def case(text, cntx):
@@ -363,7 +382,7 @@ def capital_docs(text, cntx):
     return spans, []
 
 t_docs = [
-    ("fullcalse", fullcase),
+    ("fullcase", fullcase),
     ("sentencia", sentencia),
     ("docuemnts", documents),
     ("case", case),
@@ -378,18 +397,20 @@ def test_docs(par, cntx):
 
     spans = []
     values = []
+    spans_m_dict = {}
     for type_, t in t_docs:
         spans_m, flag_def = t(text_, cntx)
-        spans_m_dict = dict(spans_m)
+        spans_m_dict.update(spans_m)
         if len(spans_m) == 0:
             continue
         spans_ = [s for s, m in spans_m]
         flat_spans_ = compatible_spans(spans_, flat_spans(spans))
         final_spans_ = []
+        values = []
         for span_ in spans_:
             if span_ in flat_spans_:
                 final_spans_.append(span_)
-                vals = spans_m_dict[span_]
+                vals = dict(spans_m_dict[span_])
                 vals['extraction'] = type_
                 values.append(vals)
         if flag_def:
@@ -403,9 +424,22 @@ def test_docs(par, cntx):
 # Functions to extract article information
 def articlede(text, cntx):
     spans = []
-    for m in re_articlede.finditer(text):
-        spans.append(((m.span('articles'),
-                       m.span("source")), groups2dic(m)))
+    spans_ = [[0, 0]]
+    for m in re_article_mention.finditer(text):
+        sini, sfin = m.span()
+        spans_[-1][1] = sini - 1
+        spans_.append([sini, sfin])
+    spans_[-1][1] = len(text)
+
+    for sini, sfin in spans_:
+        text_ = text[sini:sfin]
+        m = re_articlede.search(text_)
+        if m:
+            ini_source, fin_source = m.span("source")
+            ini_articles, fin_articles = m.span("articles")
+
+            spans.append((((sini+ini_articles, sini+fin_articles),
+                         (sini+ini_source, sini+fin_source)), groups2dic(m)))
     return spans
 
 

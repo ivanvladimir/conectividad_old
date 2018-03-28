@@ -349,7 +349,7 @@ def process_articles(par, cntx, counter):
     return par_[0]
 
 
-def label_xml(root):
+def label_xml(root,db):
     cntx = Context()
     counter = Counter([])
     root_ = ET.Element('root')
@@ -371,7 +371,7 @@ def label_xml(root):
         for doc in par_.findall('.//DocumentMention'):
             definitions = par_.findall('.//Definition[@document="{0}"]'
                                        .format(doc.attrib['id']))
-            resolution, t = resolve_document(doc.text, cntx, len(definitions))
+            resolution, t = resolve_document(doc, cntx, len(definitions),db)
             doc.attrib['name'] = resolution
             doc.attrib['type'] = t
             verbose(fg.GREEN, "Document: ",
@@ -386,12 +386,15 @@ def label_xml(root):
                 art.attrib["articles"] = split_arts(art.text)
                 verbose(fg.BLUE, "Article: ", bg.WHITE, art.text,
                         bg.RESET, '->', art.attrib["articles"])
+                verbose(fg.BLUE, "> Source: ", bg.WHITE,
+                        bg.RESET, doc.attrib['name'])
             pass
+
         # Shows some labelling in the document
         for inst in par_.findall('.//InstitutionMention'):
             definitions = par_.findall('.//Definition[@institution="{0}"]'
                                        .format(inst.attrib['id']))
-            resolution, t = resolve_document(inst.text, cntx, len(definitions))
+            resolution, t = resolve_document(inst, cntx, len(definitions),db)
             inst.attrib['name'] = resolution
             inst.attrib['type'] = t
             verbose(fg.MAGENTA, "Institution: ",
@@ -470,7 +473,7 @@ if __name__ == "__main__":
             verbose(fg.RED + 'ARCHIVO FALTANTE', style.NORMAL, xmlinfilename)
             continue
 
-        root_=label_xml(root)
+        root_=label_xml(root,contensiosos)
 
         # Writing out the XML
         xmloutfilename = os.path.join(args.labelled_dir,
