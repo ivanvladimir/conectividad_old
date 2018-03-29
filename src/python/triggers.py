@@ -84,7 +84,7 @@ re_fullcase = re.compile(r'(?P<case>Caso[ \n][\n \w\(\)]+Vs\.'
                          r'(?P<exception>[ \n]Excepci.n.?.?[^\.]+\.)?'
                          r'(?P<interpretations>[ \n]Interpretaci.n[^\.]+\.)?'
                          r'(?P<resolution>[ \n]Resoluci.n[^\.]+\.)?'
-                         r'(?P<sentence>[ \n]Sentencia[^\.]+\.)?'
+                         r'(?P<sentence>[ \n]Sentencia[^\.]+[,\.])?'
                          r'(?:(?P<serie>[ \n]Serie[^,]+)\,)?'
                          r'(?P<paragraph>[ \n]p.rr\.[ \n][^,]+)+[,\.]'
                          )
@@ -226,7 +226,7 @@ def enadelante(text, spans):
     for ini, fin in splits:
         defis = []
         limit = 200
-        for w in [".", "caso", ")","república"]:
+        for w in ["república",'caso','.',')']:
             limit_ = text[ini:].find(w)
             if limit_ >= 0:
                 if limit_ < limit:

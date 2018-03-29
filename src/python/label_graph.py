@@ -71,16 +71,21 @@ def build_graph(data,id2title):
     for d1,c in data[1].items():
         for d2,val in c.items():
             if val > 2:
+                ori_val=val
+                tpe = "normal"
                 if d2[1]=="case_cidh":
                     target=nodes_[id2title[d2[0]]]
                     print(">>>>>>",d1)
                     print("<<<<<<",id2title[d2[0]])
-                    va=val*1000
+                    val=val*50
+                    tpe = "cidh"
                 else:
                     target=nodes_[d2[0]]
                 links.append({"source":nodes_[d1],
                               "target":target,
-                              "value":val
+                              "value":val,
+                              "ori_val":ori_val,
+                              "type": tpe
                              })
                 linked.add(nodes_[d1])
                 linked.add(target)

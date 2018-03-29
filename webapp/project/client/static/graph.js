@@ -83,7 +83,12 @@ function load_data(data){
 
 	for(ilink in data.links){
 		link=data.links[ilink];
-		edges_.push({"from":link.source, "to":link.target,'value':link.value});
+		if("cidh".localeCompare(link.type)==0){
+			edges_.push({to:link.source, from:link.target,value:link.value,arrows:'to',ori_value:link.ori_val,color:{color:'blue'}});
+		}else{
+			edges_.push({to:link.source, from:link.target,value:link.value,arrows:'to',ori_value:link.ori_val,color:{color:'orange'}});
+			
+		}
 	}
 
 	edges = new vis.DataSet(edges_);
@@ -110,8 +115,16 @@ function load_data(data){
 			maxVelocity: 146,
 			solver: 'forceAtlas2Based',
 			timestep: 0.35,
-			stabilization: {iterations: 150},
-		}
+			stabilization: {iterations: 20},
+		},
+		layout: {
+			improvedLayout: false,
+        },
+        edges: {
+          smooth: true,
+          arrows: {to : true }
+        }	
+
 	};
 	network = new vis.Network(container, data_vis, options);
 
@@ -144,7 +157,6 @@ function dynamicSort(property) {
     }
     return function (a,b) {
         var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-		console.log(result,a[property],b[property]);
         return result * sortOrder;
     }
 }
@@ -204,16 +216,16 @@ function infoNode(params,info,node){
 		connected_edges_.push(connected_edge);
 	});
 
-	connected_edges_.sort(dynamicSort("-value"));
+	connected_edges_.sort(dynamicSort("-ori_value"));
 
 	var rows_column_two = "";
 	connected_edges_.forEach(function(connected_edge){
 		if(node.group==1){
-			connected_node=nodes.get(connected_edge.to);
-			rows_column_two+=`<tr><td>${connected_node.label}</td><td>${connected_edge.value}</td></tr>`
-		}else{
 			connected_node=nodes.get(connected_edge.from);
-			rows_column_two+=`<tr><td>${connected_node.label}</td><td>${connected_edge.value}</td></tr>`
+			rows_column_two+=`<tr><td>${connected_node.label}</td><td>${connected_edge.ori_value}</td></tr>`
+		}else{
+			connected_node=nodes.get(connected_edge.to);
+			rows_column_two+=`<tr><td>${connected_node.label}</td><td>${connected_edge.ori_value}</td></tr>`
 		}
 	})
 
