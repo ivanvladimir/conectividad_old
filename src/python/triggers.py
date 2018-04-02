@@ -79,15 +79,19 @@ re_avoid_defs_mentions = re.compile(r"(?P<inst>{0})".format(r"|"
 # Caso de los 19 Comerciantes Vs. Colombia.
 # Excepción Preliminar. Sentencia de 12 de junio de 2002. Serie C No. 93, párr.
 # 33.
-re_fullcase = re.compile(r'(?P<case>Caso[ \n][\n \w\(\)]+Vs\.'
-                         r'[ \n](?:[A-Z]\w+[\n ]?)+)\.'
-                         r'(?P<exception>[ \n]Excepci.n.?.?[^\.]+\.)?'
-                         r'(?P<interpretations>[ \n]Interpretaci.n[^\.]+\.)?'
-                         r'(?P<resolution>[ \n]Resoluci.n[^\.]+\.)?'
-                         r'(?P<sentence>[ \n]Sentencia[^\.]+[,\.])?'
+re_fullcase = re.compile(r'(?P<case>Caso[ \n][\n \w“”\(\)]+Vs\.'
+                         r'[ \n](?:[A-Z][^\.\-;:]+[\n ]?)+)\.'
+                         r'(?P<type_case>[ \n][A-Z][^\.\-:]+\.)?'
+                         r'(?P<sentence>[ \n]Sentencia[^\.\-:]+[,\.])?'
                          r'(?:(?P<serie>[ \n]Serie[^,]+)\,)?'
-                         r'(?P<paragraph>[ \n]p.rr\.[ \n][^,]+)+[,\.]'
+                         r'(?P<paragraph>[ \n]p.rrs?.[ \n][^,;]+)+[;,\.]'
                          )
+re_fullcase2 = re.compile(r'(?P<case>Caso[ \n][\n \w“”\(\)]+Vs\.'
+                         r'[ \n](?:[A-Z][^\,-;:]+[\n ]?)+)\,'
+                         r'(?:(?P<supra_nota>[ \n]supra nota[^,\-]+)\,)?'
+                         r'(?P<paragraph>[ \n]p.rrs?.[ \n][^,;]+)+[;,\.]'
+                         )
+#
 # Caso Loayza Tamayo Vs. Perú.
 re_case = re.compile(r"(?P<case>Caso .*) Vs. ([A-Z]\w+ ?)+")
 
@@ -323,6 +327,12 @@ def fullcase(text, cntx):
         if m:
             ini, fin = m.span()
             spans.append(([sini+ini, sini+fin], groups2dic(m)))
+            continue
+        m = re_fullcase2.search(text[sini:sfin])
+        if m:
+            ini, fin = m.span()
+            spans.append(([sini+ini, sini+fin], groups2dic(m)))
+            continue
     return [(tuple(s), m) for s, m in spans], True
 
 

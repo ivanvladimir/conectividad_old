@@ -46,6 +46,13 @@ def resolve_document(tag, cntx, definitions, db):
             doc = db.get(Filter.meta_name.number.search(attrib['serie']))
             if doc:
                 return str(doc.doc_id), "case_cidh"
+        elif "case" in attrib:
+            case_name=str(attrib["case"])
+            case_name=case_name.replace("(","\(")
+            case_name=case_name.replace(")","\)")
+            doc = db.get(Filter.meta_name.name.search(case_name))
+            if doc:
+                return str(doc.doc_id), "case_cidh"
 
 
     # Solve definitions
