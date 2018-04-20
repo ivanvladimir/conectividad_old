@@ -73,9 +73,9 @@ function load_data(data){
 	for(inode in data.nodes){
 		node=data.nodes[inode];
 		if(node.type==1){
-			nodes_.push({'group':node.type,'id':node.id, 'case_id':node.case_id, 'label':node.name,'clicked':false, 'year':node.year, 'color':country2color[node.country],'size':35});
+			nodes_.push({'group':node.type,'id':node.id, 'lower_label': node.name.toLowerCase(), 'case_id':node.case_id, 'label':node.name,'clicked':false, 'year':node.year, 'color':country2color[node.country],'size':35});
 		}else if(node.type==2){
-			nodes_.push({'group':node.type,'id':node.id, 'label':node.name,'clicked':false, 'year':node.year});
+			nodes_.push({'group':node.type,'id':node.id, 'lower_label': node.name.toLowerCase(), 'label':node.name,'clicked':false, 'year':node.year});
 		}
 	}
 
@@ -307,6 +307,37 @@ function update_graph(ini,fin){
 	});
 	nodes.update(updates);
 
+	updateCounts();
+}
+
+
+
+function updateEdges(){
+	updates = [];
+	nodes.forEach(function(node) {
+		if(node.group==2){
+			var nodes_ = network.getConnectedEdges(node.id);
+			var res_ = true;
+			for(inode in nodes_){
+				if (edges.get(nodes_[inode]).hidden == undefined || edges.get(nodes_[inode]).hidden==false){
+					res_ = false;
+					break;
+				}
+			}
+			if((node.hidden==false || !node.hidden) && res_==true)
+			{
+				updates.push({id:node.id,hidden:true});
+			}
+			if(node.hidden==true && res_==false)
+			{
+				updates.push({id:node.id,hidden:false});
+			}
+
+		}
+	});
+}
+
+function updateCounts(){
 	var n_nodes=0;
 	var n_nodes_1=0;
 	var n_nodes_2=0;
@@ -336,6 +367,7 @@ function update_graph(ini,fin){
 	document.getElementById('len_arcs').innerHTML = n_edges;
 }
 
+
 function showInfoPageGrafo(){
 	document.getElementById("myModalGrafo").classList.add('is-active');
 }
@@ -344,9 +376,62 @@ function closeInfoPageGrafo(){
 	document.getElementById("myModalGrafo").classList.remove('is-active');
 }
 
-function countryChange(me){
-  //alert(me.id.substr(1));
-	//alert(country2color[me.id.substr(1)]);
-	//years=handlesSlider.noUiSlider.get();
-	//update_graph(years[0],years[1]);
+function countryChange(me, country){
+	var updates = [];
+	var updates_ = [];
+	nodes.forEach(function(node) {
+			if((node.hidden==false || !node.hidden) && node.lower_label.includes(country) && ! me.checked){
+				updates.push({id:node.id,hidden:true});
+				var edges_ = network.getConnectedEdges(node.id);
+				for (iedge in edges_){
+					var edge= edges_[iedge];
+					updates_.push({id:edge,hidden:true});
+				}
+			}
+			if(node.hidden==true && node.lower_label.includes(country) & me.checked){
+				updates.push({id:node.id,hidden:false});
+				var edges_ = network.getConnectedEdges(node.id);
+				for (iedge in edges_){
+					var edge= edges_[iedge];
+					updates_.push({id:edge,hidden:false});
+				}
+
+			}
+	});
+	nodes.update(updates);
+	edges.update(updates_);
+	updateEdges();
+	updateCounts();
+}
+
+
+function myFilterNode(){
+	var updates = [];
+	var updates_ = [];
+    var input;
+    input = document.getElementById("myFilterNode").value.toLowerCase();
+ 
+	nodes.forEach(function(node) {
+			if((node.hidden==false || !node.hidden) && !node.lower_label.includes(input)){
+				updates.push({id:node.id,hidden:true});
+				var edges_ = network.getConnectedEdges(node.id);
+				for (iedge in edges_){
+					var edge= edges_[iedge];
+					updates_.push({id:edge,hidden:true});
+				}
+			}
+			if(node.hidden==true && node.lower_label.includes(input)){
+				updates.push({id:node.id,hidden:false});
+				var edges_ = network.getConnectedEdges(node.id);
+				for (iedge in edges_){
+					var edge= edges_[iedge];
+					updates_.push({id:edge,hidden:false});
+				}
+
+			}
+	});
+	nodes.update(updates);
+	edges.update(updates_);
+	updateEdges();
+	updateCounts();
 }
