@@ -73,17 +73,23 @@ re_avoid_defs_mentions = re.compile(r"(?P<inst>{0})".format(r"|"
 # Caso Loayza Tamayo Vs. Perú. Interpretación de la Sentencia de Fondo.
 # Resolución de la Corte Interamericana de Derechos Humanos de 8 de marzo
 # de 1998. Serie C No. 47, párr. 16,
-re_fullcase = re.compile(r'(?P<case>Caso[ \n][\n \w\(\)]+Vs\.'
-                         r'[ \n](?:[A-Z]\w+[\n ]?)+)\.'
+#
+# Caso Comunidad Indígena Xákmok Kásek. Vs. Paraguay. Fondo, Reparaciones y
+# Costas. Sentencia de
+# 24 de agosto de 2010 Serie C No. 214, párr. 136.
+re_fullcase = re.compile(r'(?P<case>Caso[ \n][\n \w\(\).]+Vs\.'
+                         r'[ \n](?:[A-Z]\w+[\n ]?)+)[\.,]'
+                         r'(?P<interpretation>[ \n]+Interpretaci.n[^\.]+[\.,])?'
+                         r'(?P<fund>[ \n]Fondo[^\.]+\.)?'
                          r'(?P<exception>[ \n]Excepciones[^\.]+\.)?'
-                         r'(?P<interpretations>[ \n]Interpretaci.n[^\.]+\.)?'
                          r'(?P<resolution>[ \n]Resoluci.n[^\.]+\.)?'
-                         r'(?P<case_name>[ \n]Sentencia[^\.]+\.)?'
+                         r'(?P<case_name>[ \n]Sentencia[^\.S]+\.?)?'
                          r'(?P<serie>[ \n]Serie[^,]+\,)?'
-                         r'(?P<paragraph>[ \n]p.rr\.[ \n][^,]+)+[,\.]'
+                         r'(?P<paragraph>[ \n]+p.rr\.[\n ]+\d+)'
                          )
 # Caso Loayza Tamayo Vs. Perú.
 re_case = re.compile(r"(?P<case>Caso .*) Vs. ([A-Z]\w+ ?)+")
+re_extrapunctuation=re.compile(r"[, .]+$")
 
 # resolución 30/83
 re_resolucion = re.compile(r"(?P<doc>resoluci.n[\ ]+\d+/\d+)")
@@ -182,7 +188,14 @@ capitals_types=[
 
 
 def groups2dic(m):
-    return m.groupdict()
+    res={}
+    for k,v in m.groupdict().items():
+        if v:
+            if len(v.strip()) > 0 and v.strip()[-1] in ['.',',']:
+                res[k]=v.strip()[:-1]
+            else:
+                res[k]=v.strip()
+    return res
 
 
 def get_splits(spans):
@@ -297,14 +310,40 @@ def sentencia(text, cntx):
 
 def fullcase(text, cntx):
     spans_ = []
-    for m in re.finditer("Caso", text):
-        ini, fin = m.span()
-        if len(spans_) > 0:
-            spans_[-1][0][1] = ini - 1
-        spans_.append(([ini, fin], groups2dic(m)))
-    if len(spans_) > 0:
-        spans_[-1][0][1] = len(text)
-    return [(tuple(s), m) for s, m in spans_], True
+    spans__ = []
+    spans_cfrs=[]
+    for m_cfr in re.finditer("Cfr.",text):
+        ini,fin= m_cfr.span()
+        if len(spans_cfrs) > 0:
+            spans_cfrs[-1][1] = ini - 1
+        spans_cfrs.append([ini,fin])
+    if len(spans_cfrs)>0:
+        spans_cfrs[-1][1] = len(text)
+
+    for ini_,fin_ in spans_cfrs:
+        flag=True
+        for m in re.finditer("Caso", text[ini_:fin_]):
+            ini, fin = m.span()
+            ini = ini_ + ini
+            fin = ini_ + fin
+            if not flag:
+                spans_[-1][0][1] = ini - 1
+            flag = False
+            spans_.append(([ini, fin], groups2dic(m)))
+
+        if not flag:
+            spans_[-1][0][1] = ini_+len(text[ini_:fin_])
+
+    for span,gd in spans_:
+        text_=text[span[0]:span[1]]
+        m = re_fullcase.search(text_)
+        if m:
+            ini, fin = m.span()
+            spans__.append(([span[0]+ini,span[0]+fin], groups2dic(m)))
+        else:
+            spans__.append((span,gd))
+
+    return [(tuple(s), m) for s, m in spans__], True
 
 
 def case(text, cntx):
@@ -364,9 +403,9 @@ def capital_docs(text, cntx):
 
 t_docs = [
     ("fullcalse", fullcase),
+#    ("case", case),
     ("sentencia", sentencia),
     ("docuemnts", documents),
-    ("case", case),
     ("resolucion", resolucion),
     ("mention_definition", mention_definition),
     ("capital", capital_docs),

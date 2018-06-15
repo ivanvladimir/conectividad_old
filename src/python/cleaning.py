@@ -28,12 +28,12 @@ def resolve_document(text, cntx, definitions):
     # Avoid solving
     flag = False
     for exception in exceptions:
-        if exception.search(""):
+        if exception.search(text):
             flag = True
             break
 
     if flag:
-        return text_, "document"
+        return text, "document"
 
 
     # Solve definitions
