@@ -24,6 +24,7 @@ re_parrafodela = re.compile(
 article_mention = r'(?:art.culos?[\n ])'\
                   r'(?P<articles>[\d\.,y ixvabc]+-?)[\n ]'\
                   r'(?:fracción [^,]*, )?(inciso [^,]*, )?'
+re_article_mention = re.compile(article_mention)
 source_mention = r'(?P<source>(?:de[\n ]esa|'\
                  r'de[\n ]esta[\n ]+|'\
                  r'de[\n ]la[\n ]+|'\
@@ -43,13 +44,14 @@ re_articlede = re.compile(article_mention + source_mention)
 re_yarticle = re.compile(r' y '
                          r'(?P<articles>[\d.y ]+)'
                          r' del (?P<source>(?:(\w+[\n ]+)+\w+))\.')
-#los artículos 4 (Derecho a la Vida)
+
+# los artículos 4 (Derecho a la Vida)
 re_articlenum = re.compile(r'(?:art.culos?[ \n])(?P<articles>\d+[\n ]'
-                            r"\(.+\))[ \n]de[ \n]la[ \n]"+
-                            r'(?P<source>\w*)')
+                           r"\(.+\))[ \n]de[ \n]la[ \n]"+
+                           r'(?P<source>\w+(?:[\n ]+\w+)*)')
 
 
-re_enadelante = re.compile(r'en[ \n]*adelante[ \n]*.*')
+re_enadelante = re.compile(r'en[ \n]*adelante\,?[ \n]*.*')
 re_definitions = re.compile(r'[“"](?P<term>[^”"]+)["”]')
 re_documents = re.compile(r"(?P<doc>{0})".format(r"|"
                           .join(
@@ -87,6 +89,7 @@ re_fullcase = re.compile(r'(?P<case>Caso[ \n][\n \w\(\).]+Vs\.'
                          r'(?P<serie>[ \n]Serie[^,]+\,)?'
                          r'(?P<paragraph>[ \n]+p.rr\.[\n ]+\d+)'
                          )
+#
 # Caso Loayza Tamayo Vs. Perú.
 re_case = re.compile(r"(?P<case>Caso .*) Vs. ([A-Z]\w+ ?)+")
 re_extrapunctuation=re.compile(r"[, .]+$")
@@ -227,7 +230,7 @@ def enadelante(text, spans):
     for ini, fin in splits:
         defis = []
         limit = 200
-        for w in [".", "caso", ")"]:
+        for w in ["república",'caso','.',')']:
             limit_ = text[ini:].find(w)
             if limit_ >= 0:
                 if limit_ < limit:
@@ -310,6 +313,7 @@ def sentencia(text, cntx):
 
 def fullcase(text, cntx):
     spans_ = []
+<<<<<<< HEAD
     spans__ = []
     spans_cfrs=[]
     for m_cfr in re.finditer("Cfr.",text):
@@ -344,6 +348,29 @@ def fullcase(text, cntx):
             spans__.append((span,gd))
 
     return [(tuple(s), m) for s, m in spans__], True
+=======
+    spans = []
+    for m in re.finditer("Caso|cfr|Cfr", text):
+        ini, fin = m.span()
+        if len(spans_) > 0:
+            spans_[-1][1] = ini - 1
+        spans_.append([ini, fin])
+    if len(spans_) > 0:
+        spans_[-1][1] = len(text)
+
+    for sini, sfin in spans_:
+        m = re_fullcase.search(text[sini:sfin])
+        if m:
+            ini, fin = m.span()
+            spans.append(([sini+ini, sini+fin], groups2dic(m)))
+            continue
+        m = re_fullcase2.search(text[sini:sfin])
+        if m:
+            ini, fin = m.span()
+            spans.append(([sini+ini, sini+fin], groups2dic(m)))
+            continue
+    return [(tuple(s), m) for s, m in spans], True
+>>>>>>> b30d51876dc636146e3b13c6cde17264b8efffb9
 
 
 def case(text, cntx):
@@ -402,8 +429,12 @@ def capital_docs(text, cntx):
     return spans, []
 
 t_docs = [
+<<<<<<< HEAD
     ("fullcalse", fullcase),
 #    ("case", case),
+=======
+    ("fullcase", fullcase),
+>>>>>>> b30d51876dc636146e3b13c6cde17264b8efffb9
     ("sentencia", sentencia),
     ("docuemnts", documents),
     ("resolucion", resolucion),
@@ -417,18 +448,20 @@ def test_docs(par, cntx):
 
     spans = []
     values = []
+    spans_m_dict = {}
     for type_, t in t_docs:
         spans_m, flag_def = t(text_, cntx)
-        spans_m_dict = dict(spans_m)
+        spans_m_dict.update(spans_m)
         if len(spans_m) == 0:
             continue
         spans_ = [s for s, m in spans_m]
         flat_spans_ = compatible_spans(spans_, flat_spans(spans))
         final_spans_ = []
+        values = []
         for span_ in spans_:
             if span_ in flat_spans_:
                 final_spans_.append(span_)
-                vals = spans_m_dict[span_]
+                vals = dict(spans_m_dict[span_])
                 vals['extraction'] = type_
                 values.append(vals)
         if flag_def:
@@ -442,9 +475,22 @@ def test_docs(par, cntx):
 # Functions to extract article information
 def articlede(text, cntx):
     spans = []
-    for m in re_articlede.finditer(text):
-        spans.append(((m.span('articles'),
-                       m.span("source")), groups2dic(m)))
+    spans_ = [[0, 0]]
+    for m in re_article_mention.finditer(text):
+        sini, sfin = m.span()
+        spans_[-1][1] = sini - 1
+        spans_.append([sini, sfin])
+    spans_[-1][1] = len(text)
+
+    for sini, sfin in spans_:
+        text_ = text[sini:sfin]
+        m = re_articlede.search(text_)
+        if m:
+            ini_source, fin_source = m.span("source")
+            ini_articles, fin_articles = m.span("articles")
+
+            spans.append((((sini+ini_articles, sini+fin_articles),
+                         (sini+ini_source, sini+fin_source)), groups2dic(m)))
     return spans
 
 

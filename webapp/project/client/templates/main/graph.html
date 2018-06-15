@@ -11,8 +11,8 @@
 <link href="{{url_for('main.static', filename='nouislider.min.css')}}" rel="stylesheet" type="text/css" />
 <link href="{{url_for('main.static', filename='graph.css')}}" rel="stylesheet" media="screen" type="text/css" />
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.18.1/vis.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.18.1/vis.min.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.19.0/vis.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.19.0/vis.min.css" rel="stylesheet" type="text/css" />
 
 
 {% endblock %}
@@ -121,25 +121,29 @@
 
   </div>
 </div>
-
-
-
-
-
 </nav>
 
 <hr/>
 
-
 <div class="container">
+
+	<div class="field">
+	    <div class="control">
+			<input class="input is-primary" type="text" id="myFilterNode" onkeyup="myFilterNode()" placeholder="Buscar">
+	   </div>
+	</div>
+
+
+
   	<div style="top:0; left:0; right:0; bottom:0; height:600px;" id="graph-ctn"></div>
 
-    {% if not params['include'] %}
 
+	<div class="box">
     <div id="meta" class="field is-grouped is-grouped-multiline">
 
+    {% if not params['include'] or 'argentina' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cargentina">
+      <input type="checkbox" checked onclick="countryChange(this,'argentina');" id="cargentina">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Argentina</span>
@@ -147,9 +151,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or 'barbados' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cbarbados">
+      <input type="checkbox" checked onclick="countryChange(this,'barbados');" id="cbarbados">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Barbados</span>
@@ -157,9 +163,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or 'bolivia' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cbolivia">
+      <input type="checkbox" checked onclick="countryChange(this,'bolivia');" id="cbolivia">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Bolivia</span>
@@ -167,9 +175,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'brasil' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cbrasil">
+      <input type="checkbox" checked onclick="countryChange(this,'brasil');" id="cbrasil">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Brasil</span>
@@ -177,9 +187,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'chile' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cchile">
+      <input type="checkbox" checked onclick="countryChange(this,'chile');" id="cchile">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Chile</span>
@@ -187,9 +199,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'colombia' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="ccolombia">
+      <input type="checkbox" checked onclick="countryChange(this,'colombia');" id="ccolombia">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Colombia</span>
@@ -197,9 +211,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'costa' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="ccosta rica">
+      <input type="checkbox" checked onclick="countryChange(this,'costa rica');" id="ccosta rica">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Costa Rica</span>
@@ -207,9 +223,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'dominicana' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cdominicana">
+      <input type="checkbox" checked onclick="countryChange(this,'dominicana');" id="cdominicana">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Dominicana</span>
@@ -217,9 +235,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'ecuador' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cecuador">
+      <input type="checkbox" checked onclick="countryChange(this,'ecuador');" id="cecuador">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Ecuador</span>
@@ -227,9 +247,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'salvador' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cel salvador">
+      <input type="checkbox" checked onclick="countryChange(this,'salvador');" id="cel salvador">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">El Salvador</span>
@@ -237,9 +259,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'guatemala' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cguatemala">
+      <input type="checkbox" checked onclick="countryChange(this,'guatemala');" id="cguatemala">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Guatemala</span>
@@ -247,9 +271,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'granada' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cgranada">
+      <input type="checkbox" checked onclick="countryChange(this,'granada');" id="cgranada">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Granada</span>
@@ -257,9 +283,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'haití' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="chaití">
+      <input type="checkbox" checked onclick="countryChange(this,'haití');" id="chaití">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Haití</span>
@@ -267,9 +295,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'honduras' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="chonduras">
+      <input type="checkbox" checked onclick="countryChange(this,'honduras');" id="chonduras">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Honduras</span>
@@ -277,9 +307,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'jamaica' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cjamaica">
+      <input type="checkbox" checked onclick="countryChange(this,'jamaica');" id="cjamaica">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Jamaica</span>
@@ -287,9 +319,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'méxico' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cméxico">
+      <input type="checkbox" checked onclick="countryChange(this,'méxico');" id="cméxico">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">México</span>
@@ -297,9 +331,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'nicaragua' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cnicaragua">
+      <input type="checkbox" checked onclick="countryChange(this,'nicaragua');" id="cnicaragua">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Nicaragua</span>
@@ -307,9 +343,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'panamá' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cpanama">
+      <input type="checkbox" checked onclick="countryChange(this,'panamá');" id="cpanama">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Panama</span>
@@ -317,9 +355,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'paraguay' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cparaguay">
+      <input type="checkbox" checked onclick="countryChange(this,'paraguay');" id="cparaguay">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Paraguay</span>
@@ -327,9 +367,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'perú' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cperú">
+      <input type="checkbox" checked onclick="countryChange(this,'perú');" id="cperú">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Perú</span>
@@ -337,9 +379,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'dominicana' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="crepública dominicana">
+      <input type="checkbox" checked onclick="countryChange(this,'dominicana');" id="crepública dominicana">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">República Dominicana</span>
@@ -347,9 +391,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'trinidad' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="ctrinidad y tobago">
+      <input type="checkbox" checked onclick="countryChange(this,'trinidad');" id="ctrinidad y tobago">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Trinidad y Tobago</span>
@@ -357,9 +403,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'surinam' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="csurinam">
+      <input type="checkbox" checked onclick="countryChange(this,'surinam');" id="csurinam">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Surinam</span>
@@ -367,9 +415,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'uruguay' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="curuguay">
+      <input type="checkbox" checked onclick="countryChange(this,'uruguay');" id="curuguay">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Uruguay</span>
@@ -377,9 +427,11 @@
         </div>
       </div>
     </label>
+    {% endif %}
 
+    {% if not params['include'] or  'venezuela' in params['include'] %}
     <label class="checkbox control">
-      <input type="checkbox" checked onclick="countryChange(this);" id="cvenezuela">
+      <input type="checkbox" checked onclick="countryChange(this,'venezuela');" id="cvenezuela">
       <div class="control" style="display: inline-block;">
         <div class="tags has-addons">
           <span class="tag">Venezuela</span>
@@ -387,10 +439,11 @@
         </div>
       </div>
     </label>
-
-      </div>
-      <br>
     {% endif %}
+      </div>
+      </div>
+
+      <br>
 <br/>
 
 <div class="field">

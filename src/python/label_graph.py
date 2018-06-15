@@ -52,7 +52,7 @@ class style:
     RESET = '\033[0m'
 
 
-def build_graph(data):
+def build_graph(data,id2title):
     nodes=[]
     nodes_={}
     for idd,(name,node) in enumerate(data[0].items()):
@@ -63,44 +63,60 @@ def build_graph(data):
                       "type":2})
         for k,v in node.items():
             nodes[-1][k]=v
- 
+
         nodes_[name]=idd
 
     links=[]
     linked = set()
     for d1,c in data[1].items():
         for d2,val in c.items():
-            if val > 5:
+            if val > 2:
+                ori_val=val
+                tpe = "normal"
+                if d2[1]=="case_cidh":
+                    target=nodes_[id2title[d2[0]]]
+                    print(">>>>>>",d1)
+                    print("<<<<<<",id2title[d2[0]])
+                    val=val*50
+                    tpe = "cidh"
+                else:
+                    target=nodes_[d2[0]]
                 links.append({"source":nodes_[d1],
-                              "target":nodes_[d2],
-                              "value":val
+                              "target":target,
+                              "value":val,
+                              "ori_val":ori_val,
+                              "type": tpe
                              })
                 linked.add(nodes_[d1])
-                linked.add(nodes_[d2])
+                linked.add(target)
 
-    print(nodes)
     for node in nodes:
         if not 'id' in node:
             print(node)
 
     return {"links":links,
             "nodes":[node for node in nodes if node['id'] in linked]}
-        
 
+def get_info_node(doc):
+    return (
+        doc.attrib['name'],
+        doc.attrib['type'],
+    )
 
 
 def extract_graph(root,case,data):
     for par in root.findall('.//paragraph'):
         # Shows some labelling in the document
         for doc in par.findall('.//DocumentMention'):
+            if not doc.attrib['type']=="case_cidh":
+                try:
+                    data[0][doc.attrib["name"]].update([])
+                except KeyError:
+                    data[0][doc.attrib["name"]]={}
             try:
-                data[0][doc.attrib["name"]].update([])
+                data[1][case['title']].update([get_info_node(doc)])
             except KeyError:
-                data[0][doc.attrib["name"]]={}
-            try:
-                data[1][case['title']].update([doc.attrib["name"]])
-            except KeyError:
-                data[1][case['title']]=Counter([doc.attrib["name"]])
+                data[1][case['title']]=Counter([get_info_node(doc)])
     return data
 
 # MAIN
@@ -159,12 +175,13 @@ if __name__ == "__main__":
 
     # Initialization counting
     Filter = Query()
-    
+
     # load graph into data
     data=(OrderedDict(),OrderedDict())
 
     # Polulate data with names
     filter_new_cases=set()
+    id2title={}
     for idd,case in enumerate(contensiosos.search(Filter.title.search(re_selector))):
         if case['title'] in data[0]:
             continue
@@ -178,10 +195,11 @@ if __name__ == "__main__":
             pais=m.group(1).strip()
         data[0][case['title']]={'year':year}
         data[0][case['title']]['type']=1
+        data[0][case['title']]['case_id']=case.doc_id
         data[0][case['title']]['country']=pais.lower()
         data[0][case['title']]['name']=case['meta_name']['name']
+        id2title[str(case.doc_id)]=case['title']
 
-            
 
     for case in contensiosos.search(Filter.title.search(re_selector)):
         if case['title'] not in filter_new_cases:
@@ -201,7 +219,7 @@ if __name__ == "__main__":
 
         data=extract_graph(root,case,data)
 
-    graph=build_graph(data)
+    graph=build_graph(data,id2title)
     verbose(style.BRIGHT, "Saving updated graph: ", args.graph)
     with open(args.graph,'w') as outfile:
         json.dump(graph, outfile)

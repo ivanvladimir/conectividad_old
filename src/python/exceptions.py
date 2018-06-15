@@ -20,6 +20,8 @@ institutions = [
     r"Comisión Interamericana de Derechos Humanos",
     r"Defensores Interamericanos",
     r"República Argentina",
+    r"República Federativa de Brasil",
+    r"República de Brasil",
     r"República Honduras",
     r"OEA",
     r"Estados Unidos de América",
