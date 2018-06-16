@@ -128,7 +128,7 @@ public class GateEmbedded {
 
     System.out.println("Getting all documents to process.");
     //filesToUse = listf(DataFolder + "extract_text/");
-    filesToUse = listf(DataFolder + "contenciosos/");
+    filesToUse = listf(DataFolder + "contenciosos/text/");
 
     System.out.println("Process the files one by one");
     // process the files one by one
@@ -197,7 +197,7 @@ public class GateEmbedded {
         Factory.deleteResource(doc);
 
         // output the XML to <inputFile>.out.xml
-        outputFileName = "/../annotatedDocuments/" + docFile.getName() + ".xml";
+        outputFileName = "../../annotatedDocuments/" + docFile.getName() + ".xml";
         outputFile = new File(docFile.getParentFile(), outputFileName);
 
         System.out.println("\tWriting XML file on " + outputFile);
@@ -348,7 +348,7 @@ public class GateEmbedded {
   private static Set<String> annotTypesRequired = new HashSet<String>();
 
   /** Folder where is the data to process*/
-  private static String DataFolder = "./../../src/python/data/";
+  private static String DataFolder = "./../../data/";
 
   /** To get Files from directory*/
   private static List<File> filesToUse = null;

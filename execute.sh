@@ -1,6 +1,7 @@
 #! /bin/bash
 # autor: @Penserbjorne - Sebastian Aguilar
 # FI-IIMAS-IIJ-UNAM
+# Modification: @ivanvladimir - Ivan Meza
 
 opt=-1
 
@@ -99,8 +100,8 @@ initialize(){
   echo $(timestamp) " > pip install -r requirements.txt"
   pip3 install -r requirements.txt
 
-  echo $(timestamp) " > python3 -m nltk.downloader all"
-  python3 -m nltk.downloader all
+  #echo $(timestamp) " > python3 -m nltk.downloader all"
+  #python3 -m nltk.downloader stopwords
 
   echo $(timestamp) " > deactivate"
   deactivate
@@ -115,12 +116,13 @@ downloadData(){
     TIME_INI=$(date -u -d "$(timestamp)" +"%s")
     echo
     echo $(timestamp) " > Begining"
+	mkdir data/contenciosos/text
 
     echo $(timestamp) " > source ./env/bin/activate"
     source ./env/bin/activate
 
-    echo $(timestamp) " > download_casos_contenciosos.py"
-    python3 ./download_casos_contenciosos.py -v
+    echo $(timestamp) " > src/python/download_casos_contenciosos.py"
+    python3 ./src/python/download_casos_contenciosos.py -v
 
     echo $(timestamp) " > deactivate"
     deactivate
@@ -142,11 +144,11 @@ extractText(){
     echo $(timestamp) " > source ./env/bin/activate"
     source ./env/bin/activate
 
-    echo $(timestamp) " > extract_text.py"
-    python3 extract_text.py -v
+    echo $(timestamp) " > src/python/extract_text.py"
+    python3 src/python/extract_text.py -v
 
     echo $(timestamp) " > module_canonical_name.py"
-    python3 module_canonical_name.py -v
+    python3 src/python/module_canonical_name.py -v
 
     echo $(timestamp) " > deactivate"
     deactivate
@@ -170,14 +172,14 @@ annotatedDocuments(){
       mkdir ./data/annotatedDocuments
     fi
 
-    echo $(timestamp) " > cd ./../../gate/Java/"
-    cd ./../../gate/Java/
+    echo $(timestamp) " > cd gate/Java/"
+    cd gate/Java/
 
     echo $(timestamp) " > ./compile_run_embedded.sh"
     ./compile_run_embedded.sh
 
-    echo $(timestamp) " > cd ./../../src/python/"
-    cd ./../../src/python/
+    echo $(timestamp) " > cd ./../../"
+    cd ./../../
 
     TIME_FIN=$(date -u -d "$(timestamp)" +"%s")
     echo "Total time: " $(date -u -d "0 $TIME_FIN sec - $TIME_INI sec" +"%H:%M:%S")
@@ -196,7 +198,7 @@ extractArticles(){
     echo $(timestamp) " > source ./env/bin/activate"
     source ./env/bin/activate
 
-    echo $(timestamp) " > extract_articles.py"
+    echo $(timestamp) " > src/python/extract_articles.py"
     python3 extract_articles.py -v
 
     echo $(timestamp) " > deactivate"

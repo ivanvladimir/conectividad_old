@@ -34,7 +34,7 @@ if __name__ == "__main__":
             action="store", dest="dbname",
             help="Name for the db file")
     p.add_argument("--odir",
-            default="data/contenciosos/", type=str,
+            default="data/contenciosos/text/", type=str,
             action="store", dest="odir",
             help="File where to extract data")
     p.add_argument("-v", "--verbose",
