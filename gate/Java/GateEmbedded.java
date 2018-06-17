@@ -156,6 +156,14 @@ public class GateEmbedded {
         //File docFile = (File)iterFiles.next();
         System.out.println("Processing document " + (processedFiles+1) + " of " + filesToUse.size() + ": " + docFile + "...");
         doc = Factory.newDocument(docFile.toURL(), encoding);
+   		// output the XML to <inputFile>.out.xml
+        outputFileName = "../../annotatedDocuments/" + docFile.getName() + ".xml";
+        outputFile = new File(docFile.getParentFile(), outputFileName);
+		if(outputFile.exists() && !outputFile.isDirectory()) { 
+			continue;
+		}
+
+
 
         System.out.println("\tAdding to corpus and executing.");
         // put the document in the corpus
@@ -196,11 +204,7 @@ public class GateEmbedded {
         // Release the document, as it is no longer needed
         Factory.deleteResource(doc);
 
-        // output the XML to <inputFile>.out.xml
-        outputFileName = "../../annotatedDocuments/" + docFile.getName() + ".xml";
-        outputFile = new File(docFile.getParentFile(), outputFileName);
-
-        System.out.println("\tWriting XML file on " + outputFile);
+             System.out.println("\tWriting XML file on " + outputFile);
         // Write output files using the same encoding as the original
         fos = new FileOutputStream(outputFile);
         bos = new BufferedOutputStream(fos);

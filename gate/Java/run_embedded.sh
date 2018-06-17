@@ -12,7 +12,7 @@ TIME_INI_t=$(date -u -d "$(timestamp)" +"%s")
 echo $(timestamp) " > ulimit -m 2097152 => Max. 2 GB"
 #echo $(timestamp) " > ulimit -m 7340032 => Max. 7 GB"
 #ulimit -m 2097152
-ulimit -m 7340032
+ulimit -m 16340032
 
 echo $(timestamp) " > Executing"
 
@@ -24,7 +24,7 @@ DFLAGS3=-Dgate.site.config=$GATE_HOME/gate.xml
 
 echo "GateEmbedded flags: " $DFLAGS1 $DFLAGS2 $DFLAGS3
 
-java $DFLAGS1 $DFLAGS2 $DFLAGS3 -cp $CP GateEmbedded -g ./../appgate.gapp -e UTF-8
+java -Xmx16048m $DFLAGS1 $DFLAGS2 $DFLAGS3 -cp $CP GateEmbedded -g ./../appgate.gapp -e UTF-8
 
 echo $(timestamp) " > Execution terminated"
 
