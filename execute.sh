@@ -198,8 +198,8 @@ extractArticles(){
     echo $(timestamp) " > source ./env/bin/activate"
     source ./env/bin/activate
 
-    echo $(timestamp) " > src/python/extract_articles.py"
-    python3 extract_articles.py -v
+    echo $(timestamp) " > src/python/label_articles.py"
+    python3 src/python/label_articles.py -v
 
     echo $(timestamp) " > deactivate"
     deactivate

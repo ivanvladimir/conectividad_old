@@ -313,7 +313,6 @@ def sentencia(text, cntx):
 
 def fullcase(text, cntx):
     spans_ = []
-<<<<<<< HEAD
     spans__ = []
     spans_cfrs=[]
     for m_cfr in re.finditer("Cfr.",text):
@@ -348,29 +347,6 @@ def fullcase(text, cntx):
             spans__.append((span,gd))
 
     return [(tuple(s), m) for s, m in spans__], True
-=======
-    spans = []
-    for m in re.finditer("Caso|cfr|Cfr", text):
-        ini, fin = m.span()
-        if len(spans_) > 0:
-            spans_[-1][1] = ini - 1
-        spans_.append([ini, fin])
-    if len(spans_) > 0:
-        spans_[-1][1] = len(text)
-
-    for sini, sfin in spans_:
-        m = re_fullcase.search(text[sini:sfin])
-        if m:
-            ini, fin = m.span()
-            spans.append(([sini+ini, sini+fin], groups2dic(m)))
-            continue
-        m = re_fullcase2.search(text[sini:sfin])
-        if m:
-            ini, fin = m.span()
-            spans.append(([sini+ini, sini+fin], groups2dic(m)))
-            continue
-    return [(tuple(s), m) for s, m in spans], True
->>>>>>> b30d51876dc636146e3b13c6cde17264b8efffb9
 
 
 def case(text, cntx):
@@ -429,12 +405,8 @@ def capital_docs(text, cntx):
     return spans, []
 
 t_docs = [
-<<<<<<< HEAD
     ("fullcalse", fullcase),
 #    ("case", case),
-=======
-    ("fullcase", fullcase),
->>>>>>> b30d51876dc636146e3b13c6cde17264b8efffb9
     ("sentencia", sentencia),
     ("docuemnts", documents),
     ("resolucion", resolucion),
