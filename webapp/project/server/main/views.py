@@ -101,7 +101,7 @@ def doc():
         "”.", "].", "[.]", '_','-','/', "_________________________"]
     )
 
-    with open('contenciosos/'+xmlName) as filename:
+    with open('contenciosos/text/'+xmlName) as filename:
         lines=filename.readlines()
 
     cleaned = ""

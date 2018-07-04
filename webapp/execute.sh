@@ -12,7 +12,7 @@ TIME_INI=$(date -u -d "$(timestamp)" +"%s")
 # Get Parammeter
 while getopts frh opts; do
    case ${opts} in
-      f) FIRST_TIME=true;;
+      f) FIRST_TIME=false;;
       #r) REMOVE=true ;;
       #r) REMOVE=${OPTARG} ;;
       h) HELP=true ;;
