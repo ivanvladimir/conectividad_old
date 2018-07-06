@@ -70,13 +70,12 @@ def build_graph(data,id2title):
     linked = set()
     for d1,c in data[1].items():
         for d2,val in c.items():
-            if val > 2:
+            if val > 0:
                 ori_val=val
                 tpe = "normal"
+                print(d2)
                 if d2[1]=="case_cidh":
                     target=nodes_[id2title[d2[0]]]
-                    print(">>>>>>",d1)
-                    print("<<<<<<",id2title[d2[0]])
                     val=val*50
                     tpe = "cidh"
                 else:

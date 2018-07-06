@@ -55,6 +55,7 @@ def resolve_document(tag, cntx, definitions, db):
                 return str(doc.doc_id), "case_cidh"
 
 
+
     # Solve definitions
     if definitions == 0:
         for defi in cntx.definitions_.keys():
@@ -132,6 +133,6 @@ reductions = [
 ]
 
 exceptions = [
-    re.compile(r"Caso.*"),
+#    re.compile(r"Caso.*"),
     re.compile(r".*.eglamento de la .omisi.n")
 ]

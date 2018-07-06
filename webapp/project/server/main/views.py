@@ -187,6 +187,9 @@ def graph_json():
     graph_={'nodes':[],'links':[]}
     nodes_=set()
     graph_nodes=[]
+    min_nodes=5
+    if request.args.get('min'):
+        min_nodes=request.args.get('min')
     if request.args.get('include'):
         re_include=re.compile(request.args.get('include'))
     if request.args.get('include_doc'):
@@ -251,9 +254,10 @@ def graph_json():
     sources_=set()
     for edge in json_graph['links']:
         if edge['source'] in nodes_ and edge['target'] in nodes_:
-            graph_['links'].append(edge)
-            targets_.add(edge['target'])
-            sources_.add(edge['source'])
+            if edge['value']>= min_nodes:
+                graph_['links'].append(edge)
+                targets_.add(edge['target'])
+                sources_.add(edge['source'])
 
 
     for node in graph_nodes_:
@@ -265,6 +269,4 @@ def graph_json():
                 graph_['nodes'].append(node)
 
 
-    print(len(graph_['nodes']))
-    print(len(graph_['links']))
     return jsonify(graph_)

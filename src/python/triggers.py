@@ -405,7 +405,7 @@ def capital_docs(text, cntx):
     return spans, []
 
 t_docs = [
-    ("fullcalse", fullcase),
+    ("fullcase", fullcase),
 #    ("case", case),
     ("sentencia", sentencia),
     ("docuemnts", documents),
