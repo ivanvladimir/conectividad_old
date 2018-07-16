@@ -76,6 +76,8 @@ function load_data(data){
 			nodes_.push({'group':node.type,'id':node.id, 'lower_label': node.name.toLowerCase(), 'case_id':node.case_id, 'label':node.name,'clicked':false, 'year':node.year, 'color':country2color[node.country],'size':35});
 		}else if(node.type==2){
 			nodes_.push({'group':node.type,'id':node.id, 'lower_label': node.name.toLowerCase(), 'label':node.name,'clicked':false, 'year':node.year});
+		}else if(node.type==3){
+			nodes_.push({'group':node.type,'id':node.id, 'lower_label': node.name.toLowerCase(), 'label':node.name,'clicked':false, 'year':node.year});
 		}
 	}
 
@@ -115,7 +117,11 @@ function load_data(data){
 			maxVelocity: 146,
 			solver: 'forceAtlas2Based',
 			timestep: 0.35,
-			stabilization: {iterations: 20},
+			stabilization: {
+				enabled: true,
+				iterations: 1000,
+				updateInterval: 25
+			}
 		},
 		layout: {
 			improvedLayout: false,
@@ -127,6 +133,10 @@ function load_data(data){
 
 	};
 	network = new vis.Network(container, data_vis, options);
+
+	network.on("stabilizationIterationsDone", function () {
+		    network.setOptions( { physics: false } );
+	});
 
 	network.on("click", function (params) {
 		params.event = "[original event]";

@@ -1,0 +1,60 @@
+{% extends "_base.html" %}
+
+{% block css %}
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+{% endblock %}
+
+
+{% block content %}
+<div class="content">
+
+<h3>Casos por país</h3>
+<p>
+	Total de casos: {{total_cases}}
+
+	<canvas id="histogram" width="400" height="400"></canvas>
+
+	<script>
+var ctx = document.getElementById("histogram");
+var myChart = new Chart(ctx, {
+    type: 'horizontalBar',
+    data: {
+        labels: [
+		{% for x,y in data.most_common() %}
+			"{{name_country[x]}}",
+		{% endfor %}
+		],
+        datasets: [{
+            data: [
+			{% for x,y in data.most_common() %}
+			"{{y}}",
+			{% endfor %}
+			],
+			backgroundColor:[
+			{% for x,y in data.most_common() %}
+			"{{color_country[x]}}",
+			{% endfor %}
+			],
+            borderWidth: 1
+        }]
+    },
+    options: {
+		legend: {
+			            display: false
+		},
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+</script>
+
+
+</p>
+</div>
+
+{% endblock %}

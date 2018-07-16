@@ -15,10 +15,12 @@
     <div class="container">
       <h1 class="title">Grafos por país</h1>
       <form action="graph/"  method="POST">
-        <div class="field is-grouped">
+
+        <div class="field">
           <div class="control">
             <label class="label">Países</label>
           </div>
+
 
           <div class="control">
             <div class="select">
@@ -40,7 +42,7 @@
                 <option value="jamaica">Jamaica</option>
                 <option value="méxico">México</option>
                 <option value="nicaragua">Nicaragua</option>
-                <option value="panama">Panama</option>
+                <option value="panamá">Panama</option>
                 <option value="paraguay">Paraguay</option>
                 <option value="perú">Perú</option>
                 <option value="república dominicana">República Dominicana</option>
@@ -52,15 +54,28 @@
             </div>
           </div>
 
-          <div class="control">
-            <label class="checkbox">
-              <input type="checkbox" name="exclude_doc" value="(convención americana sobre derechos humanos|reglamento de la corte)">Excluir citas comunes</input>
-            </label>
-          </div>
 
-          <div class="control">
+		<div class="field">
+        <label class="label">Mínimo de sentencias</label>
+        <div class="control">
+          {{ render_field(form.min,None,"Número",value=5)}}
+        </div>
+      </div>
+
+
+
+	  <div class="field">
+      		<div class="control">
+            <label class="checkbox">
+              <input type="checkbox" name="exclude_doc" value="{{common_documents}}">Excluir citas comunes</input>
+              <input type="checkbox" name="arts" value="True">Expandir a artículo</input>
+            </label>
+          	</div>
+    	  <div class="control">
             <button class="button is-primary" type="submit">Dibujar</a>
           </div>
+      </div>
+
 
         </div>
       </form>
@@ -70,28 +85,43 @@
 <section class="section">
   <div class="container">
     <h1 class="title">Grafos completo</h1>
-    <div class="field is-grouped">
 
-      <div class="control">
+
+
         <form action="graph/"  method="POST">
-          <div class="field is-grouped">
-            <div class="control">
-              <input type="hidden" id="exclude_doc" name="exclude_doc" value="(convención americana sobre derechos humanos|reglamento de la corte)">
+          <div class="field">
+  				<div class="control">
+				<label class="label">Mínimo de sentencias</label>
+				<div class="control">
+				  {{ render_field(form.min,None,"Número",value=5)}}
+				</div>
+				</div>
+
+
+			  <div class="control">
+              <input type="hidden" id="exclude_doc" name="exclude_doc" value="{{common_documents}}">
               <button class="button is-primary" type="submit">Grafo sin links comunes</a>
             </div>
           </div>
         </form>
-      </div>
 
-      <div class="control">
-        <form action="graph_full"  method="GET">
-          <div class="field is-grouped">
+
+
+        <form action="graph/"  method="POST">
+          <div class="field">
+			  <div class="control">
+				<label class="label">Mínimo de sentencias</label>
+				<div class="control">
+				  {{ render_field(form.min,None,"Número",value=5)}}
+				</div>
+			</div>
+
+
             <div class="control">
               <button class="button is-success" type="submit">Grafo completo</a>
             </div>
           </div>
         </form>
-      </div>
 
     </div>
   </div>
@@ -103,6 +133,13 @@
 
     <form action="graph/"  method="POST">
       {{ form.csrf_token }}
+
+ 	  <div class="field">
+        <label class="label">Mínimo de sentencias</label>
+        <div class="control">
+          {{ render_field(form.min,None,"Número",value=5)}}
+        </div>
+      </div>
 
       <div class="field">
         <label class="label">Incluir sentencias</label>

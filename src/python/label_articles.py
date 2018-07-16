@@ -78,6 +78,9 @@ class Context:
 
     def escape_phrase(self, phrase):
         phrase = re_espace_or_enter.sub("[ \n]", phrase)
+        phrase = phrase.replace("*","\*")
+        phrase = phrase.replace("(","")
+        phrase = phrase.replace(")","")
         return phrase
 
     def add_definition(self, doc, phrase, t):
@@ -88,6 +91,16 @@ class Context:
             self.definitions[doc] = [escaped_phrase]
         self.definitions_[escaped_phrase] = doc
         self.t_definitions_[escaped_phrase] = t
+
+    def check_redefinition(self,text,resolution):
+        flag=False
+        for re_def in self.definitions_.keys():
+            if re.search(re_def,text):
+                if not resolution == self.definitions_[re_def]:
+                    flag=True
+                break
+        return flag
+
 
     def __str__(self):
         res = []
@@ -303,12 +316,13 @@ def compatible_tags(candidates, gs_labeling):
     return candidates_
 
 
-def process_articles(par, cntx, counter):
+def process_articles(par, cntx, counter, institutions):
     arts = test_articles(par, cntx)
     docs = test_docs(par, cntx)
     docs = compatible_tags(docs, [arts])
     insts = test_institutions(par, cntx)
     insts = compatible_tags(insts, [arts, docs])
+    institutions.update([ inst['inst'] for x,y,inst in insts])
     tags = []
     for art, definitions, vals in arts:
         counter.update(["art", "doc"])
@@ -353,6 +367,8 @@ def label_xml(root,db):
     cntx = Context()
     counter = Counter([])
     root_ = ET.Element('root')
+    institutions=set()
+    last_doc=None
     for par in root.findall('.//paragraph'):
         counter.update(["par"])
         verbose(fg.YELLOW, "")
@@ -363,7 +379,7 @@ def label_xml(root,db):
 
         # Eliminates article tags
         get_context(par, cntx)
-        par_ = process_articles(par, cntx, counter)
+        par_ = process_articles(par, cntx, counter,institutions)
         for k, i in cntx.info().items():
             par_.attrib[k] = i
 
@@ -372,15 +388,32 @@ def label_xml(root,db):
             definitions = par_.findall('.//Definition[@document="{0}"]'
                                        .format(doc.attrib['id']))
             resolution, t = resolve_document(doc, cntx, len(definitions),db)
+            if resolution is "PENDING":
+                if last_doc:
+                    resolution = last_doc
+                else:
+                    resolution = "fail"
+            last_doc = resolution
             doc.attrib['name'] = resolution
             doc.attrib['type'] = t
-            verbose(fg.GREEN, "Document: ",
-                    bg.WHITE, resolution, bg.RESET, "/", doc.text)
+            #for x,y in doc.attrib.items():
+            #    print(">>>>",x,y)
+
+            if resolution in institutions:
+                doc.tag="InstitutionMention"
+                verbose(fg.MAGENTA, "Institution: ",
+                        bg.WHITE, resolution, bg.RESET, "/", doc.text)
+            else:
+                verbose(fg.GREEN, "Document: ",
+                        bg.WHITE, resolution, bg.RESET, "/", doc.text)
             for defi in definitions:
+                if cntx.check_redefinition(doc.text,resolution):
+                    continue
                 cntx.add_definition(resolution, defi.text, "document")
                 verbose(fg.YELLOW, "Definition: ", bg.WHITE,
                         "".join([x for x in defi.itertext()]),
                         bg.RESET, "->", resolution)
+
             for art in par_.findall('.//ArticleMention[@document="{0}"]'
                                     .format(doc.attrib['id'])):
                 art.attrib["articles"] = split_arts(art.text)
@@ -389,7 +422,6 @@ def label_xml(root,db):
                 verbose(fg.BLUE, "> Source: ", bg.WHITE,
                         bg.RESET, doc.attrib['name'])
             pass
-
         # Shows some labelling in the document
         for inst in par_.findall('.//InstitutionMention'):
             definitions = par_.findall('.//Definition[@institution="{0}"]'

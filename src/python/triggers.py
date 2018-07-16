@@ -25,12 +25,11 @@ article_mention = r'(?:art.culos?[\n ])'\
                   r'(?P<articles>[\d\.,y ixvabc]+-?)[\n ]'\
                   r'(?:fracción [^,]*, )?(inciso [^,]*, )?'
 re_article_mention = re.compile(article_mention)
-source_mention = r'(?P<source>(?:de[\n ]esa|'\
-                 r'de[\n ]esta[\n ]+|'\
-                 r'de[\n ]la[\n ]+|'\
-                 r'del[ \n]+|'\
-                 r'de[\n ]su[\n ]+|'\
-                 r'en[\n ]la[\n ]+)'\
+source_mention = r'del?[\n ]+(?P<source>(?:esa|'\
+                 r'esta[\n ]+|'\
+                 r'la[\n ]+|'\
+                 r'su[\n ]+|'\
+                 r'la[\n ]+)?'\
                  r'(?:\w+[ \n]){0,8}\w+)'
 
 
@@ -97,8 +96,8 @@ re_extrapunctuation=re.compile(r"[, .]+$")
 # resolución 30/83
 re_resolucion = re.compile(r"(?P<doc>resoluci.n[\ ]+\d+/\d+)")
 # Acta
-capitals_words = r'([A-Z]\w+[\n ]'\
-                 r'|[a-zñ]{0,6}[\n ]|Vs\.[\n ])+[A-Z]\w+[a-z](?:[ \n]\d+)?'
+capitals_words = r'(?P<source>[A-Z]\w+[\n ]([A-Z]\w+[\n ]'\
+                 r'|[a-zñ]{0,6}[\n ]|Vs\.[\n ])+[A-Z]\w+[a-z](?:[ \n]\d+)?)'
 
 re_capitals= re.compile(capitals_words)
 capitals_types=[
@@ -393,16 +392,22 @@ def mention_definition(text, cntx):
 
 def capital_docs(text, cntx):
     spans = []
-
     for doc in re_capitals.finditer(text):
         span = doc.span(0)
-        text = doc.group(0)
+        text_ = doc.group(0)
+        if re_institutions.match(text_):
+            continue
         for type_, re_ in capitals_types:
-            m = re_.match(text)
+            m = re_.match(text_)
             if m:
-                spans.append((span, groups2dic(m)))
+                spans.append((span, groups2dic(doc)))
                 break
-    return spans, []
+
+    if not re_avoid_defs_mentions.search(text):
+        definitions_ = True
+    else:
+        definitions_ = False
+    return spans, definitions_
 
 t_docs = [
     ("fullcase", fullcase),

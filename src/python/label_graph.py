@@ -66,6 +66,18 @@ def build_graph(data,id2title):
 
         nodes_[name]=idd
 
+    len_nodes=len(nodes)
+    for idd,(name,node) in enumerate(data[2].items()):
+        if 'type' in node and node['type']=="institution":
+            continue
+        bits=name.split(":",2)
+        nodes.append({"name":name,
+                      "doc":bits[0],
+                      "art":bits[1],
+                      "id":idd+len_nodes,
+                      "type":3})
+        nodes_[name]=idd+len_nodes
+
     links=[]
     linked = set()
     for d1,c in data[1].items():
@@ -73,13 +85,27 @@ def build_graph(data,id2title):
             if val > 0:
                 ori_val=val
                 tpe = "normal"
-                print(d2)
                 if d2[1]=="case_cidh":
                     target=nodes_[id2title[d2[0]]]
                     val=val*50
                     tpe = "cidh"
                 else:
                     target=nodes_[d2[0]]
+                links.append({"source":nodes_[d1],
+                              "target":target,
+                              "value":val,
+                              "ori_val":ori_val,
+                              "type": tpe
+                             })
+                linked.add(nodes_[d1])
+                linked.add(target)
+
+    for d1,c in data[3].items():
+        for d2,val in c.items():
+            if val > 0:
+                ori_val=val
+                tpe = "artcle"
+                target=nodes_["{0}:{1}".format(d2[0],d2[2])]
                 links.append({"source":nodes_[d1],
                               "target":target,
                               "value":val,
@@ -96,11 +122,18 @@ def build_graph(data,id2title):
     return {"links":links,
             "nodes":[node for node in nodes if node['id'] in linked]}
 
-def get_info_node(doc):
-    return (
-        doc.attrib['name'],
-        doc.attrib['type'],
-    )
+def get_info_node(doc,artn=None):
+    if  artn:
+        return (
+            doc.attrib['name'],
+            doc.attrib['type'],
+            artn
+        )
+    else:
+        return (
+            doc.attrib['name'],
+            doc.attrib['type']
+        )
 
 
 def extract_graph(root,case,data):
@@ -116,6 +149,19 @@ def extract_graph(root,case,data):
                 data[1][case['title']].update([get_info_node(doc)])
             except KeyError:
                 data[1][case['title']]=Counter([get_info_node(doc)])
+            for art in par.findall('.//ArticleMention[@document="{0}"]'
+                                    .format(doc.attrib['id'])):
+                for artn in art.attrib['articles'].split():
+                    if not doc.attrib['type']=="case_cidh":
+                        try:
+                            data[2]["{0}:{1}".format(doc.attrib["name"],artn)].update([])
+                        except KeyError:
+                            data[2]["{0}:{1}".format(doc.attrib["name"],artn)]={}
+                    try:
+                        data[3][case['title']].update([get_info_node(doc,artn=artn)])
+                    except KeyError:
+                        data[3][case['title']]=Counter([get_info_node(doc,artn=artn)])
+
     return data
 
 # MAIN
@@ -176,7 +222,7 @@ if __name__ == "__main__":
     Filter = Query()
 
     # load graph into data
-    data=(OrderedDict(),OrderedDict())
+    data=(OrderedDict(),OrderedDict(),OrderedDict(),OrderedDict())
 
     # Polulate data with names
     filter_new_cases=set()

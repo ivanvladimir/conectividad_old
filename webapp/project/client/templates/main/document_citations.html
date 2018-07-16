@@ -1,0 +1,29 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<div class="content">
+
+{% if ntop %}
+<h3>{{ntop }} documentos más citados</h3>
+{% else %}
+<h3>Documentos citados</h3>
+{% endif %}
+<p>
+<table class="table">
+  <thead>
+      <tr>
+	        <th>Documento</th>
+	        <th>Citas</th>
+	  </tr>
+  </thead>
+  <tbody>
+ 	{% for x,y in data.most_common(ntop) %}
+		<tr><td>{{x}}</td><td>{{y}}</></tr>
+	{% endfor %}
+  </tbody>
+</table>
+
+</p>
+</div>
+
+{% endblock %}

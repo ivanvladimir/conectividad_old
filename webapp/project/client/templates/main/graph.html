@@ -46,6 +46,7 @@
     </div>
   </div>
 {% if params | length > 0 %}
+
 <div class="level-item has-text-centered">
 <div>
       <p class="heading">Gráfico</p>
@@ -71,6 +72,20 @@
     </tr>
   	</thead>
   	<tbody>
+	{% if params['exp_arts'] %}
+    <tr>
+      <td>Expandir artículos</td>
+      <td>True</td>
+    </tr>
+	{% endif %}
+	
+	{% if params['min'] %}
+    <tr>
+      <td>Mínimo de citas por nodo</td>
+      <td>{{params['min']}}</td>
+    </tr>
+	{% endif %}
+	
 	{% if params['include'] %}
     <tr>
       <td>Sentencia incluidas</td>

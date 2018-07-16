@@ -25,6 +25,10 @@ def split_arts(text):
 def resolve_document(tag, cntx, definitions, db):
     text = tag.text
     attrib = tag.attrib
+    #for name, value in attrib.items():
+    #        print('>>>>>{0}="{1}"'.format(name, value))
+
+
     text = re_enters.sub(" ", text)
     text = re_spaces.sub(" ", text)
     text_ = re_espace_or_enter.sub("[ \n]", text)
@@ -34,7 +38,6 @@ def resolve_document(tag, cntx, definitions, db):
         if exception.search(text):
             flag = True
             break
-
 
     if flag:
         return text, "document"
@@ -57,8 +60,9 @@ def resolve_document(tag, cntx, definitions, db):
 
 
     # Solve definitions
-    if definitions == 0:
+    if definitions == 0 and not text_.startswith("Reglamento"):
         for defi in cntx.definitions_.keys():
+#            if text_.find(defi) >= 0 or defi.find(text_) >=0:
             if text_.find(defi) >= 0:
                 return cntx.definitions_[defi], cntx.t_definitions_[defi]
     for lower, red, res, t in reductions:
@@ -75,6 +79,10 @@ def resolve_document(tag, cntx, definitions, db):
 
 
 reductions = [
+    (False, re.compile(r'la misma'),
+        'PENDING', "pending"),
+    (False, re.compile(r'el mismo'),
+        'PENDING', "pending"),
     (False, re.compile(r'mism[ao]'),
         'PENDING', "pending"),
     (False, re.compile(r'MISM[AO]'),
@@ -93,6 +101,8 @@ reductions = [
         'PENDING', "pending"),
     (False, re.compile(r'Convención [I|i]\w*'),
         'Convención Interamericana de Derechos Humanos', "document"),
+    (False, re.compile(r'^la Convención$'),
+        'Convención Americana sobre Derechos Humanos', "document"),
     (False, re.compile(r'Convención [A|a]\w*'),
         'Convención Americana sobre Derechos Humanos', "document"),
     (False, re.compile(r'RAAN'),
@@ -108,7 +118,7 @@ reductions = [
         'Convención Americana de Derechos Humanos', "document"),
     (False, re.compile(r'Estatuto.*(corte)*'),
         'Estatuto de la Corte', "document"),
-    (False, re.compile(r'^Reglamento$'),
+    (False, re.compile(r'^[Rr]eglamento'),
         'Reglamento de la Corte', "document"),
     (False, re.compile(r'CP'),
         'Código Penal', 'document'),
@@ -121,6 +131,8 @@ reductions = [
         'Comisión de Justicia Militar', "document"),
     (False, re.compile(r'OEA'),
         'Organización de Estados Americanos', "institutions"),
+    (False, re.compile(r'IADEF'),
+        'Intituto Argentino de la Empresa Familiar', "institutions"),
     (False,
      re.compile(
        r'^Sentencia de Excepción Preliminar, Fondo, Reparaciones y Costas.*'),
@@ -134,5 +146,5 @@ reductions = [
 
 exceptions = [
 #    re.compile(r"Caso.*"),
-    re.compile(r".*.eglamento de la .omisi.n")
+    re.compile(r".*.eglamento de la .omisi.n"),
 ]
