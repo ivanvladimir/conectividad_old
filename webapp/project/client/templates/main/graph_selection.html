@@ -53,10 +53,11 @@
               </select>
             </div>
           </div>
+        </div>
 
 
 		<div class="field">
-        <label class="label">Mínimo de sentencias</label>
+        <label class="label">Mínimo de citas</label>
         <div class="control">
           {{ render_field(form.min,None,"Número",value=5)}}
         </div>
@@ -68,7 +69,8 @@
       		<div class="control">
             <label class="checkbox">
               <input type="checkbox" name="exclude_doc" value="{{common_documents}}">Excluir citas comunes</input>
-              <input type="checkbox" name="arts" value="True">Expandir a artículo</input>
+              <input type="checkbox" name="arts" value="True">Expandir artículos</input>
+              <input type="checkbox" name="court_cases" value="True">Sólo casos de la corte</input>
             </label>
           	</div>
     	  <div class="control">
@@ -77,7 +79,6 @@
       </div>
 
 
-        </div>
       </form>
     </div>
   </section>
@@ -91,7 +92,7 @@
         <form action="graph/"  method="POST">
           <div class="field">
   				<div class="control">
-				<label class="label">Mínimo de sentencias</label>
+				<label class="label">Mínimo de citas</label>
 				<div class="control">
 				  {{ render_field(form.min,None,"Número",value=5)}}
 				</div>
@@ -100,6 +101,12 @@
 
 			  <div class="control">
               <input type="hidden" id="exclude_doc" name="exclude_doc" value="{{common_documents}}">
+            <label class="checkbox">
+              <input type="checkbox" name="arts" value="True">Expandir a artículos</input>
+              <input type="checkbox" name="court_cases" value="True">Sólo casos de la corte</input>
+			</label>
+            </div>
+			  <div class="control">
               <button class="button is-primary" type="submit">Grafo sin links comunes</a>
             </div>
           </div>
@@ -110,7 +117,11 @@
         <form action="graph/"  method="POST">
           <div class="field">
 			  <div class="control">
-				<label class="label">Mínimo de sentencias</label>
+				<label class="label">Mínimo de citas</label>
+   				<label class="checkbox">
+              		<input type="checkbox" name="arts" value="True">Expandir a artículos</input>
+              		<input type="checkbox" name="court_cases" value="True">Sólo casos de la corte</input>
+				</label>
 				<div class="control">
 				  {{ render_field(form.min,None,"Número",value=5)}}
 				</div>
@@ -124,7 +135,6 @@
         </form>
 
     </div>
-  </div>
 </section>
 
 <section class="section">
@@ -134,8 +144,13 @@
     <form action="graph/"  method="POST">
       {{ form.csrf_token }}
 
+	  <label class="checkbox">
+              		<input type="checkbox" name="arts" value="True">Expandir a artículos</input>
+              		<input type="checkbox" name="court_cases" value="True">Sólo casos de la corte</input>
+	  </label>
+
  	  <div class="field">
-        <label class="label">Mínimo de sentencias</label>
+        <label class="label">Mínimo de citas</label>
         <div class="control">
           {{ render_field(form.min,None,"Número",value=5)}}
         </div>

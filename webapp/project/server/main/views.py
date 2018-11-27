@@ -19,7 +19,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import wordpunct_tokenize
 from nltk.probability import FreqDist
-import matplotlib.pyplot as plt
+import networkx as nx
 
 #######################
 #### loading JSONDB ###
@@ -61,6 +61,7 @@ class GraphForm(Form):
     exclude = StringField('exclude')
     include_doc = StringField('include_doc')
     exclude_doc = StringField('exclude_doc')
+    court_cases = BooleanField()
     min = IntegerField()
     arts = BooleanField()
 
@@ -231,6 +232,8 @@ def graph():
             query["min"]=int(form.min.data)
         if form.arts.data:
             query["exp_arts"]="true"
+        if form.court_cases.data:
+            query["court_cases"]="true"
         if len(query)>0:
             return render_template("main/graph.html",params=query,year=datetime.now().year)
         else:
@@ -258,6 +261,32 @@ def cases_country():
 			total_cases=sum(country_cases.values()))
 
 
+@main_blueprint.route("/numbers/articles_citation/<int:ntop>")
+@main_blueprint.route("/numbers/articles_citation")
+def articles_citation(ntop=200):
+    country_cases= Counter()
+
+    articles=[]
+    for node in json_graph['nodes']:
+        if node['type']==3:
+            articles.append((node['id'],(node['doc'],node['art'])))
+    articles=dict(articles)
+
+    articles_citation=Counter()
+    for link in json_graph['links']:
+        if  link['target'] in articles:
+            try:
+                articles_citation[articles[link["target"]]]+=int(link['ori_val'])
+            except KeyError:
+                articles_citation[articles[link["target"]]]=int(link['ori_val'])
+
+
+    return render_template("main/articles_citation.html",
+			data=articles_citation,
+			total_articles=sum(articles_citation.values()),ntop=ntop)
+
+
+
 
 @main_blueprint.route("/numbers/documents_citation/<int:ntop>")
 @main_blueprint.route("/numbers/documents_citation")
@@ -266,16 +295,17 @@ def documents_citation(ntop=200):
 
     documents=[]
     for node in json_graph['nodes']:
-        documents.append((node['id'],node['name']))
+        if node['type']==2:
+            documents.append((node['id'],node['name']))
     documents=dict(documents)
 
     documents_citation=Counter()
     for link in json_graph['links']:
-        try:
-            documents_citation[documents[link["target"]]]+=int(link['ori_val'])
-        except KeyError:
-            documents_citation[documents[link["target"]]]=int(link['ori_val'])
-
+        if link['target'] in documents:
+            try:
+                documents_citation[documents[link["target"]]]+=int(link['ori_val'])
+            except KeyError:
+                documents_citation[documents[link["target"]]]=int(link['ori_val'])
 
     return render_template("main/documents_citation.html",
 			data=documents_citation,
@@ -293,7 +323,14 @@ def case_json(case_id):
    case = contensiosos.get(doc_id=case_id)
    return jsonify(case)
 
-
+def get_max(dic):
+    m=0
+    nm=None
+    for k,v in dic.items():
+        if v>m:
+            m=v
+            nm=k
+    return m,nm
 
 @main_blueprint.route("/graph.json")
 def graph_json():
@@ -304,11 +341,15 @@ def graph_json():
     graph_nodes=[]
     min_nodes=5
     exp_arts=False
+    court_cases=False
     if request.args.get('min'):
         min_nodes=int(request.args.get('min'))
     if request.args.get('exp_arts'):
         if request.args.get('exp_arts')=="true":
             exp_arts=True
+    if request.args.get('court_cases'):
+        if request.args.get('court_cases')=="true":
+            court_cases=True
     if request.args.get('include'):
         re_include=re.compile(request.args.get('include'))
     if request.args.get('include_doc'):
@@ -325,7 +366,7 @@ def graph_json():
                 if not node['id'] in nodes_:
                     graph_nodes.append(node)
                     nodes_.add(node['id'])
-        elif not exp_arts and node['type']==2:
+        elif not court_cases and not exp_arts and node['type']==2:
             if request.args.get('include_doc'):
                 if re_include_doc.search(node['name'].lower()):
                     if not node['id'] in nodes_:
@@ -335,7 +376,7 @@ def graph_json():
                 if not node['id'] in nodes_:
                     graph_nodes.append(node)
                     nodes_.add(node['id'])
-        elif exp_arts and node['type']==3:
+        elif not court_cases and exp_arts and node['type']==3:
             if request.args.get('include_doc'):
                 if re_include_doc.search(node['name'].lower()):
                     if not node['id'] in nodes_:
@@ -366,7 +407,7 @@ def graph_json():
                 if not node['id'] in nodes_:
                     graph_nodes_.append(node)
                     nodes_.add(node['id'])
-        elif not exp_arts and node['type']==2:
+        elif not court_cases and not exp_arts and node['type']==2:
             if request.args.get('exclude_doc'):
                 if not re_exclude_doc.search(node['name'].lower()):
                     if not node['id'] in nodes_:
@@ -376,7 +417,7 @@ def graph_json():
                 if not node['id'] in nodes_:
                     graph_nodes_.append(node)
                     nodes_.add(node['id'])
-        elif exp_arts and node['type']==3:
+        elif not court_cases and exp_arts and node['type']==3:
             if request.args.get('exclude_doc'):
                 if not re_exclude_doc.search(node['name'].lower()):
                     if not node['id'] in nodes_:
@@ -398,14 +439,31 @@ def graph_json():
                 targets_.add(edge['target'])
                 sources_.add(edge['source'])
 
-
     for node in graph_nodes_:
         if node['type']==1:
-            if node['id'] in sources_:
+            if node['id'] in sources_ or node['id'] in targets_:
                 graph_['nodes'].append(node)
         if node['type']>1:
             if node['id'] in targets_:
                 graph_['nodes'].append(node)
+
+
+    G = nx.DiGraph()
+    G.add_nodes_from([ n['id'] for n in graph_['nodes']])
+    G.add_weighted_edges_from([ (e['source'],e['target'],e['ori_val']) for e in graph_['links']])
+
+    graph_['stats']={}
+    graph_['stats']['Density']=nx.density(G)
+    dc=nx.degree_centrality(G)
+    m,nm=get_max(dc)
+    if m>0.0:
+        graph_['stats']['avg Degree Centrality']=sum([v for v in dc.values()])/len(dc)
+        graph_['stats']['max Degree Centrality']=m
+        graph_['stats']['Node Degree Centrality']=nm
+
+    for i,node in enumerate(graph_['nodes']):
+        graph_['nodes'][i]['dc']=dc[node['id']]
+
 
 
     return jsonify(graph_)

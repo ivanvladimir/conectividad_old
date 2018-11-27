@@ -23,12 +23,6 @@
 <nav class="level">
   <div class="level-item has-text-centered">
     <div>
-      <p class="heading">Nodos</p>
-      <p class="title" id="len_nodes"></p>
-    </div>
-  </div>
-  <div class="level-item has-text-centered">
-    <div>
       <p class="heading">Sentencias</p>
       <p class="title" id="len_sntcs"></p>
     </div>
@@ -45,6 +39,45 @@
       <p class="title" id="len_arcs"></p>
     </div>
   </div>
+
+
+<div class="level-item has-text-centered">
+<div>
+      <p class="heading">Red</p>
+      <div class="title" id="len_arcs">
+<div class="dropdown is-hoverable">
+  <div class="dropdown-trigger">
+    <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4">
+      <span>Estadísticas</span>
+      <span class="icon is-small">
+        <i class="fas fa-angle-down" aria-hidden="true"></i>
+      </span>
+    </button>
+  </div>
+  <div class="dropdown-menu" id="dropdown-menu4" role="menu">
+    <div class="dropdown-content">
+      <div class="dropdown-item">
+	<table class="table">
+  	<thead>
+    <tr>
+      <th>Desc.</th>
+      <th>Val</th>
+    </tr>
+  	</thead>
+  	<tbody  id="stats">
+
+	</tbody>
+	</table>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+
+
+
 {% if params | length > 0 %}
 
 <div class="level-item has-text-centered">
@@ -125,10 +158,10 @@
 {% endif %}
 <div class="level-item has-text-centered">
   <div>
-    <p class="heading">Información</p>
+    <p class="heading">Ayuda</p>
 
     <a class="button" onclick="showInfoPageGrafo();">
-      <span>Grafo</span>
+      <span>Descripción</span>
       <span class="icon is-small">
         <i class="fas fa-info"></i>
       </span>

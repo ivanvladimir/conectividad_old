@@ -16,11 +16,12 @@
       <tr>
 	        <th>Documento</th>
 	        <th>Citas</th>
+	        <th>Percentage</th>
 	  </tr>
   </thead>
   <tbody>
  	{% for x,y in data.most_common(ntop) %}
-		<tr><td>{{x}}</td><td>{{y}}</></tr>
+		<tr><td>{{x}}</td><td>{{y}}</td><td>{{"{0:.2%}".format(y/total_cases)}}</td></tr>
 	{% endfor %}
   </tbody>
 </table>

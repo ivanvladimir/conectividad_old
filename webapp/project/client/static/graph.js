@@ -73,11 +73,11 @@ function load_data(data){
 	for(inode in data.nodes){
 		node=data.nodes[inode];
 		if(node.type==1){
-			nodes_.push({'group':node.type,'id':node.id, 'lower_label': node.name.toLowerCase(), 'case_id':node.case_id, 'label':node.name,'clicked':false, 'year':node.year, 'color':country2color[node.country],'size':35});
+			nodes_.push({'group':node.type,'id':node.id, 'lower_label': node.name.toLowerCase(), 'case_id':node.case_id, 'label':node.name,'clicked':false, 'year':node.year, 'color':country2color[node.country],'size':35, 'dc':node.dc});
 		}else if(node.type==2){
-			nodes_.push({'group':node.type,'id':node.id, 'lower_label': node.name.toLowerCase(), 'label':node.name,'clicked':false, 'year':node.year});
+			nodes_.push({'group':node.type,'id':node.id, 'lower_label': node.name.toLowerCase(), 'label':node.name,'clicked':false, 'year':node.year,'dc':node.dc});
 		}else if(node.type==3){
-			nodes_.push({'group':node.type,'id':node.id, 'lower_label': node.name.toLowerCase(), 'label':node.name,'clicked':false, 'year':node.year});
+			nodes_.push({'group':node.type,'id':node.id, 'lower_label': node.name.toLowerCase(), 'label':node.name,'clicked':false, 'year':node.year,'dc':node.dc});
 		}
 	}
 
@@ -152,11 +152,14 @@ function load_data(data){
 			};
 		});
 
-	document.getElementById('len_nodes').innerHTML = nodes.length;
 	document.getElementById('len_sntcs').innerHTML = nodes_.filter((node) =>node.group==1).length;
 	document.getElementById('len_citations').innerHTML = nodes_.filter((node) => node.group==2).length;
 	document.getElementById('len_arcs').innerHTML = edges.length;
-
+	table_stats = new String();
+	for(var k in data.stats){
+		table_stats+="<tr><td>"+k+"</td><td>"+data.stats[k]+"</td></tr>";
+	}
+	document.getElementById('stats').innerHTML = table_stats;
 }
 
 function dynamicSort(property) {
@@ -177,7 +180,7 @@ function infoNode(params,info,node){
 	node=nodes.get(params.nodes[0])
 
 	//draw column_on
-	if(node.group==2){
+	if(node.group==2 && node.group==3){
 		tipo = "Documento cita";
 		name = node.label;
 		var column_one=`<div class="column">
@@ -185,6 +188,7 @@ function infoNode(params,info,node){
 			<tbody>
 			<tr><td><strong>Tipo</strong></td><td>${tipo}</td></tr>
 			<tr><td><strong>Total arcos</strong></td><td>${params.edges.length}</td></tr>
+			<tr><td><strong>Degree density</strong></td><td>${node.dc}</td></tr>
 			</tbody>
 		</table>
 		</div>`;
@@ -199,6 +203,7 @@ function infoNode(params,info,node){
 			<tr><td><strong>Número</strong></td><td>${info.meta_name.number}</td></tr>
 			<tr><td><strong>Fecha</strong></td><td>${info.meta_name.date_sentence}</td></tr>
 			<tr><td><strong>Total arcos</strong></td><td>${params.edges.length}</td></tr>
+			<tr><td><strong>Degree density</strong></td><td>${node.dc}</td></tr>
 			<tr><td><strong>Fuentes</strong></td><td>
         		<a href="${info.source_pdf}" target="_blank" >
             	<span class="icon">
