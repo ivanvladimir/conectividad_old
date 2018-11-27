@@ -20,6 +20,8 @@ from nltk.corpus import stopwords
 from nltk.tokenize import wordpunct_tokenize
 from nltk.probability import FreqDist
 import networkx as nx
+from py2neo import Graph
+import operator
 
 #######################
 #### loading JSONDB ###
@@ -30,12 +32,21 @@ db = TinyDB('DB.json')
 contensiosos = db.table('contensiosos')
 CaseQ = Query()
 
+
 #######################
 #### loading JSONGRPAH ###
 #######################
 import json
 with open('graph.json') as data_file:
     json_graph = json.load(data_file)
+
+
+#######################
+#### loading GRPAH ###
+#######################
+from project.server.main import config
+graph__ = Graph("bolt://127.0.0.1:7687", auth=(config.NEO4J_USER, config.NEO4J_PASSWORD))
+
 
 ################
 #### config ####
@@ -45,6 +56,13 @@ main_blueprint = Blueprint('main', __name__,
     url_prefix="/conectividad",
     static_folder='../../client/static'
     )
+
+
+api_blueprint = Blueprint('api', __name__,
+    url_prefix="/conectividad/api",
+    static_folder='../../client/static'
+    )
+
 
 
 import re
@@ -286,6 +304,143 @@ def articles_citation(ntop=200):
 			total_articles=sum(articles_citation.values()),ntop=ntop)
 
 
+@main_blueprint.route("/numbers/density_country")
+@main_blueprint.route("/numbers/density_country/<int:min_value>")
+def numbers_density_country(min_value=5):
+    countries={}
+    for country in name_country.keys():
+        G = nx.DiGraph()
+        nodes_=set()
+        edges_=[]
+        targets_=set()
+        for node in json_graph['nodes']:
+            if node['type']==1 and node['country']==country:
+                nodes_.add(node['id'])
+            if node['type']==2:
+                targets_.add(node['id'])
+        for link in json_graph['links']:
+            if link['source'] in nodes_ and link['target'] in targets_ and link['ori_val']>=min_value:
+                nodes_.add(node['id'])
+                edges_.append((link['source'],link['target'],link['ori_val']))
+
+        G.add_nodes_from(nodes_ )
+        G.add_weighted_edges_from([ e for e in edges_ ])
+        d=nx.density(G)
+        countries[country]=d
+
+    return render_template("main/country.html",
+                        title="Densidad grafo por país",
+			data=countries,
+                        country_names=[x for x,y in sorted(countries.items(), key=operator.itemgetter(1),reverse=True)],
+			color_country=color_country,
+			name_country=name_country)
+
+
+@main_blueprint.route("/numbers/adc_country")
+@main_blueprint.route("/numbers/adc_country/<int:min_value>")
+def numbers_adc_country(min_value=5):
+    countries={}
+    for country in name_country.keys():
+        G = nx.DiGraph()
+        nodes_=set()
+        edges_=[]
+        targets_=set()
+        for node in json_graph['nodes']:
+            if node['type']==1 and node['country']==country:
+                nodes_.add(node['id'])
+            if node['type']==2:
+                targets_.add(node['id'])
+        for link in json_graph['links']:
+            if link['source'] in nodes_ and link['target'] in targets_ and link['ori_val']>=min_value:
+                nodes_.add(node['id'])
+                edges_.append((link['source'],link['target'],link['ori_val']))
+
+        G.add_nodes_from(nodes_ )
+        G.add_weighted_edges_from([ e for e in edges_ ])
+        dc=nx.degree_centrality(G)
+        if len(dc)>0:
+            countries[country]=sum([v for v in dc.values()])/len(dc)
+
+    return render_template("main/country.html",
+                        title="Promedio grado de centralidad grafo por país",
+			data=countries,
+                        country_names=[x for x,y in sorted(countries.items(), key=operator.itemgetter(1),reverse=True)],
+			color_country=color_country,
+			name_country=name_country)
+
+@main_blueprint.route("/numbers/maxdc_country")
+@main_blueprint.route("/numbers/maxdc_country/<int:min_value>")
+def numbers_maxdc_country(min_value=5):
+    countries={}
+    for country in name_country.keys():
+        G = nx.DiGraph()
+        nodes_=set()
+        edges_=[]
+        targets_=set()
+        for node in json_graph['nodes']:
+            if node['type']==1 and node['country']==country:
+                nodes_.add(node['id'])
+            if node['type']==2:
+                targets_.add(node['id'])
+        for link in json_graph['links']:
+            if link['source'] in nodes_ and link['target'] in targets_ and link['ori_val']>=min_value:
+                nodes_.add(node['id'])
+                edges_.append((link['source'],link['target'],link['ori_val']))
+
+        G.add_nodes_from(nodes_ )
+        G.add_weighted_edges_from([ e for e in edges_ ])
+        dc=nx.degree_centrality(G)
+        if len(dc)>0:
+            m,nm=get_max(dc)
+            countries[country]=m
+
+    return render_template("main/country.html",
+                        title="Máximo grado de centralidad grafo por país",
+			data=countries,
+                        country_names=[x for x,y in sorted(countries.items(), key=operator.itemgetter(1),reverse=True)],
+			color_country=color_country,
+			name_country=name_country)
+
+
+
+
+@main_blueprint.route("/numbers/arcs_country")
+@main_blueprint.route("/numbers/arcs_country/<int:min_value>")
+def numbers_arcs_country(min_value=5):
+    countries={}
+    country_names={}
+    for country in name_country.keys():
+        nodes_=set()
+        cases=0
+        edges_=set()
+        targets_=set()
+        for node in json_graph['nodes']:
+            if node['type']==1 and node['country']==country:
+                nodes_.add(node['id'])
+                cases+=1
+            if node['type']==2:
+                targets_.add(node['id'])
+        for link in json_graph['links']:
+            if link['source'] in nodes_ and link['target'] in targets_ and link['ori_val']>=min_value:
+                nodes_.add(node['id'])
+                edges_.add((link['source'],link['target'],link['ori_val']))
+
+        if cases:
+            countries[country]=len(edges_)/cases
+            country_names[country]=name_country[country]+" ({})".format(cases)
+
+    return render_template("main/country.html",
+                        title="Arcos por país",
+			data=countries,
+                        country_names=[x for x,y in sorted(countries.items(), key=operator.itemgetter(1),reverse=True)],
+			color_country=color_country,
+			name_country=country_names)
+
+
+
+
+
+
 
 
 @main_blueprint.route("/numbers/documents_citation/<int:ntop>")
@@ -331,6 +486,8 @@ def get_max(dic):
             m=v
             nm=k
     return m,nm
+
+
 
 @main_blueprint.route("/graph.json")
 def graph_json():
@@ -467,3 +624,16 @@ def graph_json():
 
 
     return jsonify(graph_)
+
+
+
+
+@api_blueprint.route("/graph/case")
+def graph_cases():
+    cur=graph__.nodes.match("Case")
+    j=[]
+    for record in cur:
+        j.append({u'title':record['name']})
+    return jsonify(j)
+
+

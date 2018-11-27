@@ -1,0 +1,58 @@
+{% extends "_base.html" %}
+
+{% block css %}
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+{% endblock %}
+
+
+{% block content %}
+<div class="content">
+
+<h3>{{title}}</h3>
+<p>
+	<canvas id="histogram" width="400" height="400"></canvas>
+
+	<script>
+var ctx = document.getElementById("histogram");
+var myChart = new Chart(ctx, {
+    type: 'horizontalBar',
+    data: {
+        labels: [
+		{% for x in country_names %}
+			"{{name_country[x]}}",
+		{% endfor %}
+		],
+        datasets: [{
+            data: [
+			{% for x in country_names %}
+			"{{data[x]}}",
+			{% endfor %}
+			],
+			backgroundColor:[
+			{% for x in country_names %}
+			"{{color_country[x]}}",
+			{% endfor %}
+			],
+            borderWidth: 1
+        }]
+    },
+    options: {
+		legend: {
+			            display: false
+		},
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+</script>
+
+
+</p>
+</div>
+
+{% endblock %}
